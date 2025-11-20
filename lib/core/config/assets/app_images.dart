@@ -1,0 +1,34 @@
+class AppImages {
+  static const String basePath = 'assets/images/';
+  static const String format = '.png';
+  static const String logo = '${basePath}logo$format';
+  static const String logoWhite = '${basePath}logoWhite$format';
+  static const String jobseeker = '${basePath}user$format';
+  static const String company = '${basePath}company$format';
+  static const String profile = '${basePath}profile$format';
+  static const String email = '${basePath}email$format';
+  static const String google = '${basePath}google$format';
+  static const String gradientEmail = '${basePath}gradientEmail$format';
+  static const String userProfile = '${basePath}userProfile$format';
+  static const String dot = '${basePath}dot$format';
+  static const String doneSubmission = '${basePath}doneSubmission$format';
+  static const String not = '${basePath}not$format';
+  static const String addFinalis = '${basePath}addFinalis$format';
+  static const String blink = '${basePath}blink$format';
+  static const String aiLoading = '${basePath}aiLoading$format';
+  static const String satu = '${basePath}satu$format';
+  static const String dua = '${basePath}dua$format';
+  static const String tiga = '${basePath}tiga$format';
+  static const String promo = '${basePath}promo$format';
+  static const String uiux = '${basePath}uiux$format';
+  static const String mobile = '${basePath}mobile$format';
+  static const String py = '${basePath}py$format';
+  static const String be = '${basePath}be$format';
+  static const String fs = '${basePath}fs$format';
+  static const String premium1 = '${basePath}premium1$format';
+  static const String premium2 = '${basePath}premium2$format';
+  static const String premium3 = '${basePath}premium3$format';
+  static const String ligaEmas = '${basePath}ligaEmas$format';
+  static const String ligaPerak = '${basePath}ligaPerak$format';
+  static const String ligaTerkunci = '${basePath}ligaTerkunci$format';
+}

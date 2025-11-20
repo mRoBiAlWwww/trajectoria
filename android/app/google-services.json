@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "991376195963",
+    "project_id": "trajectoria-9023f",
+    "storage_bucket": "trajectoria-9023f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991376195963:android:ecfca9de7623022df57dde",
+        "android_client_info": {
+          "package_name": "com.example.trajectoria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991376195963-0e68s5p9mpu68rrv70ibcvmmmng3tnu6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trajectoria",
+            "certificate_hash": "905bd2e51d643bfcd9d58e059f6f7b0f26f4a002"
+          }
+        },
+        {
+          "client_id": "991376195963-71ge2d53admoulk0gejl8qba76146stt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFa4uYyaJx3JVO7ERSp-in7TnrRpbLSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991376195963-71ge2d53admoulk0gejl8qba76146stt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "991376195963-h1ilgg5ul8mkmrgbg12ne9ol7t85ctp7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.trajectoria"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
