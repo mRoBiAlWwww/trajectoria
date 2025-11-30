@@ -100,7 +100,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<CreateCompetitionRepository>(
     CreateCompetitionRepositoryImpl(),
   );
-  sl.registerSingleton<LeaderboardRepository>(LeaderboardRepositoryImpl());
+  sl.registerSingleton<LeaderboardRepository>(
+    LeaderboardRepositoryImpl(service: sl<LeaderboardServices>()),
+  );
 
   //usecases
   //auth
