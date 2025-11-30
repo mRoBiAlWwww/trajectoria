@@ -396,31 +396,3 @@ class CompetitionServiceImpl extends CompetitionService {
     }
   }
 }
-
-  // @override
-  // Future<String> isAlreadySubmitted(String competitionId) async {
-  //   var currentUser = FirebaseAuth.instance.currentUser;
-  //   try {
-  //     final jobseeker = await FirebaseFirestore.instance
-  //         .collection('Jobseeker')
-  //         .doc(currentUser!.uid)
-  //         .get();
-  //     if (!jobseeker.exists) return (false.toString());
-  //     final List<dynamic> onprogressCompetitionIds =
-  //         jobseeker['competitions_onprogress'] ?? [];
-  //     bool isSubmitted = onprogressCompetitionIds.contains(competitionId);
-  //     if (isSubmitted) {
-  //       return onprogressCompetitionIds[0];
-  //     }
-  //     final List<dynamic> doneCompetitionIds =
-  //         jobseeker['competitions_done'] ?? [];
-  //     isSubmitted = doneCompetitionIds.contains(competitionId);
-  //     if (isSubmitted) {
-  //       return "done";
-  //     }
-  //     return "notparticipation";
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //     throw Exception('Error mengecek status kompetisi $e');
-  //   }
-  // }
