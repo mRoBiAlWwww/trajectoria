@@ -98,7 +98,7 @@ Future<void> initializeDependencies() async {
     CreateCompImageRepositoryImpl(),
   );
   sl.registerSingleton<CreateCompetitionRepository>(
-    CreateCompetitionRepositoryImpl(),
+    CreateCompetitionRepositoryImpl(service: sl<CreateCompetitionService>()),
   );
   sl.registerSingleton<LeaderboardRepository>(
     LeaderboardRepositoryImpl(service: sl<LeaderboardServices>()),

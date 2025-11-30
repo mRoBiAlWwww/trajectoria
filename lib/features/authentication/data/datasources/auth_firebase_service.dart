@@ -35,7 +35,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         await userReturned.sendEmailVerification();
       }
 
-      return ("Signup berhasil");
+      return "Signup berhasil";
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
     } catch (_) {
@@ -51,7 +51,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
-      return ("Verifikasi email telah terkirim. Silahkan cek kotak masuk mu");
+      return "Verifikasi email telah terkirim. Silahkan cek kotak masuk mu";
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
     } catch (_) {
@@ -78,7 +78,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           .collection("Jobseeker")
           .doc(currentUser?.uid)
           .set(data);
-      return ("Signup telah berhasil");
+      return "Signup telah berhasil";
     } on FirebaseAuthException catch (e) {
       return _firebaseErrorMessage(e);
     } on FirebaseException catch (e) {
@@ -108,7 +108,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           .doc(currentUser?.uid)
           .set(data);
 
-      return ("Signup telah berhasil");
+      return "Signup telah berhasil";
     } on FirebaseAuthException catch (e) {
       return _firebaseErrorMessage(e);
     } on FirebaseException catch (e) {
@@ -124,7 +124,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
     try {
       await auth.sendPasswordResetEmail(email: email);
 
-      return ("Email reset password berhasil dikirim ke $email");
+      return "Email reset password berhasil dikirim ke $email";
     } on FirebaseAuthException catch (e) {
       return _firebaseErrorMessage(e);
     } catch (e) {
@@ -307,7 +307,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       await googleSignIn.signOut();
       await auth.signOut();
 
-      return ("Logout Success");
+      return "Logout Success";
     } catch (e) {
       throw Exception("Kesalahan saat logout: $e");
     }

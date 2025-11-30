@@ -7,120 +7,109 @@ import 'package:trajectoria/features/jobseeker/compete/data/models/finalis.dart'
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/submission.dart';
-import 'package:trajectoria/service_locator.dart';
 
 class CreateCompetitionRepositoryImpl extends CreateCompetitionRepository {
+  final CreateCompetitionService service;
+  CreateCompetitionRepositoryImpl({required this.service});
+
   @override
   Future<Either> createCompetition(CompetitionEntity newCompetition) async {
-    return await sl<CreateCompetitionService>().createCompetition(
-      CompetitionModel.fromEntity(newCompetition),
-    );
+    try {
+      final result = await service.createCompetition(
+        CompetitionModel.fromEntity(newCompetition),
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> draftCompetition(CompetitionEntity newCompetition) async {
-    return await sl<CreateCompetitionService>().draftCompetition(
-      CompetitionModel.fromEntity(newCompetition),
-    );
+    try {
+      final result = await service.draftCompetition(
+        CompetitionModel.fromEntity(newCompetition),
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getDraftCompetitions() async {
-    var drafts = await sl<CreateCompetitionService>().getDraftCompetitions();
-    return drafts.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getDraftCompetitions();
+      return Right(
+        List.from(
+          result,
+        ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getCompetitions() async {
-    var competitions = await sl<CreateCompetitionService>().getCompetitions();
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getCompetitions();
+      return Right(
+        List.from(
+          result,
+        ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> deleteCompetitionById(String competitionId) async {
-    var competitions = await sl<CreateCompetitionService>()
-        .deleteCompetitionById(competitionId);
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-      },
-    );
+    try {
+      final result = await service.deleteCompetitionById(competitionId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getCompetitionById(String competitionId) async {
-    var competitions = await sl<CreateCompetitionService>().getCompetitionById(
-      competitionId,
-    );
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(CompetitionModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final result = await service.getCompetitionById(competitionId);
+      return Right(CompetitionModel.fromMap(result).toEntity());
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getCompetitionsByTitle(String keyword) async {
-    var competitions = await sl<CreateCompetitionService>()
-        .getCompetitionsByTitle(keyword);
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getCompetitionsByTitle(keyword);
+      return Right(
+        List.from(
+          result,
+        ).map((e) => CompetitionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getJobseekerSubmissions(String competitionId) async {
-    var submissions = await sl<CreateCompetitionService>()
-        .getJobseekerSubmissions(competitionId);
-    return submissions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getJobseekerSubmissions(competitionId);
+      return Right(
+        List.from(
+          result,
+        ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
@@ -129,35 +118,26 @@ class CreateCompetitionRepositoryImpl extends CreateCompetitionRepository {
     required String problemStatement,
     required List<String> fileUrls,
   }) async {
-    var analyzedStatus = await sl<CreateCompetitionService>().analyzeSubmission(
-      problemStatement: problemStatement,
-      submissionId: submissionId,
-      fileUrls: fileUrls,
-    );
-    return analyzedStatus.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-        // return Right(InsightAIModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final result = await service.analyzeSubmission(
+        problemStatement: problemStatement,
+        submissionId: submissionId,
+        fileUrls: fileUrls,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getUserInfo(String submissionId) async {
-    var userInfo = await sl<CreateCompetitionService>().getUserInfo(
-      submissionId,
-    );
-    return userInfo.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(JobSeekerModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final result = await service.getUserInfo(submissionId);
+      return Right(JobSeekerModel.fromMap(result).toEntity());
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
@@ -166,19 +146,12 @@ class CreateCompetitionRepositoryImpl extends CreateCompetitionRepository {
     String feedback,
     String submissionId,
   ) async {
-    var userInfo = await sl<CreateCompetitionService>().scoring(
-      totalScore,
-      feedback,
-      submissionId,
-    );
-    return userInfo.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-      },
-    );
+    try {
+      final result = await service.scoring(totalScore, feedback, submissionId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
@@ -187,88 +160,69 @@ class CreateCompetitionRepositoryImpl extends CreateCompetitionRepository {
     String name,
     String imageUrl,
   ) async {
-    var userInfo = await sl<CreateCompetitionService>().addToFinalis(
-      finalis.toModel(),
-      name,
-      imageUrl,
-    );
-    return userInfo.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-      },
-    );
+    try {
+      final result = await service.addToFinalis(
+        finalis.toModel(),
+        name,
+        imageUrl,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getFinalis(String competitionId) async {
-    var competitions = await sl<CreateCompetitionService>().getFinalis(
-      competitionId,
-    );
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => FinalisModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getFinalis(competitionId);
+      return Right(
+        List.from(
+          result,
+        ).map((e) => FinalisModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> deleteFinalis(String finalisId) async {
-    var competitions = await sl<CreateCompetitionService>().deleteFinalis(
-      finalisId,
-    );
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-      },
-    );
+    try {
+      final result = await service.deleteFinalis(finalisId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getJobseekerSubmissionsIncrement(String competitionId) async {
-    var submissions = await sl<CreateCompetitionService>()
-        .getJobseekerSubmissionsIncrement(competitionId);
-    return submissions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getJobseekerSubmissionsIncrement(
+        competitionId,
+      );
+      return Right(
+        List.from(
+          result,
+        ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getAcrossJobseekerSubmissions() async {
-    var submissions = await sl<CreateCompetitionService>()
-        .getAcrossJobseekerSubmissions();
-    return submissions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getAcrossJobseekerSubmissions();
+      return Right(
+        List.from(
+          result,
+        ).map((e) => SubmissionModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 }

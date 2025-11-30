@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -11,37 +10,42 @@ import 'package:trajectoria/features/jobseeker/compete/data/models/competitions.
 import 'package:trajectoria/features/jobseeker/compete/data/models/finalis.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/insightAI.dart';
 
 abstract class CreateCompetitionService {
-  Future<Either> createCompetition(CompetitionModel newCompetition);
-  Future<Either> draftCompetition(CompetitionModel newCompetition);
-  Future<Either> getDraftCompetitions();
-  Future<Either> getCompetitions();
-  Future<Either> getCompetitionById(String competitionId);
-  Future<Either> deleteCompetitionById(String competitionId);
-  Future<Either> getCompetitionsByTitle(String keyword);
-  Future<Either> getJobseekerSubmissions(String competitionId);
-  Future<Either> analyzeSubmission({
+  Future<String> createCompetition(CompetitionModel newCompetition);
+  Future<String> draftCompetition(CompetitionModel newCompetition);
+  Future<List<Map<String, dynamic>>> getDraftCompetitions();
+  Future<List<Map<String, dynamic>>> getCompetitions();
+  Future<Map<String, dynamic>> getCompetitionById(String competitionId);
+  Future<String> deleteCompetitionById(String competitionId);
+  Future<List<Map<String, dynamic>>> getCompetitionsByTitle(String keyword);
+  Future<List<Map<String, dynamic>>> getJobseekerSubmissions(
+    String competitionId,
+  );
+  Future<Map<String, dynamic>> getUserInfo(String submissionId);
+  Future<InsightAIEntity> analyzeSubmission({
     required String submissionId,
     required String problemStatement,
     required List<String> fileUrls,
   });
-  Future<Either> getUserInfo(String submissionId);
-  Future<Either> scoring(int totalScore, String feedback, String submissionId);
-  Future<Either> addToFinalis(
+  Future<String> scoring(int totalScore, String feedback, String submissionId);
+  Future<String> addToFinalis(
     SubmissionModel finalis,
     String name,
     String imageUrl,
   );
-  Future<Either> getFinalis(String competitionId);
-  Future<Either> deleteFinalis(String finalisId);
-  Future<Either> getJobseekerSubmissionsIncrement(String competitionId);
-  Future<Either> getAcrossJobseekerSubmissions();
+  Future<List<Map<String, dynamic>>> getFinalis(String competitionId);
+  Future<String> deleteFinalis(String finalisId);
+  Future<List<Map<String, dynamic>>> getJobseekerSubmissionsIncrement(
+    String competitionId,
+  );
+  Future<List<Map<String, dynamic>>> getAcrossJobseekerSubmissions();
 }
 
 class CreateCompetitionServiceImpl extends CreateCompetitionService {
   @override
-  Future<Either> createCompetition(CompetitionModel newCompetition) async {
+  Future<String> createCompetition(CompetitionModel newCompetition) async {
     final firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
 
@@ -49,7 +53,7 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
     try {
       if (newCompetition.competitionId.isEmpty) {
         final competitionId = firestoreInstance
-            .collection('Competitions')
+            .collection("Competitions")
             .doc()
             .id;
 
@@ -60,30 +64,30 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
           status: "Dirilis",
         );
         await firestoreInstance
-            .collection('Competitions')
+            .collection("Competitions")
             .doc(competitionId)
             .set(updatedEntity.toMap());
-        return Right(competitionId);
+        return competitionId;
       } else {
         debugPrint(newCompetition.status);
         await firestoreInstance
-            .collection('Competitions')
+            .collection("Competitions")
             .doc(newCompetition.competitionId)
             .set(newCompetition.toMap());
-        return Right(newCompetition.competitionId);
+        return newCompetition.competitionId;
       }
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error Gagal membuat kompetisi: $e");
     }
   }
 
   @override
-  Future<Either> draftCompetition(CompetitionModel newCompetition) async {
+  Future<String> draftCompetition(CompetitionModel newCompetition) async {
     final firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
       final competitionId = firestoreInstance
-          .collection('Draft_competitions')
+          .collection("Draft_competitions")
           .doc()
           .id;
 
@@ -91,170 +95,174 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
         competitionId: competitionId,
         companyId: currentUser!.uid,
       );
-      debugPrint("Draft Competition Service Called 1");
       await firestoreInstance
-          .collection('Draft_competitions')
+          .collection("Draft_competitions")
           .doc(competitionId)
           .set(updatedEntity.toMap());
-      debugPrint("Draft Competition Service Called 2");
-      debugPrint(competitionId);
-      return Right(competitionId);
+      return competitionId;
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error Gagal membuat draft kompetisi: $e");
     }
   }
 
   @override
-  Future<Either> getDraftCompetitions() async {
+  Future<List<Map<String, dynamic>>> getDraftCompetitions() async {
     final firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
       var drafts = await firestoreInstance
-          .collection('Draft_competitions')
-          .where('company_id', isEqualTo: currentUser!.uid)
+          .collection("Draft_competitions")
+          .where("company_id", isEqualTo: currentUser!.uid)
           .get();
-      debugPrint(currentUser.uid);
-      return Right(drafts.docs.map((e) => e.data()).toList());
+      return drafts.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error Gagal mengambil daftar draft kompetisi: $e");
     }
   }
 
   @override
-  Future<Either> getCompetitions() async {
+  Future<List<Map<String, dynamic>>> getCompetitions() async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
       var competitions = await firestoreInstance
-          .collection('Competitions')
-          .where('company_id', isEqualTo: currentUser!.uid)
+          .collection("Competitions")
+          .where("company_id", isEqualTo: currentUser!.uid)
           .get();
 
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error Gagal mengambil daftar kompetisi: $e");
     }
   }
 
   @override
-  Future<Either> getCompetitionById(String competitionId) async {
+  Future<Map<String, dynamic>> getCompetitionById(String competitionId) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var competitions = await firestoreInstance
-          .collection('Competitions')
-          .where('competition_id', isEqualTo: competitionId)
+          .collection("Competitions")
+          .where("competition_id", isEqualTo: competitionId)
           .limit(1)
           .get();
 
-      debugPrint("Get Competition By Id Service Called");
-      return Right(competitions.docs.first.data());
+      return competitions.docs.first.data();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error Gagal mengambil kompetisi berdasarkan ID: $e");
     }
   }
 
   @override
-  Future<Either> deleteCompetitionById(String competitionId) async {
+  Future<String> deleteCompetitionById(String competitionId) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       await firestoreInstance
-          .collection('Competitions')
+          .collection("Competitions")
           .doc(competitionId)
           .delete();
 
-      return Right("Competition was successfully deleted");
+      return "Kompetisi berhasil dihapus";
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error Gagal menghapus kompetisi: $e");
     }
   }
 
   @override
-  Future<Either> getCompetitionsByTitle(String keyword) async {
+  Future<List<Map<String, dynamic>>> getCompetitionsByTitle(
+    String keyword,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     final String capitalizedKeyword = capitalizeWords(keyword);
 
     if (capitalizedKeyword.isEmpty) {
-      debugPrint("Keyword kosong, mengembalikan list kosong.");
-      return Right([]);
+      debugPrint("Keyword kosong, mengembalikan list kosong");
+      return [];
     }
     try {
       final competitions = await firestoreInstance
-          .collection('Competitions')
-          .where('company_id', isEqualTo: currentUser!.uid)
-          .orderBy('title')
+          .collection("Competitions")
+          .where("company_id", isEqualTo: currentUser!.uid)
+          .orderBy("title")
           .startAt([capitalizedKeyword])
-          .endAt(['$capitalizedKeyword\uf8ff'])
+          .endAt(["$capitalizedKeyword\uf8ff"])
           .get();
 
-      debugPrint("jangan");
-      debugPrint("Mencari: $capitalizedKeyword");
-      debugPrint(competitions.docs.length.toString());
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        "Error Gagal mengambil daftar kompetisi berdasarkan title: $e",
+      );
     }
   }
 
   @override
-  Future<Either> getJobseekerSubmissions(String competitionId) async {
+  Future<List<Map<String, dynamic>>> getJobseekerSubmissions(
+    String competitionId,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       final submissions = await firestoreInstance
-          .collection('Submissions')
-          .where('competition_id', isEqualTo: competitionId)
+          .collection("Submissions")
+          .where("competition_id", isEqualTo: competitionId)
           .get();
 
-      return Right(submissions.docs.map((e) => e.data()).toList());
+      return submissions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        "Error Gagal mengambil daftar submission dari jobseeker: $e",
+      );
     }
   }
 
   @override
-  Future<Either> getUserInfo(String submissionId) async {
+  Future<Map<String, dynamic>> getUserInfo(String submissionId) async {
     final firestoreInstance = FirebaseFirestore.instance;
 
     try {
       final submissionDoc = await firestoreInstance
-          .collection('Submissions')
+          .collection("Submissions")
           .doc(submissionId)
           .get();
 
-      if (!submissionDoc.exists) return Left('Submission not found');
+      if (!submissionDoc.exists) throw Exception("Submission tidak ditemukan");
       final submissionData = submissionDoc.data()!;
 
       final competitionParticipantId =
-          submissionData['competition_participants_id'];
+          submissionData["competition_participants_id"];
       debugPrint(competitionParticipantId);
 
       final participantDoc = await firestoreInstance
-          .collection('Competition_participants')
+          .collection("Competition_participants")
           .doc(competitionParticipantId)
           .get();
 
-      if (!participantDoc.exists) return Left('Participant not found');
-      final userId = participantDoc.data()?['user_id'] as String?;
+      if (!participantDoc.exists) {
+        throw Exception("Partisipan dari kompetisi tidak ditemukan");
+      }
+      final userId = participantDoc.data()?["user_id"] as String?;
 
-      if (userId == null || userId.isEmpty) return Left('User ID not found');
+      if (userId == null || userId.isEmpty) {
+        throw Exception("ID partisipan dari kompetisi tidak ditemukan");
+      }
 
       final userDoc = await firestoreInstance
-          .collection('Jobseeker')
+          .collection("Jobseeker")
           .doc(userId)
           .get();
 
-      if (userDoc.exists) {
-        return Right(userDoc.data());
-      } else {
-        return Left('User not found');
+      if (!userDoc.exists) {
+        throw Exception("Jobseeker tidak ditemukan");
       }
+
+      return userDoc.data()!;
     } catch (e) {
-      return Left("error $e");
+      throw Exception("Error gagal mendapatkan informasi jobseeker $e");
     }
   }
 
   @override
-  Future<Either> analyzeSubmission({
+  Future<InsightAIEntity> analyzeSubmission({
     required String submissionId,
     required String problemStatement,
     required List<String> fileUrls,
@@ -276,9 +284,9 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
         }
         final Uint8List fileBytes = response.bodyBytes;
 
-        final mimeType = fileUrl.endsWith('.pdf')
-            ? 'application/pdf'
-            : 'image/jpeg';
+        final mimeType = fileUrl.endsWith(".pdf")
+            ? "application/pdf"
+            : "image/jpeg";
 
         final analysisResultSummary = Content.multi([
           TextPart(
@@ -309,44 +317,41 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
         combinedProblemSolution.addAll(problemSolutionList);
       }
       final data = {
-        'common_pattern': combinedProblemSolution.take(5).toList(),
-        'summary': combinedSummary.take(5).toList(),
+        "common_pattern": combinedProblemSolution.take(5).toList(),
+        "summary": combinedSummary.take(5).toList(),
       };
-      await firestoreInstance.collection('Submissions').doc(submissionId).set({
-        'ai_analyzed': data,
+      await firestoreInstance.collection("Submissions").doc(submissionId).set({
+        "ai_analyzed": data,
       }, SetOptions(merge: true));
 
-      return Right(InsightAIModel.fromMap(data).toEntity());
+      return InsightAIModel.fromMap(data).toEntity();
     } catch (e) {
-      return Left("Analisa Gagal: $e");
+      throw Exception("Error Analisa Gagal: $e");
     }
   }
 
   @override
-  Future<Either> scoring(
+  Future<String> scoring(
     int totalScore,
     String feedback,
     String submissionId,
   ) async {
-    debugPrint(totalScore.toString());
-    debugPrint(feedback);
-    debugPrint(submissionId);
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
-      await firestoreInstance.collection('Submissions').doc(submissionId).set({
-        'score': totalScore,
-        'feedback': feedback,
-        'isChecked': true,
+      await firestoreInstance.collection("Submissions").doc(submissionId).set({
+        "score": totalScore,
+        "feedback": feedback,
+        "isChecked": true,
       }, SetOptions(merge: true));
 
-      return Right("Score was successfully");
+      return "Score telah berhasil ditambahkan";
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error score tidak berhasil ditambahkan $e");
     }
   }
 
   @override
-  Future<Either> addToFinalis(
+  Future<String> addToFinalis(
     SubmissionModel finalis,
     String name,
     String imageUrl,
@@ -355,15 +360,15 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
 
     try {
       final alreadyInFinal = await FirebaseFirestore.instance
-          .collection('Finalis')
-          .where('submissions_id', isEqualTo: finalis.submissionId)
+          .collection("Finalis")
+          .where("submissions_id", isEqualTo: finalis.submissionId)
           .get();
 
       if (alreadyInFinal.docs.isNotEmpty) {
-        return Right("User sudah ada di final");
+        return "Partisipan ini sudah ada di final";
       }
 
-      final finalisId = firestoreInstance.collection('Finalis').doc().id;
+      final finalisId = firestoreInstance.collection("Finalis").doc().id;
 
       FinalisModel userFinalis = FinalisModel(
         finalisId: finalisId,
@@ -375,58 +380,64 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
         submittedAt: finalis.submittedAt,
       );
       await firestoreInstance
-          .collection('Finalis')
+          .collection("Finalis")
           .doc(finalisId)
           .set(userFinalis.toMap());
-      return Right(finalisId);
+      return finalisId;
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error partisipan gagal ditambahkan ke finalis $e");
     }
   }
 
   @override
-  Future<Either> getFinalis(String competitionId) async {
+  Future<List<Map<String, dynamic>>> getFinalis(String competitionId) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var finalis = await firestoreInstance
-          .collection('Finalis')
-          .where('competition_id', isEqualTo: competitionId)
+          .collection("Finalis")
+          .where("competition_id", isEqualTo: competitionId)
           .get();
-      return Right(finalis.docs.map((e) => e.data()).toList());
+      return finalis.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error partisipan gagal ditambahkan ke finalis $e");
     }
   }
 
   @override
-  Future<Either> deleteFinalis(String finalisId) async {
+  Future<String> deleteFinalis(String finalisId) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
-      await firestoreInstance.collection('Finalis').doc(finalisId).delete();
-      return Right("data was successfull delete");
+      await firestoreInstance.collection("Finalis").doc(finalisId).delete();
+      return "Partisipan telah berhasil dihapus dari daftar finalis";
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        "Error gagal menghapus partisipan dari daftar finalis $e",
+      );
     }
   }
 
   @override
-  Future<Either> getJobseekerSubmissionsIncrement(String competitionId) async {
+  Future<List<Map<String, dynamic>>> getJobseekerSubmissionsIncrement(
+    String competitionId,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       final submissions = await firestoreInstance
-          .collection('Submissions')
-          .where('competition_id', isEqualTo: competitionId)
-          .orderBy('score', descending: true)
+          .collection("Submissions")
+          .where("competition_id", isEqualTo: competitionId)
+          .orderBy("score", descending: true)
           .get();
 
-      return Right(submissions.docs.map((e) => e.data()).toList());
+      return submissions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        "Error gagal mendapatkan list peringkat dari submissions $e",
+      );
     }
   }
 
   @override
-  Future<Either> getAcrossJobseekerSubmissions() async {
+  Future<List<Map<String, dynamic>>> getAcrossJobseekerSubmissions() async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
 
@@ -434,14 +445,14 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
       final uid = currentUser!.uid;
 
       final competitionsSnap = await firestoreInstance
-          .collection('Competitions')
-          .where('company_id', isEqualTo: uid)
+          .collection("Competitions")
+          .where("company_id", isEqualTo: uid)
           .get();
 
       final compIds = competitionsSnap.docs.map((e) => e.id).toList();
 
       if (compIds.isEmpty) {
-        return Right([]);
+        return [];
       }
 
       List<Map<String, dynamic>> allSubs = [];
@@ -453,16 +464,16 @@ class CreateCompetitionServiceImpl extends CreateCompetitionService {
         );
 
         final subSnap = await firestoreInstance
-            .collection('Submissions')
-            .where('competition_id', whereIn: chunk)
+            .collection("Submissions")
+            .where("competition_id", whereIn: chunk)
             .get();
 
         allSubs.addAll(subSnap.docs.map((e) => e.data()).toList());
       }
 
-      return Right(allSubs);
+      return allSubs;
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error coba lagi $e");
     }
   }
 }
