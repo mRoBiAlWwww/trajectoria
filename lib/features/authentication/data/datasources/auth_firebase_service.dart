@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:trajectoria/features/authentication/data/models/company_signup_req.dart';
@@ -9,20 +8,20 @@ import 'package:trajectoria/features/authentication/data/models/user_signup_req.
 import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthFirebaseService {
-  Future<Either> signup(UserSignupReq user);
-  Future<Either> resendVerificationEmail();
-  Future<Either> additionalUserInfoJobSeeker(JobseekerSignupReq user);
-  Future<Either> additionalUserInfoCompany(CompanySignupReq user);
-  Future<Either> forgotPassword(String email);
-  Future<Either> signin(UserSigninReq user);
-  Future<Either> signInWithGoogle(String role);
-  Future<Either> getCurrentUser();
-  Future<Either> signOut();
+  Future<String> signup(UserSignupReq user);
+  Future<String> resendVerificationEmail();
+  Future<String> additionalUserInfoJobSeeker(JobseekerSignupReq user);
+  Future<String> additionalUserInfoCompany(CompanySignupReq user);
+  Future<String> forgotPassword(String email);
+  Future<(Map<String, dynamic>, String)> signin(UserSigninReq user);
+  Future<(Map<String, dynamic>, String)> signInWithGoogle(String role);
+  Future<(Map<String, dynamic>, String)> getCurrentUser();
+  Future<String> signOut();
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
   @override
-  Future<Either> signup(UserSignupReq user) async {
+  Future<String> signup(UserSignupReq user) async {
     try {
       var returnedData = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -36,52 +35,38 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         await userReturned.sendEmailVerification();
       }
 
-      return const Right(true);
+      return ("Signup berhasil");
     } on FirebaseAuthException catch (e) {
-      String message = '';
-
-      if (e.code == 'weak-password') {
-        message = 'Password terlalu lemah!';
-      } else if (e.code == 'email-already-in-use') {
-        message = 'Email telah digunakan!';
-      } else {
-        message = "Harap masukkan data diri dengan teliti";
-      }
-      return Left(message);
+      throw Exception(_firebaseErrorMessage(e));
+    } catch (_) {
+      throw Exception("Harap masukkan data diri dengan teliti");
     }
   }
 
   @override
-  Future<Either> resendVerificationEmail() async {
+  Future<String> resendVerificationEmail() async {
     try {
       final User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
-      return const Right(
-        'Verification email has been sent again. Please check your inbox.',
-      );
+      return ("Verifikasi email telah terkirim. Silahkan cek kotak masuk mu");
     } on FirebaseAuthException catch (e) {
-      String message = '';
-      if (e.code == 'too-many-requests') {
-        message =
-            'You have requested a verification email too recently. Please try again later.';
-      } else {
-        message = 'An error occurred: ${e.message ?? 'Unknown error'}';
-      }
-      return Left(message);
+      throw Exception(_firebaseErrorMessage(e));
+    } catch (_) {
+      throw Exception("Harap masukkan data diri dengan teliti");
     }
   }
 
   @override
-  Future<Either> additionalUserInfoJobSeeker(JobseekerSignupReq user) async {
+  Future<String> additionalUserInfoJobSeeker(JobseekerSignupReq user) async {
     try {
       final firestoreInstance = FirebaseFirestore.instance;
       var currentUser = FirebaseAuth.instance.currentUser;
 
       Map<String, dynamic> data = user.toJobseekerModel().toMap();
-      data['user_id'] = currentUser?.uid;
+      data["user_id"] = currentUser?.uid;
 
       //dihapus dari entitas Unrole
       await firestoreInstance
@@ -90,25 +75,27 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           .delete();
 
       await firestoreInstance
-          .collection('Jobseeker')
+          .collection("Jobseeker")
           .doc(currentUser?.uid)
           .set(data);
-      return const Right('Sign up was successfull');
+      return ("Signup telah berhasil");
+    } on FirebaseAuthException catch (e) {
+      return _firebaseErrorMessage(e);
     } on FirebaseException catch (e) {
-      return Left(e.message ?? 'A Firebase error occurred.');
+      throw Exception("Terjadi kesalahan saat mengakses menyimpan data: $e");
     } catch (e) {
-      return Left('An unexpected error occurred: ${e.toString()}');
+      throw Exception("Unexpected error: $e");
     }
   }
 
   @override
-  Future<Either> additionalUserInfoCompany(CompanySignupReq user) async {
+  Future<String> additionalUserInfoCompany(CompanySignupReq user) async {
     try {
       final firestoreInstance = FirebaseFirestore.instance;
       var currentUser = FirebaseAuth.instance.currentUser;
 
       Map<String, dynamic> data = user.toCompanyModel().toMap();
-      data['user_id'] = currentUser?.uid;
+      data["user_id"] = currentUser?.uid;
 
       //dihapus dari entitas Unrole
       await firestoreInstance
@@ -117,57 +104,37 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           .delete();
 
       await firestoreInstance
-          .collection('Company')
+          .collection("Company")
           .doc(currentUser?.uid)
           .set(data);
 
-      // final companyEntity = user.toCompanyEntity();
-      // final updatedUser = companyEntity.copyWith(userId: currentUser?.uid);
-      // user.role == "Jobseeker"
-      //     ? await firestoreInstance
-      //           .collection('Jobseeker')
-      //           .doc(user.userId)
-      //           .set(updatedUser.toMap())
-      //     : await firestoreInstance
-      //           .collection('Company')
-      //           .doc(user.userId)
-      //           .set(updatedUser.toMap());
-      return const Right('Sign up was successfull');
+      return ("Signup telah berhasil");
+    } on FirebaseAuthException catch (e) {
+      return _firebaseErrorMessage(e);
     } on FirebaseException catch (e) {
-      return Left(e.message ?? 'A Firebase error occurred.');
+      throw Exception("Terjadi kesalahan saat  menyimpan data: $e");
     } catch (e) {
-      return Left('An unexpected error occurred: ${e.toString()}');
+      throw Exception("Terjadi kesalahan tak terduga: $e");
     }
   }
 
   @override
-  Future<Either> forgotPassword(String email) async {
+  Future<String> forgotPassword(String email) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     try {
       await auth.sendPasswordResetEmail(email: email);
 
-      return Right('Email reset password berhasil dikirim ke $email.');
+      return ("Email reset password berhasil dikirim ke $email");
     } on FirebaseAuthException catch (e) {
-      String message = 'Gagal mengirim email reset password.';
-
-      if (e.code == 'user-not-found') {
-        message = 'Tidak ada pengguna yang terdaftar dengan email ini.';
-      } else if (e.code == 'invalid-email') {
-        message = 'Format email tidak valid.';
-      } else {
-        message = e.message ?? 'Gagal mengirim email reset password.';
-      }
-
-      return Left(message);
+      return _firebaseErrorMessage(e);
     } catch (e) {
-      return Left('Terjadi kesalahan tak terduga: ${e.toString()}');
+      throw Exception("Terjadi kesalahan tak terduga: $e");
     }
   }
 
   @override
-  Future<Either> signin(UserSigninReq user) async {
+  Future<(Map<String, dynamic>, String)> signin(UserSigninReq user) async {
     try {
-      DocumentSnapshot userDoc;
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       final userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
@@ -178,86 +145,47 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       final userId = userCredential.user?.uid;
 
       if (userId == null) {
-        return const Left('User ID tidak ditemukan setelah login.');
+        throw Exception("User ID tidak ditemukan setelah login");
       }
 
       final querySnapshot = await firestoreInstance
-          .collection('Jobseeker')
-          .where('email', isEqualTo: user.email)
+          .collection("Jobseeker")
+          .where("email", isEqualTo: user.email)
           .limit(1)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        userDoc = querySnapshot.docs.first;
-        return Right([userDoc.data(), "Jobseeker"]);
+        return (querySnapshot.docs.first.data(), "Jobseeker");
       } else {
         final companySnapshot = await firestoreInstance
-            .collection('Company')
-            .where('email', isEqualTo: user.email)
+            .collection("Company")
+            .where("email", isEqualTo: user.email)
             .limit(1)
             .get();
 
         if (companySnapshot.docs.isNotEmpty) {
-          userDoc = companySnapshot.docs.first;
-          return Right([userDoc.data(), "Company"]);
+          return (companySnapshot.docs.first.data(), "Company");
         } else {
-          return const Left('Gagal mengambil data pengguna setelah login.');
+          throw Exception("Gagal mengambil data pengguna setelah login");
         }
       }
-      // final querySnapshot = await firestoreInstance
-      //     .collection('Jobseeker')
-      //     .where('email', isEqualTo: user.email)
-      //     .limit(1)
-      //     .get();
-
-      // if (querySnapshot.docs.isNotEmpty) {
-      //   userDoc = querySnapshot.docs.first;
-      //   return Right(userDoc.data());
-      // } else {
-      //   final companySnapshot = await firestoreInstance
-      //       .collection('Company')
-      //       .where('email', isEqualTo: user.email)
-      //       .limit(1)
-      //       .get();
-
-      //   if (companySnapshot.docs.isNotEmpty) {
-      //     userDoc = companySnapshot.docs.first;
-      //     return Right(userDoc.data());
-      //   } else {
-      //     return const Left('Gagal mengambil data pengguna setelah login.');
-      //   }
-      // }
     } on FirebaseAuthException catch (e) {
-      String message = 'Login gagal.';
-
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        message = 'Email atau kata sandi salah.';
-      } else if (e.code == 'invalid-email') {
-        message = 'Format email tidak valid.';
-      } else if (e.code == 'user-disabled') {
-        message = 'Akun pengguna ini telah dinonaktifkan.';
-      } else {
-        message = e.message ?? 'Gagal login karena kesalahan tak terduga.';
-      }
-      return Left(message);
-    } catch (e) {
-      return Left('Terjadi kesalahan umum: ${e.toString()}');
+      throw Exception(_firebaseErrorMessage(e));
     }
   }
 
   @override
-  Future<Either> signInWithGoogle(String role) async {
+  Future<(Map<String, dynamic>, String)> signInWithGoogle(String role) async {
     try {
       //initialisasi
       final GoogleSignIn googleSignIn = GoogleSignIn();
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       final FirebaseAuth authInstance = FirebaseAuth.instance;
-      DocumentSnapshot userDoc;
 
       //proses auth dengan google
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        return const Left('Proses login Google dibatalkan oleh pengguna.');
+        throw Exception("Proses login Google dibatalkan oleh pengguna");
       }
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -270,29 +198,30 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       //cek ketersedian user di db
       final User? currentUser = userCredential.user;
-      final querySnapshot = await firestoreInstance
-          .collection('Jobseeker')
-          .where('email', isEqualTo: currentUser!.email)
+
+      if (currentUser == null) {
+        throw Exception("User Google tidak ditemukan.");
+      }
+
+      final jobseekerSnapshot = await firestoreInstance
+          .collection("Jobseeker")
+          .where("email", isEqualTo: currentUser.email)
           .limit(1)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        userDoc = querySnapshot.docs.first;
+      if (jobseekerSnapshot.docs.isNotEmpty) {
         //user lama
-        // return Right(false);
-        return Right([userDoc.data(), "Jobseeker"]);
+        return (jobseekerSnapshot.docs.first.data(), "Jobseeker");
       } else {
         final companySnapshot = await firestoreInstance
-            .collection('Company')
-            .where('email', isEqualTo: currentUser.email)
+            .collection("Company")
+            .where("email", isEqualTo: currentUser.email)
             .limit(1)
             .get();
 
         if (companySnapshot.docs.isNotEmpty) {
-          userDoc = companySnapshot.docs.first;
           //user lama
-          // return Right(false);
-          return Right([userDoc.data(), "Company"]);
+          return (companySnapshot.docs.first.data(), "Company");
         } else {
           //user baru
           final newUserData = {
@@ -316,96 +245,92 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
               .collection(role)
               .doc(currentUser.uid)
               .set(newUserData);
-          // return Right(true);
-          return Right([newUserData, role]);
+          return (newUserData, role);
         }
       }
     } on FirebaseAuthException catch (e) {
-      return Left('Login Google gagal: ${e.message}');
+      throw Exception(_firebaseErrorMessage(e));
     } on Exception catch (e) {
-      return Left('Kesalahan pada layanan Google: ${e.toString()}');
+      throw Exception("Kesalahan pada layanan Google: $e");
     }
   }
 
   @override
-  Future<Either> getCurrentUser() async {
+  Future<(Map<String, dynamic>, String)> getCurrentUser() async {
     try {
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       var currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        debugPrint("Tidak ada pengguna yang login (currentUser is null)");
-        return const Left('Unauthenticated');
+        throw Exception("Unauthenticated");
       }
-      DocumentSnapshot userDoc;
 
       debugPrint(currentUser.uid);
-      userDoc = await firestoreInstance
-          .collection('Jobseeker')
+      final jobseekerUserDoc = await firestoreInstance
+          .collection("Jobseeker")
           .doc(currentUser.uid)
           .get();
 
-      if (userDoc.exists) {
-        return Right([userDoc.data(), "Jobseeker"]);
+      if (jobseekerUserDoc.exists) {
+        return (jobseekerUserDoc.data()!, "Jobseeker");
       }
 
-      userDoc = await firestoreInstance
-          .collection('Company')
+      final companyUserDoc = await firestoreInstance
+          .collection("Company")
           .doc(currentUser.uid)
           .get();
 
-      if (userDoc.exists) {
-        return Right([userDoc.data(), "Company"]);
+      if (companyUserDoc.exists) {
+        return (companyUserDoc.data()!, "Company");
       }
 
-      userDoc = await firestoreInstance
-          .collection('Unrole')
+      final unroleUserDoc = await firestoreInstance
+          .collection("Unrole")
           .doc(currentUser.uid)
           .get();
 
-      if (userDoc.exists) {
-        return Right([userDoc.data(), "Unrole"]);
-      } else {
-        return const Left('Gagal mengambil data pengguna setelah login.');
+      if (unroleUserDoc.exists) {
+        return (unroleUserDoc.data()!, "Unrole");
       }
-      // userDoc = await firestoreInstance
-      //     .collection('Jobseeker')
-      //     .doc(currentUser?.uid)
-      //     .get();
-
-      // if (!userDoc.exists) {
-      //   userDoc = await firestoreInstance
-      //       .collection('Company')
-      //       .doc(currentUser?.uid)
-      //       .get();
-      // }
-      // if (!userDoc.exists) {
-      //   userDoc = await firestoreInstance
-      //       .collection('Unrole')
-      //       .doc(currentUser?.uid)
-      //       .get();
-      // }
-
-      // if (!userDoc.exists) {
-      //   return const Left('Gagal mengambil data pengguna setelah login.');
-      // }
-
-      // return Right(userDoc.data());
+      throw Exception("Data pengguna tidak ditemukan");
+    } on FirebaseException catch (e) {
+      throw Exception("Kesalahan saat mengambil data pengguna: $e");
     } catch (e) {
-      return Left('Kesalahan saat mengambil data pengguna: $e');
+      throw Exception("Terjadi kesalahan tak terduga: $e");
     }
   }
 
   @override
-  Future<Either> signOut() async {
+  Future<String> signOut() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final GoogleSignIn googleSignIn = GoogleSignIn();
     try {
       await googleSignIn.signOut();
       await auth.signOut();
 
-      return Right("Logout Success");
+      return ("Logout Success");
     } catch (e) {
-      return Left('Kesalahan saat logout: $e');
+      throw Exception("Kesalahan saat logout: $e");
     }
+  }
+
+  String _firebaseErrorMessage(FirebaseAuthException e) {
+    if (e.code == "weak-password") return "Password terlalu lemah!";
+    if (e.code == "email-already-in-use") return "Email telah digunakan!";
+    if (e.code == "user-not-found" || e.code == "wrong-password") {
+      return "Email atau kata sandi salah.";
+    }
+    if (e.code == "invalid-email") {
+      return "Format email tidak valid.";
+    }
+    if (e.code == "user-disabled") {
+      return "Akun ini telah dinonaktifkan.";
+    }
+    if (e.code == "too-many-requests") {
+      return "Kamu telah meminta permintaan verifikasi email terlalu sering baru-baru ini. Coba lagi nanti.";
+    }
+    if (e.code == "wrong-password") {
+      return "Email atau password salah.";
+    }
+    return e.message ?? "Kesalahan authentikasi tak terduga.";
   }
 }

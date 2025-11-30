@@ -41,8 +41,6 @@ class AuthStateCubit extends Cubit<AuthState> {
   Future<String> signup(UserSignupReq user) async {
     emit(AuthLoading());
     final result = await sl<SignupUseCase>().call(user);
-    // final usecase = sl<SignupUseCase>();
-    // final result = await usecase(user);
 
     final String isSuccess = result.fold(
       (failure) {
@@ -65,8 +63,6 @@ class AuthStateCubit extends Cubit<AuthState> {
   Future<void> signin(UserSigninReq user) async {
     emit(AuthLoading());
     final result = await sl<SigninUseCase>().call(user);
-    // final usecase = sl<SigninUseCase>();
-    // final result = await usecase(user);
 
     result.fold(
       (failure) => emit(AuthFailure(failure)),
@@ -77,8 +73,6 @@ class AuthStateCubit extends Cubit<AuthState> {
   Future<void> forgotPassword(String email) async {
     emit(AuthLoading());
     final result = await sl<ForgotPasswordUseCase>().call(email);
-    // final usecase = sl<ForgotPasswordUseCase>();
-    // final result = await usecase(email);
     result.fold(
       (failure) => emit(AuthFailure(failure)),
       (successMessage) => emit(AuthSuccess(successMessage)),
@@ -88,8 +82,6 @@ class AuthStateCubit extends Cubit<AuthState> {
   Future<void> resendVerificationEmail() async {
     emit(AuthLoading());
     final result = await sl<ResendEmailUseCase>().call();
-    // final usecase = sl<ResendEmailUseCase>();
-    // final result = await usecase();
     result.fold(
       (failure) => emit(AuthFailure(failure)),
       (successMessage) => emit(AuthSuccess(successMessage)),
@@ -100,8 +92,6 @@ class AuthStateCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     await Future.delayed(Duration(seconds: 2));
     final result = await sl<AdditionalInfoJobseekerUseCase>().call(user);
-    // final usecase = sl<AdditionalInfoUseCase>();
-    // final result = await usecase(user);
     result.fold(
       (failure) => emit(AuthFailure(failure)),
       (successMessage) => emit(AuthSuccess(user.toJobseekerEntity())),
@@ -112,8 +102,6 @@ class AuthStateCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     await Future.delayed(Duration(seconds: 2));
     final result = await sl<AdditionalInfoCompanyUseCase>().call(user);
-    // final usecase = sl<AdditionalInfoUseCase>();
-    // final result = await usecase(user);
     result.fold(
       (failure) => emit(AuthFailure(failure)),
       (successMessage) => emit(AuthSuccess(user.toCompanyEntity())),
@@ -124,18 +112,12 @@ class AuthStateCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     await Future.delayed(Duration(seconds: 2));
     final result = await sl<SignInWithGoogleUseCase>().call(role);
-    // final usecase = sl<SignInWithGoogleUseCase>();
-    // final result = await usecase(role);
-
-    // if (isClosed) return;
 
     result.fold(
       (failure) {
-        // if (!isClosed)
         emit(AuthFailure(failure));
       },
       (data) {
-        // if (!isClosed)
         emit(AuthSuccess(data));
       },
     );
@@ -163,16 +145,3 @@ class AuthStateCubit extends Cubit<AuthState> {
     emit(AuthInitial());
   }
 }
-
-  // Future<Either> getCurrentUser(String role) async {
-  //   emit(AuthLoading());
-  //   final Either result;
-  //   if (role == "jobseeker") {
-  //     final usecase = sl<GetJobseekerUseCase>();
-  //     result = await usecase();
-  //   } else {
-  //     final usecase = sl<GetCompanyUseCase>();
-  //     result = await usecase();
-  //   }
-  //   return result;
-  // }

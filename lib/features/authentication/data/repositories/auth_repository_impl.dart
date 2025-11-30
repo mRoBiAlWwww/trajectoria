@@ -12,94 +12,113 @@ import 'package:trajectoria/features/authentication/domain/repositories/auth.dar
 import 'package:trajectoria/service_locator.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
+  final AuthFirebaseService service;
+  AuthRepositoryImpl({required this.service});
+
   @override
   Future<Either> signup(UserSignupReq user) async {
-    return await sl<AuthFirebaseService>().signup(user);
+    try {
+      final result = await service.signup(user);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> resendVerificationEmail() async {
-    return await sl<AuthFirebaseService>().resendVerificationEmail();
+    try {
+      final result = await service.resendVerificationEmail();
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> additionalUserInfoJobSeeker(JobseekerSignupReq user) async {
-    return await sl<AuthFirebaseService>().additionalUserInfoJobSeeker(user);
+    try {
+      final result = await service.additionalUserInfoJobSeeker(user);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> additionalUserInfoCompany(CompanySignupReq user) async {
-    return await sl<AuthFirebaseService>().additionalUserInfoCompany(user);
+    try {
+      final result = await service.additionalUserInfoCompany(user);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> forgotPassword(String email) async {
-    return await sl<AuthFirebaseService>().forgotPassword(email);
+    try {
+      final result = await service.forgotPassword(email);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> signin(UserSigninReq user) async {
-    var userData = await sl<AuthFirebaseService>().signin(user);
-    return userData.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        if (data[1] == "Jobseeker") {
-          return Right(JobSeekerModel.fromMap(data[0]).toEntity());
-        } else {
-          return Right(CompanyModel.fromMap(data[0]).toEntity());
-        }
-        // return Right(UserModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final (raw, role) = await service.signin(user);
+
+      if (role == "Jobseeker") {
+        return Right(JobSeekerModel.fromMap(raw).toEntity());
+      } else {
+        return Right(CompanyModel.fromMap(raw).toEntity());
+      }
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> signInWithGoogle(String role) async {
-    var user = await sl<AuthFirebaseService>().signInWithGoogle(role);
-    return user.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        debugPrint("masalha");
-        debugPrint(data[1]);
-        if (data[1] == "Jobseeker") {
-          return Right(JobSeekerModel.fromMap(data[0]).toEntity());
-        } else if (data[1] == "Company") {
-          return Right(CompanyModel.fromMap(data[0]).toEntity());
-        } else {
-          debugPrint("harus sini");
-          return Right(UnroleModel.fromMap(data[0]).toEntity());
-        }
-        // return Right(UserModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final (raw, userRole) = await service.signInWithGoogle(role);
+
+      if (userRole == "Jobseeker") {
+        return Right(JobSeekerModel.fromMap(raw).toEntity());
+      } else {
+        return Right(CompanyModel.fromMap(raw).toEntity());
+      }
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getCurrentUser() async {
-    var user = await sl<AuthFirebaseService>().getCurrentUser();
-    return user.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        if (data[1] == "Jobseeker") {
-          return Right(JobSeekerModel.fromMap(data[0]).toEntity());
-        } else if (data[1] == "Company") {
-          return Right(CompanyModel.fromMap(data[0]).toEntity());
-        } else {
-          return Right(UnroleModel.fromMap(data[0]).toEntity());
-        }
-        // return Right(UserModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final (raw, userRole) = await service.getCurrentUser();
+
+      if (userRole == "Jobseeker") {
+        return Right(JobSeekerModel.fromMap(raw).toEntity());
+      } else if (userRole == "Company") {
+        return Right(CompanyModel.fromMap(raw).toEntity());
+      } else {
+        return Right(UnroleModel.fromMap(raw).toEntity());
+      }
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> signOut() async {
-    return await sl<AuthFirebaseService>().signOut();
+    try {
+      final result = await service.signOut();
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 }

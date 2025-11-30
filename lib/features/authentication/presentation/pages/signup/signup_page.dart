@@ -195,7 +195,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   );
                   debugPrint(result);
-                  if (result == "true") {
+                  if (result == "Signup berhasil") {
                     final user = UserSignupReq(
                       email: _emailCon.text,
                       password: _passwordCon.text,
@@ -212,15 +212,6 @@ class _SignupPageState extends State<SignupPage> {
                       );
                     }
                   }
-                  // result == "true"
-                  //     ? await authCubit.additionalUserInfo(
-                  //         UserSignupReq(
-                  //           email: _emailCon.text,
-                  //           password: _passwordCon.text,
-                  //           role: role,
-                  //         ).toEntity(),
-                  //       )
-                  //     : null;
                 }
               : null,
           backgroundColor: Colors.black,
@@ -239,71 +230,3 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 }
-
-
-// TextField(
-        //   controller: _emailCon,
-        //   decoration: InputDecoration(
-        //     hintText: 'nama@email.com',
-        //     enabledBorder: OutlineInputBorder(
-        //       borderSide: BorderSide(
-        //         width: 2.0,
-        //         color: isFormValid ? Colors.black : Colors.grey,
-        //       ),
-        //     ),
-        //     focusedBorder: OutlineInputBorder(
-        //       borderSide: BorderSide(
-        //         width: 2.0,
-        //         color: isFormValid ? Colors.black : Colors.grey,
-        //       ),
-        //     ),
-        //   ),
-        // ),
-         // TextField(
-        //   controller: _passwordCon,
-        //   decoration: InputDecoration(
-        //     hintText: 'Password',
-        //     enabledBorder: OutlineInputBorder(
-        //       borderSide: BorderSide(
-        //         width: 2.0,
-        //         color: isFormValid ? Colors.black : Colors.grey,
-        //       ),
-        //     ),
-        //     focusedBorder: OutlineInputBorder(
-        //       borderSide: BorderSide(
-        //         width: 2.0,
-        //         color: isFormValid ? Colors.black : Colors.grey,
-        //       ),
-        //     ),
-        //   ),
-        // ),
-// Widget _continueButton(BuildContext context, bool isFormValid) {
-  //   return ElevatedButton(
-  //     onPressed: isFormValid
-  //         ? () {
-  //             AppNavigator.push(
-  //               context,
-  //               FirstLastNamePage(
-  //                 signinReq: UserSigninReq(
-  //                   email: _emailCon.text,
-  //                   password: _passwordCon.text,
-  //                   role: context.read<RoleCubit>().state,
-  //                 ),
-  //               ),
-  //             );
-  //           }
-  //         : null,
-  //     style: ElevatedButton.styleFrom(
-  //       minimumSize: const Size(double.infinity, 50),
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-  //       backgroundColor: isFormValid ? Colors.black : Colors.grey,
-  //       foregroundColor: isFormValid
-  //           ? Colors.white
-  //           : AppColors.disableTextButton,
-  //     ),
-  //     child: Text(
-  //       'Lanjut',
-  //       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-  //     ),
-  //   );
-  // }
