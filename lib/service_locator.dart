@@ -88,7 +88,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<LeaderboardServices>(LeaderboardServicesImpl());
 
   //repositories
-  sl.registerSingleton<AuthRepository>(AuthRepositoryImpl(service: sl()));
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(service: sl<AuthFirebaseService>()),
+  );
   sl.registerSingleton<ImageUploadRepository>(ImageUploadRepositoryImpl());
   sl.registerSingleton<CompetitionRepository>(CompetitionRepositoryImpl());
   sl.registerSingleton<LearnRepository>(LearnRepositoryImpl());
