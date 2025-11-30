@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
 import 'package:trajectoria/features/authentication/data/datasources/auth_firebase_service.dart';
 import 'package:trajectoria/features/authentication/data/models/company.dart';
 import 'package:trajectoria/features/authentication/data/models/company_signup_req.dart';
@@ -9,7 +8,6 @@ import 'package:trajectoria/features/authentication/data/models/unrole.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signin_req.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
 import 'package:trajectoria/features/authentication/domain/repositories/auth.dart';
-import 'package:trajectoria/service_locator.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   final AuthFirebaseService service;
