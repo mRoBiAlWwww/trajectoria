@@ -74,12 +74,9 @@ class SubmissionCubit extends Cubit<SubmissionState> {
     var returnedData = await sl<IsAlreadySubmitedUseCase>().call(competitionId);
     returnedData.fold(
       (error) {
-        debugPrint("Cek dong ${error}");
         return emit(SubmissionError(error));
       },
       (data) {
-        debugPrint("hauds");
-        debugPrint(data);
         data == "notparticipation"
             ? emit(SubmissionInitial())
             : data == "done"

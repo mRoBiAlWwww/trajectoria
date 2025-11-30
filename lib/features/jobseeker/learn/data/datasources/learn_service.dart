@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:trajectoria/features/authentication/data/models/jobseeker.dart';
 
 abstract class LearnService {
@@ -36,8 +35,8 @@ class LearnServiceImpl extends LearnService {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var getCourses = await firestoreInstance
-          .collection('Courses')
-          .orderBy('order_index', descending: false)
+          .collection("Courses")
+          .orderBy("order_index", descending: false)
           .get();
 
       return getCourses.docs.map((e) => e.data()).toList();
@@ -54,11 +53,11 @@ class LearnServiceImpl extends LearnService {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var getCourses = await firestoreInstance
-          .collection('Courses')
+          .collection("Courses")
           .doc(courseId)
-          .collection('course_chapters')
-          .where('order_index', isEqualTo: chapterOrder)
-          .orderBy('order_index', descending: false)
+          .collection("course_chapters")
+          .where("order_index", isEqualTo: chapterOrder)
+          .orderBy("order_index", descending: false)
           .get();
 
       return getCourses.docs.first.data();
@@ -77,20 +76,20 @@ class LearnServiceImpl extends LearnService {
 
     try {
       QuerySnapshot<Map<String, dynamic>> getCourses = await firestoreInstance
-          .collection('Courses')
+          .collection("Courses")
           .doc(courseId)
-          .collection('course_chapters')
-          .where('order_index', isEqualTo: chapterOrder)
+          .collection("course_chapters")
+          .where("order_index", isEqualTo: chapterOrder)
           .get();
 
       QuerySnapshot<Map<String, dynamic>> subchaptersSnapshot =
           await firestoreInstance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
-              .orderBy('order_index', descending: false)
+              .collection("sub_chapters")
+              .orderBy("order_index", descending: false)
               .get();
 
       List<Map<String, dynamic>> lessons = subchaptersSnapshot.docs
@@ -114,32 +113,32 @@ class LearnServiceImpl extends LearnService {
 
     try {
       QuerySnapshot<Map<String, dynamic>> getCourses = await firestoreInstance
-          .collection('Courses')
+          .collection("Courses")
           .doc(courseId)
-          .collection('course_chapters')
-          .where('order_index', isEqualTo: chapterOrder)
+          .collection("course_chapters")
+          .where("order_index", isEqualTo: chapterOrder)
           .get();
 
       QuerySnapshot<Map<String, dynamic>> subchapterSnapshot =
           await FirebaseFirestore.instance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
-              .where('subchapter_id', isEqualTo: subChapterId)
+              .collection("sub_chapters")
+              .where("subchapter_id", isEqualTo: subChapterId)
               .get();
 
       QuerySnapshot<Map<String, dynamic>> modulesSnapshot =
           await FirebaseFirestore.instance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
+              .collection("sub_chapters")
               .doc(subchapterSnapshot.docs.first.id)
-              .collection('modules')
-              .orderBy('order_index', descending: false)
+              .collection("modules")
+              .orderBy("order_index", descending: false)
               .get();
 
       List<Map<String, dynamic>> module = modulesSnapshot.docs
@@ -163,48 +162,44 @@ class LearnServiceImpl extends LearnService {
     List<Map<String, dynamic>> quizzes = [];
     try {
       QuerySnapshot<Map<String, dynamic>> getCourses = await firestoreInstance
-          .collection('Courses')
+          .collection("Courses")
           .doc(courseId)
-          .collection('course_chapters')
-          .where('order_index', isEqualTo: chapterOrder)
+          .collection("course_chapters")
+          .where("order_index", isEqualTo: chapterOrder)
           .get();
 
       QuerySnapshot<Map<String, dynamic>> subchapterSnapshot =
           await FirebaseFirestore.instance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
-              .where('subchapter_id', isEqualTo: subChapterId)
+              .collection("sub_chapters")
+              .where("subchapter_id", isEqualTo: subChapterId)
               .get();
 
       QuerySnapshot<Map<String, dynamic>> modulesSnapshot =
           await FirebaseFirestore.instance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
+              .collection("sub_chapters")
               .doc(subchapterSnapshot.docs.first.id)
-              .collection('modules')
-              .where('module_id', isEqualTo: moduleId)
+              .collection("modules")
+              .where("module_id", isEqualTo: moduleId)
               .get();
-      debugPrint(courseId);
-      debugPrint(getCourses.docs.first.id);
-      debugPrint(subchapterSnapshot.docs.first.id);
-      debugPrint(modulesSnapshot.docs.first.id);
       QuerySnapshot<Map<String, dynamic>> quizzesSnapshot =
           await FirebaseFirestore.instance
-              .collection('Courses')
+              .collection("Courses")
               .doc(courseId)
-              .collection('course_chapters')
+              .collection("course_chapters")
               .doc(getCourses.docs.first.id)
-              .collection('sub_chapters')
+              .collection("sub_chapters")
               .doc(subchapterSnapshot.docs.first.id)
-              .collection('modules')
+              .collection("modules")
               .doc(modulesSnapshot.docs.first.id)
-              .collection('quizzes')
+              .collection("quizzes")
               .get();
       List<Map<String, dynamic>> quiz = quizzesSnapshot.docs
           .map((doc) => doc.data())
@@ -222,10 +217,10 @@ class LearnServiceImpl extends LearnService {
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
       await firestoreInstance
-          .collection('Jobseeker')
+          .collection("Jobseeker")
           .doc(currentUser?.uid)
           .update({
-            'finished_module': FieldValue.arrayUnion([moduleId]),
+            "finished_module": FieldValue.arrayUnion([moduleId]),
           });
 
       return "Modul yang selesai berhasil ditambahkan ke daftar";
@@ -240,9 +235,9 @@ class LearnServiceImpl extends LearnService {
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
       await firestoreInstance
-          .collection('Jobseeker')
+          .collection("Jobseeker")
           .doc(currentUser?.uid)
-          .update({'courses_score': FieldValue.increment(score)});
+          .update({"courses_score": FieldValue.increment(score)});
 
       return "Skor berhasil ditambahkan";
     } catch (e) {

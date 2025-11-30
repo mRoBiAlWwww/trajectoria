@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,25 +18,27 @@ import 'package:trajectoria/service_locator.dart';
 import 'package:path/path.dart' as p;
 
 abstract class CompetitionService {
-  Future<Either> getCompetitions();
-  Future<Either> getSingleCompetition(String competitionId);
-  Future<Either> addCompetitionParticipant(String compId);
-  Future<Either> downloadAndOpenFile(String fileUrl, String fileName);
-  Future<Either> uploadMultiplePdfs();
-  Future<Either> addSubmission(SubmissionReq submission);
-  Future<Either> getCompetitionsByTitle(String keyword);
-  Future<Either> getCategories();
-  Future<Either> getCompetitionsByCategory(String categoryId);
-  Future<Either> getCompetitionsByFilters(
+  Future<List<Map<String, dynamic>>> getCompetitions();
+  Future<Map<String, dynamic>> getSingleCompetition(String competitionId);
+  Future<String> addCompetitionParticipant(String compId);
+  Future<String> downloadAndOpenFile(String fileUrl, String fileName);
+  Future<List<FileItemModel>> uploadMultiplePdfs();
+  Future<String> addSubmission(SubmissionReq submission);
+  Future<List<Map<String, dynamic>>> getCompetitionsByTitle(String keyword);
+  Future<List<Map<String, dynamic>>> getCompetitionsByCategory(
+    String categoryId,
+  );
+  Future<List<Map<String, dynamic>>> getCompetitionsByFilters(
     List<String> category,
     String deadline,
   );
-  Future<Either> isAlreadySubmitted(String competitionId);
+  Future<List<Map<String, dynamic>>> getCategories();
+  Future<String> isAlreadySubmitted(String competitionId);
 }
 
 class CompetitionServiceImpl extends CompetitionService {
   @override
-  Future<Either> getCompetitions() async {
+  Future<List<Map<String, dynamic>>> getCompetitions() async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var competitions = await firestoreInstance
@@ -45,28 +46,29 @@ class CompetitionServiceImpl extends CompetitionService {
           .where('status', isEqualTo: "Dirilis")
           .get();
 
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan daftar kompetisi $e");
     }
   }
 
   @override
-  Future<Either> getSingleCompetition(String competitionId) async {
+  Future<Map<String, dynamic>> getSingleCompetition(
+    String competitionId,
+  ) async {
     try {
       var userDoc = await FirebaseFirestore.instance
           .collection('Competitions')
           .doc(competitionId)
           .get();
-      return Right(userDoc.data());
+      return userDoc.data()!;
     } catch (e) {
-      return Left("Kesalahan saat mengambil kompetisi: $e");
+      throw Exception("Error gagal mendapatkan kompetisi $e");
     }
   }
 
   @override
-  Future<Either> addCompetitionParticipant(String compId) async {
-    debugPrint("================");
+  Future<String> addCompetitionParticipant(String compId) async {
     try {
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       //ambil id unik current user
@@ -98,14 +100,14 @@ class CompetitionServiceImpl extends CompetitionService {
           .update({
             'competitions_onprogress': FieldValue.arrayUnion([compId]),
           });
-      return Right(competitionParticipantId);
+      return competitionParticipantId;
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error gagal menambahkan partisipan kompetisi $e");
     }
   }
 
   @override
-  Future<Either> downloadAndOpenFile(String fileUrl, String fileName) async {
+  Future<String> downloadAndOpenFile(String fileUrl, String fileName) async {
     try {
       // 1️⃣ Minta izin (Android lama)
       if (Platform.isAndroid && await Permission.storage.isDenied) {
@@ -126,15 +128,14 @@ class CompetitionServiceImpl extends CompetitionService {
 
       // 5️⃣ Buka file otomatis
       await OpenFilex.open(filePath);
-      return Right("Download Success");
+      return "Download berhasil dan file berhasil dibuka";
     } catch (e) {
-      debugPrint('Download failed: $e');
-      return Left('Download failed: $e');
+      throw Exception('Error download file gagal: $e');
     }
   }
 
   @override
-  Future<Either> uploadMultiplePdfs() async {
+  Future<List<FileItemModel>> uploadMultiplePdfs() async {
     try {
       // 1️⃣ pilih beberapa file PDF
       final result = await FilePicker.platform.pickFiles(
@@ -143,7 +144,7 @@ class CompetitionServiceImpl extends CompetitionService {
       );
 
       if (result == null || result.files.isEmpty) {
-        return Left("Tidak ada format file yg cocok");
+        throw Exception("Tidak ada format file yg cocok");
       }
 
       const Set<String> imageExtensions = {
@@ -155,11 +156,6 @@ class CompetitionServiceImpl extends CompetitionService {
         'webp',
         'heic',
       };
-
-      // final files = result.files
-      //     .where((f) => f.path != null)
-      //     .map((f) => File(f.path!))
-      //     .toList();
 
       final files = result.files
           .where((f) {
@@ -175,7 +171,7 @@ class CompetitionServiceImpl extends CompetitionService {
           .toList();
 
       if (files.isEmpty) {
-        return Left(
+        throw Exception(
           "Format file gambar tidak diizinkan. Silakan pilih format lain.",
         );
       }
@@ -198,7 +194,6 @@ class CompetitionServiceImpl extends CompetitionService {
             resourceType: CloudinaryResourceType.Raw,
           ),
         );
-        debugPrint("disini berhasil");
         uploadedFiles.add(
           FileItemModel(
             fileName: fileName,
@@ -208,15 +203,14 @@ class CompetitionServiceImpl extends CompetitionService {
         );
       }
 
-      return Right(uploadedFiles);
+      return uploadedFiles;
     } catch (e) {
-      debugPrint("❌ Gagal upload beberapa file: $e");
-      return Left("Upload file gagal $e");
+      throw Exception("Error Upload file gagal $e");
     }
   }
 
   @override
-  Future<Either> addSubmission(SubmissionReq submission) async {
+  Future<String> addSubmission(SubmissionReq submission) async {
     try {
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       var currentUser = FirebaseAuth.instance.currentUser;
@@ -264,20 +258,22 @@ class CompetitionServiceImpl extends CompetitionService {
               submission.competitionId,
             ]),
           });
-      return Right("Pengumupulan tugas berhasil!");
+      return "Pengumupulan tugas berhasil!";
     } catch (e) {
-      return Left("Error: $e");
+      throw Exception("Error submission gagal ditambahkan $e");
     }
   }
 
   @override
-  Future<Either> getCompetitionsByTitle(String keyword) async {
+  Future<List<Map<String, dynamic>>> getCompetitionsByTitle(
+    String keyword,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     final String capitalizedKeyword = capitalizeWords(keyword);
 
     if (capitalizedKeyword.isEmpty) {
       debugPrint("Keyword kosong, mengembalikan list kosong.");
-      return Right([]);
+      return [];
     }
     try {
       final competitions = await firestoreInstance
@@ -288,21 +284,21 @@ class CompetitionServiceImpl extends CompetitionService {
           .where('status', isEqualTo: "Dirilis")
           .get();
 
-      debugPrint("Mencari: $capitalizedKeyword");
-      debugPrint(competitions.docs.length.toString());
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception('Error gagal mendapatkan kompetisi berdasarkan title $e');
     }
   }
 
   @override
-  Future<Either> getCompetitionsByCategory(String categoryId) async {
+  Future<List<Map<String, dynamic>>> getCompetitionsByCategory(
+    String categoryId,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
     if (categoryId.isEmpty) {
       debugPrint("Keyword kosong, mengembalikan list kosong.");
-      return Right([]);
+      return [];
     }
     try {
       final competitions = await firestoreInstance
@@ -311,14 +307,16 @@ class CompetitionServiceImpl extends CompetitionService {
           .where('status', isEqualTo: "Dirilis")
           .get();
 
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        'Error gagal mendapatkan kompetisi berdasarkan kategori $e',
+      );
     }
   }
 
   @override
-  Future<Either> getCompetitionsByFilters(
+  Future<List<Map<String, dynamic>>> getCompetitionsByFilters(
     List<String> category,
     String deadline,
   ) async {
@@ -333,7 +331,7 @@ class CompetitionServiceImpl extends CompetitionService {
 
     if (category.isEmpty) {
       debugPrint("Keyword kosong, mengembalikan list kosong.");
-      return Right([]);
+      return [];
     }
     try {
       final competitions = await firestoreInstance
@@ -346,26 +344,28 @@ class CompetitionServiceImpl extends CompetitionService {
           )
           .get();
       debugPrint(competitions.docs.length.toString());
-      return Right(competitions.docs.map((e) => e.data()).toList());
+      return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception(
+        'Error gagal mendapatkan kompetisi berdasarkan filters $e',
+      );
     }
   }
 
   @override
-  Future<Either> getCategories() async {
+  Future<List<Map<String, dynamic>>> getCategories() async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var category = await firestoreInstance.collection('Category').get();
 
-      return Right(category.docs.map((e) => e.data()).toList());
+      return category.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception('Error gagal kategori dari tiap kompetisi $e');
     }
   }
 
   @override
-  Future<Either> isAlreadySubmitted(String competitionId) async {
+  Future<String> isAlreadySubmitted(String competitionId) async {
     var currentUser = FirebaseAuth.instance.currentUser;
 
     try {
@@ -374,28 +374,53 @@ class CompetitionServiceImpl extends CompetitionService {
           .doc(currentUser!.uid)
           .get();
 
-      if (!jobseeker.exists) return Right(false);
+      if (!jobseeker.exists) return "notparticipation";
 
       final List<dynamic> onprogressCompetitionIds =
-          jobseeker['competitions_onprogress'] ?? [];
-      bool isSubmitted = onprogressCompetitionIds.contains(competitionId);
+          jobseeker.data()?['competitions_onprogress'] ?? [];
 
-      if (isSubmitted) {
-        return Right(onprogressCompetitionIds[0]);
+      if (onprogressCompetitionIds.contains(competitionId)) {
+        return "onprogress";
       }
 
-      final List<dynamic> doneCompetitionIds =
-          jobseeker['competitions_done'] ?? [];
-      isSubmitted = doneCompetitionIds.contains(competitionId);
+      final List<dynamic> done = jobseeker.data()?['competitions_done'] ?? [];
 
-      if (isSubmitted) {
-        return Right("done");
+      if (done.contains(competitionId)) {
+        return "done";
       }
 
-      return Right("notparticipation");
+      return "notparticipation";
     } catch (e) {
       debugPrint(e.toString());
-      return const Left('Please try again');
+      throw Exception('Error mengecek status kompetisi $e');
     }
   }
 }
+
+  // @override
+  // Future<String> isAlreadySubmitted(String competitionId) async {
+  //   var currentUser = FirebaseAuth.instance.currentUser;
+  //   try {
+  //     final jobseeker = await FirebaseFirestore.instance
+  //         .collection('Jobseeker')
+  //         .doc(currentUser!.uid)
+  //         .get();
+  //     if (!jobseeker.exists) return (false.toString());
+  //     final List<dynamic> onprogressCompetitionIds =
+  //         jobseeker['competitions_onprogress'] ?? [];
+  //     bool isSubmitted = onprogressCompetitionIds.contains(competitionId);
+  //     if (isSubmitted) {
+  //       return onprogressCompetitionIds[0];
+  //     }
+  //     final List<dynamic> doneCompetitionIds =
+  //         jobseeker['competitions_done'] ?? [];
+  //     isSubmitted = doneCompetitionIds.contains(competitionId);
+  //     if (isSubmitted) {
+  //       return "done";
+  //     }
+  //     return "notparticipation";
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //     throw Exception('Error mengecek status kompetisi $e');
+  //   }
+  // }

@@ -92,7 +92,9 @@ Future<void> initializeDependencies() async {
     () => AuthRepositoryImpl(service: sl<AuthFirebaseService>()),
   );
   sl.registerSingleton<ImageUploadRepository>(ImageUploadRepositoryImpl());
-  sl.registerSingleton<CompetitionRepository>(CompetitionRepositoryImpl());
+  sl.registerSingleton<CompetitionRepository>(
+    CompetitionRepositoryImpl(service: sl<CompetitionService>()),
+  );
   sl.registerSingleton<LearnRepository>(
     LearnRepositoryImpl(service: sl<LearnService>()),
   );
