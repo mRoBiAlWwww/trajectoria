@@ -38,8 +38,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return "Signup berhasil";
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
-    } catch (_) {
-      throw Exception("Harap masukkan data diri dengan teliti");
+    } catch (e) {
+      throw Exception("Harap masukkan data diri dengan teliti $e");
     }
   }
 
@@ -54,8 +54,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return "Verifikasi email telah terkirim. Silahkan cek kotak masuk mu";
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
-    } catch (_) {
-      throw Exception("Harap masukkan data diri dengan teliti");
+    } catch (e) {
+      throw Exception("Harap masukkan data diri dengan teliti $e");
     }
   }
 
@@ -80,11 +80,9 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           .set(data);
       return "Signup telah berhasil";
     } on FirebaseAuthException catch (e) {
-      return _firebaseErrorMessage(e);
-    } on FirebaseException catch (e) {
-      throw Exception("Terjadi kesalahan saat mengakses menyimpan data: $e");
+      throw Exception(_firebaseErrorMessage(e));
     } catch (e) {
-      throw Exception("Unexpected error: $e");
+      throw Exception("Error gagal menambahkan informasi jobseeker $e");
     }
   }
 
@@ -110,11 +108,9 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       return "Signup telah berhasil";
     } on FirebaseAuthException catch (e) {
-      return _firebaseErrorMessage(e);
-    } on FirebaseException catch (e) {
-      throw Exception("Terjadi kesalahan saat  menyimpan data: $e");
+      throw Exception(_firebaseErrorMessage(e));
     } catch (e) {
-      throw Exception("Terjadi kesalahan tak terduga: $e");
+      throw Exception("Error gagal menambahkan informasi company $e");
     }
   }
 
@@ -126,9 +122,9 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       return "Email reset password berhasil dikirim ke $email";
     } on FirebaseAuthException catch (e) {
-      return _firebaseErrorMessage(e);
+      throw Exception(_firebaseErrorMessage(e));
     } catch (e) {
-      throw Exception("Terjadi kesalahan tak terduga: $e");
+      throw Exception("Error gagal reset password $e");
     }
   }
 
@@ -171,6 +167,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       }
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
+    } catch (e) {
+      throw Exception("Error tidak dapat melakukan signin $e");
     }
   }
 
@@ -250,8 +248,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       }
     } on FirebaseAuthException catch (e) {
       throw Exception(_firebaseErrorMessage(e));
-    } on Exception catch (e) {
-      throw Exception("Kesalahan pada layanan Google: $e");
+    } catch (e) {
+      throw Exception("Error kesalahan pada layanan Google: $e");
     }
   }
 
@@ -292,10 +290,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         return (unroleUserDoc.data()!, "Unrole");
       }
       throw Exception("Data pengguna tidak ditemukan");
-    } on FirebaseException catch (e) {
-      throw Exception("Kesalahan saat mengambil data pengguna: $e");
     } catch (e) {
-      throw Exception("Terjadi kesalahan tak terduga: $e");
+      throw Exception("Error kesalahan saat mengambil data pengguna $e");
     }
   }
 

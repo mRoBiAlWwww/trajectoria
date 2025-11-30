@@ -6,60 +6,47 @@ import 'package:trajectoria/features/jobseeker/learn/data/models/module.dart';
 import 'package:trajectoria/features/jobseeker/learn/data/models/quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/data/models/subchapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/repositories/learn.dart';
-import 'package:trajectoria/service_locator.dart';
 
 class LearnRepositoryImpl extends LearnRepository {
+  final LearnService service;
+  LearnRepositoryImpl({required this.service});
+
   @override
   Future<Either> getCourses() async {
-    var competitions = await sl<LearnService>().getCourses();
-    return competitions.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => CourseModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getCourses();
+      return Right(
+        List.from(
+          result,
+        ).map((e) => CourseModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getCourseChapter(String courseId, int chapterOrder) async {
-    var chapters = await sl<LearnService>().getCourseChapter(
-      courseId,
-      chapterOrder,
-    );
-    return chapters.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(CourseChapterModel.fromMap(data).toEntity());
-      },
-    );
+    try {
+      final result = await service.getCourseChapter(courseId, chapterOrder);
+      return Right(CourseChapterModel.fromMap(result).toEntity());
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> getSubchapters(String courseId, int chapterOrder) async {
-    var subchapters = await sl<LearnService>().getSubchapters(
-      courseId,
-      chapterOrder,
-    );
-    return subchapters.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => SubChapterModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getSubchapters(courseId, chapterOrder);
+      return Right(
+        List.from(
+          result,
+        ).map((e) => SubChapterModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
@@ -68,23 +55,20 @@ class LearnRepositoryImpl extends LearnRepository {
     int chapterOrder,
     String subChapterId,
   ) async {
-    var modules = await sl<LearnService>().getModules(
-      courseId,
-      chapterOrder,
-      subChapterId,
-    );
-    return modules.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(
-            data,
-          ).map((e) => ModuleModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getModules(
+        courseId,
+        chapterOrder,
+        subChapterId,
+      );
+      return Right(
+        List.from(
+          result,
+        ).map((e) => ModuleModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
@@ -94,47 +78,38 @@ class LearnRepositoryImpl extends LearnRepository {
     String subChapterId,
     String moduleId,
   ) async {
-    var modules = await sl<LearnService>().getQuizzes(
-      courseId,
-      chapterOrder,
-      subChapterId,
-      moduleId,
-    );
-    return modules.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(
-          List.from(data).map((e) => QuizModel.fromMap(e).toEntity()).toList(),
-        );
-      },
-    );
+    try {
+      final result = await service.getQuizzes(
+        courseId,
+        chapterOrder,
+        subChapterId,
+        moduleId,
+      );
+      return Right(
+        List.from(result).map((e) => QuizModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> addFinishedModule(String moduleId) async {
-    var modules = await sl<LearnService>().addFinishedModule(moduleId);
-    return modules.fold(
-      (error) {
-        return Left(error);
-      },
-      (successMessage) {
-        return Right(successMessage);
-      },
-    );
+    try {
+      final result = await service.addFinishedModule(moduleId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 
   @override
   Future<Either> addUserScore(double score) async {
-    var modules = await sl<LearnService>().addUserScore(score);
-    return modules.fold(
-      (error) {
-        return Left(error);
-      },
-      (successMessage) {
-        return Right(successMessage);
-      },
-    );
+    try {
+      final result = await service.addUserScore(score);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
   }
 }

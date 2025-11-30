@@ -93,7 +93,9 @@ Future<void> initializeDependencies() async {
   );
   sl.registerSingleton<ImageUploadRepository>(ImageUploadRepositoryImpl());
   sl.registerSingleton<CompetitionRepository>(CompetitionRepositoryImpl());
-  sl.registerSingleton<LearnRepository>(LearnRepositoryImpl());
+  sl.registerSingleton<LearnRepository>(
+    LearnRepositoryImpl(service: sl<LearnService>()),
+  );
   sl.registerSingleton<CreateCompImageRepository>(
     CreateCompImageRepositoryImpl(),
   );

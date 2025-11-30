@@ -5,28 +5,34 @@ import 'package:flutter/foundation.dart';
 import 'package:trajectoria/features/authentication/data/models/jobseeker.dart';
 
 abstract class LearnService {
-  Future<Either> getCourses();
-  Future<Either> getCourseChapter(String courseId, int chapterOrder);
-  Future<Either> getSubchapters(String courseId, int chapterOrder);
-  Future<Either> getModules(
+  Future<List<Map<String, dynamic>>> getCourses();
+  Future<Map<String, dynamic>> getCourseChapter(
+    String courseId,
+    int chapterOrder,
+  );
+  Future<List<Map<String, dynamic>>> getSubchapters(
+    String courseId,
+    int chapterOrder,
+  );
+  Future<List<Map<String, dynamic>>> getModules(
     String courseId,
     int chapterOrder,
     String subChapterId,
   );
-  Future<Either> getQuizzes(
+  Future<List<Map<String, dynamic>>> getQuizzes(
     String courseId,
     int chapterOrder,
     String subChapterId,
     String moduleId,
   );
-  Future<Either> addFinishedModule(String moduleId);
-  Future<Either> addUserScore(double score);
+  Future<String> addFinishedModule(String moduleId);
+  Future<String> addUserScore(double score);
   Future<Either> getFinishedModules();
 }
 
 class LearnServiceImpl extends LearnService {
   @override
-  Future<Either> getCourses() async {
+  Future<List<Map<String, dynamic>>> getCourses() async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var getCourses = await firestoreInstance
@@ -34,14 +40,17 @@ class LearnServiceImpl extends LearnService {
           .orderBy('order_index', descending: false)
           .get();
 
-      return Right(getCourses.docs.map((e) => e.data()).toList());
+      return getCourses.docs.map((e) => e.data()).toList();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan list course $e");
     }
   }
 
   @override
-  Future<Either> getCourseChapter(String courseId, int chapterOrder) async {
+  Future<Map<String, dynamic>> getCourseChapter(
+    String courseId,
+    int chapterOrder,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
       var getCourses = await firestoreInstance
@@ -52,14 +61,17 @@ class LearnServiceImpl extends LearnService {
           .orderBy('order_index', descending: false)
           .get();
 
-      return Right(getCourses.docs.first.data());
+      return getCourses.docs.first.data();
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan chapter dari course $e");
     }
   }
 
   @override
-  Future<Either> getSubchapters(String courseId, int chapterOrder) async {
+  Future<List<Map<String, dynamic>>> getSubchapters(
+    String courseId,
+    int chapterOrder,
+  ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     List<Map<String, dynamic>> subchapters = [];
 
@@ -85,14 +97,14 @@ class LearnServiceImpl extends LearnService {
           .map((doc) => doc.data())
           .toList();
       subchapters.addAll(lessons);
-      return Right(subchapters);
+      return subchapters;
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan subchapters dari chapter $e");
     }
   }
 
   @override
-  Future<Either> getModules(
+  Future<List<Map<String, dynamic>>> getModules(
     String courseId,
     int chapterOrder,
     String subChapterId,
@@ -134,14 +146,14 @@ class LearnServiceImpl extends LearnService {
           .map((doc) => doc.data())
           .toList();
       modules.addAll(module);
-      return Right(modules);
+      return modules;
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan modul dari subchapter $e");
     }
   }
 
   @override
-  Future<Either> getQuizzes(
+  Future<List<Map<String, dynamic>>> getQuizzes(
     String courseId,
     int chapterOrder,
     String subChapterId,
@@ -198,14 +210,14 @@ class LearnServiceImpl extends LearnService {
           .map((doc) => doc.data())
           .toList();
       quizzes.addAll(quiz);
-      return Right(quizzes);
+      return quizzes;
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error gagal mendapatkan kuis dari modul $e");
     }
   }
 
   @override
-  Future<Either> addFinishedModule(String moduleId) async {
+  Future<String> addFinishedModule(String moduleId) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
@@ -216,14 +228,14 @@ class LearnServiceImpl extends LearnService {
             'finished_module': FieldValue.arrayUnion([moduleId]),
           });
 
-      return Right("Changes was successful");
+      return "Modul yang selesai berhasil ditambahkan ke daftar";
     } catch (e) {
-      return const Left('Please try again');
+      throw Exception("Error modul gagal ditambahkan ke daftar $e");
     }
   }
 
   @override
-  Future<Either> addUserScore(double score) async {
+  Future<String> addUserScore(double score) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
     try {
@@ -232,9 +244,9 @@ class LearnServiceImpl extends LearnService {
           .doc(currentUser?.uid)
           .update({'courses_score': FieldValue.increment(score)});
 
-      return Right("Score was successful added");
+      return "Skor berhasil ditambahkan";
     } catch (e) {
-      return const Left("Please try again");
+      throw Exception("Error skor gagal ditambahkan $e");
     }
   }
 
