@@ -259,7 +259,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       var currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        throw Exception("Unauthenticated");
+        return (<String, dynamic>{}, "Unauthenticated");
       }
 
       debugPrint(currentUser.uid);

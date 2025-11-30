@@ -32,6 +32,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthStateCubit, AuthState>(
       listener: (context, state) {
+        debugPrint("cek cekdong $state");
         if (state is UnAuthenticated) {
           AppNavigator.pushReplacement(context, WelcomeAnimationPage());
         }

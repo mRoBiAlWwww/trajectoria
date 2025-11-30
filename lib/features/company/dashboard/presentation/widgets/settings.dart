@@ -418,7 +418,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
                                                 _displaySuccessToast(
                                                   context,
-                                                  "Kompetisi berhasil dibuat",
+                                                  "Perubahan berhasil disimpan",
                                                 );
                                               }
                                             : null,
