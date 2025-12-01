@@ -42,6 +42,7 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("${widget.nextMaximumScore.toString()} XP 2");
     return BlocProvider(
       create: (context) => QuizCubit(),
       child: Scaffold(
@@ -183,7 +184,7 @@ class _ScorePageState extends State<ScorePage> {
                                               ),
                                             ),
                                             Text(
-                                              "${widget.nextMaximumScore.toString()} XP",
+                                              "${widget.nextMaximumScore} XP",
                                               style: TextStyle(
                                                 fontFamily: 'JetBrainsMono',
                                                 fontSize: 18,

@@ -280,8 +280,8 @@ class _SubchapterPageState extends State<SubchapterPage> {
                                     ? ""
                                     : state.modules[index].title,
                                 nextMaximumScore:
-                                    index + 1 >= state.modules.length
-                                    ? state.modules[index].maximumScore
+                                    index + 1 < state.modules.length
+                                    ? state.modules[index + 1].maximumScore
                                     : 0,
                               ),
                             );

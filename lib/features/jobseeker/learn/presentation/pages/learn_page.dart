@@ -370,7 +370,7 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                           );
                         }
                       },
-                      verticalPadding: 20,
+                      verticalPadding: 18,
                       backgroundColor: AppColors.secondaryBackgroundButton,
                       content: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

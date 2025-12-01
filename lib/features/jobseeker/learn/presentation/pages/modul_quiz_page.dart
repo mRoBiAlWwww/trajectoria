@@ -45,7 +45,7 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(widget.module.title);
+    debugPrint("${widget.nextMaximumScore.toString()} XP 1");
     return MultiBlocProvider(
       providers: [
         BlocProvider(
