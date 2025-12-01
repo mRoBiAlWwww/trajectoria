@@ -420,6 +420,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                                   context,
                                                   "Perubahan berhasil disimpan",
                                                 );
+                                                Navigator.pop(context);
                                               }
                                             : null,
                                         backgroundColor:

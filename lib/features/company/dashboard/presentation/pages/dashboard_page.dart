@@ -17,77 +17,87 @@ import 'package:trajectoria/features/company/dashboard/presentation/cubit/organi
 import 'package:trajectoria/features/company/dashboard/presentation/pages/all_competitions.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/pages/detail_submission.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
+import 'package:trajectoria/main.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> with RouteAware {
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<OrganizeCompetitionCubit>().getCompetitions();
+    context.read<JobseekerSubmissionCubit>().getJobseekerAcrossSubmissions();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPopNext() {
+    context.read<OrganizeCompetitionCubit>().getCompetitions();
+    context.read<JobseekerSubmissionCubit>().getJobseekerAcrossSubmissions();
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final userCompany =
         (context.watch<AuthStateCubit>().state as AuthSuccess).user.name;
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => OrganizeCompetitionCubit()..getCompetitions(),
-        ),
-        BlocProvider(
-          create: (context) =>
-              JobseekerSubmissionCubit()..getJobseekerAcrossSubmissions(),
-        ),
-        BlocProvider(create: (context) => GetUserCompeCubit()),
-      ],
+    return BlocProvider(
+      create: (context) => GetUserCompeCubit(),
       child: Builder(
         builder: (context) {
           return Scaffold(
             appBar: _buildAppBar(context, userCompany),
-            body: RefreshIndicator(
-              onRefresh: () async {
-                await context
-                    .read<OrganizeCompetitionCubit>()
-                    .getCompetitions();
-                await context
-                    .read<JobseekerSubmissionCubit>()
-                    .getJobseekerAcrossSubmissions();
-              },
-              child:
-                  BlocBuilder<
-                    OrganizeCompetitionCubit,
-                    OrganizeCompetitionState
-                  >(
-                    builder: (context, competitionState) {
-                      if (competitionState is OrganizeCompetitionsLoaded) {
-                        final List<CompetitionEntity> allCompetitions =
-                            competitionState.data;
+            body:
+                BlocBuilder<OrganizeCompetitionCubit, OrganizeCompetitionState>(
+                  builder: (context, competitionState) {
+                    if (competitionState is OrganizeCompetitionsLoaded) {
+                      final List<CompetitionEntity> allCompetitions =
+                          competitionState.data;
 
-                        return SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 75),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildCompetitionHeader(context),
-                                const SizedBox(height: 10),
-                                _buildCompetitionListSection(),
-                                const SizedBox(height: 30),
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 75),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildCompetitionHeader(context),
+                              const SizedBox(height: 10),
+                              _buildCompetitionListSection(),
+                              const SizedBox(height: 30),
 
-                                _buildSubmissionHeader(context),
-                                const SizedBox(height: 10),
+                              _buildSubmissionHeader(context),
+                              const SizedBox(height: 10),
 
-                                _buildSubmissionListSection(
-                                  context,
-                                  allCompetitions,
-                                ),
-                              ],
-                            ),
+                              _buildSubmissionListSection(
+                                context,
+                                allCompetitions,
+                              ),
+                            ],
                           ),
-                        );
-                      }
+                        ),
+                      );
+                    }
 
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  ),
-            ),
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
           );
         },
       ),

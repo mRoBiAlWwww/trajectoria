@@ -9,6 +9,8 @@ import 'package:trajectoria/core/config/theme/app_theme.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/google_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/user_role_cubit.dart';
+import 'package:trajectoria/features/company/dashboard/presentation/cubit/jobseeker_submission_cubit.dart';
+import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competitions_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/hydrated_history_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_course_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress.dart';
@@ -50,6 +52,8 @@ class MyApp extends StatelessWidget {
           create: (context) => HydratedSelectedCourseCubit(),
         ),
         BlocProvider<LoginFlowCubit>(create: (context) => LoginFlowCubit()),
+        BlocProvider(create: (context) => OrganizeCompetitionCubit()),
+        BlocProvider(create: (context) => JobseekerSubmissionCubit()),
       ],
       child: MaterialApp(
         title: 'Trejectoria',

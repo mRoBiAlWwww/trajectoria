@@ -18,7 +18,6 @@ class CompanyItems extends StatelessWidget {
       'd MMM y',
       'id_ID',
     ).format(deadlineDate);
-    debugPrint(" ikiloh cok ${competition.competitionImage}");
     return InkWell(
       onTap: () {
         AppNavigator.push(
