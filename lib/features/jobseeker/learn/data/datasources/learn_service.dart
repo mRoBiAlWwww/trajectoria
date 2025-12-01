@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:trajectoria/features/authentication/data/models/jobseeker.dart';
 
 abstract class LearnService {
   Future<List<Map<String, dynamic>>> getCourses();
@@ -26,7 +24,7 @@ abstract class LearnService {
   );
   Future<String> addFinishedModule(String moduleId);
   Future<String> addUserScore(double score);
-  Future<Either> getFinishedModules();
+  // Future<JobSeekerModel> getFinishedModules();
 }
 
 class LearnServiceImpl extends LearnService {
@@ -242,23 +240,6 @@ class LearnServiceImpl extends LearnService {
       return "Skor berhasil ditambahkan";
     } catch (e) {
       throw Exception("Error skor gagal ditambahkan $e");
-    }
-  }
-
-  //hanya sementara
-  @override
-  Future<Either> getFinishedModules() async {
-    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
-    var currentUser = FirebaseAuth.instance.currentUser;
-    try {
-      var returnedData = await firestoreInstance
-          .collection('Jobseeker')
-          .doc(currentUser?.uid)
-          .get();
-
-      return Right(JobSeekerModel.fromMap(returnedData.data()!).toEntity());
-    } catch (e) {
-      return const Left('Please try again');
     }
   }
 }

@@ -26,13 +26,13 @@ class _SplashPageState extends State<SplashPage> {
         _opacity = 1.0;
       });
     });
+    context.read<AuthStateCubit>().appStarted();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthStateCubit, AuthState>(
       listener: (context, state) {
-        debugPrint("cek cekdong $state");
         if (state is UnAuthenticated) {
           AppNavigator.pushReplacement(context, WelcomeAnimationPage());
         }

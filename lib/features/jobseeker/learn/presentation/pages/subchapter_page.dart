@@ -266,7 +266,8 @@ class _SubchapterPageState extends State<SubchapterPage> {
             if (state.modules.isNotEmpty) {
               return Column(
                 children: List.generate(state.modules.length, (index) {
-                  bool isCompleted = state.user.finishedModule.contains(
+                  // bool isCompleted = state.user.finishedModule.contains(
+                  bool isCompleted = state.user.contains(
                     state.modules[index].moduleId,
                   );
                   //cek apakah ada module yg sudah selesai
@@ -469,79 +470,3 @@ class _SubchapterPageState extends State<SubchapterPage> {
     );
   }
 }
-
-// child: AnimatedContainer(
-//                                 padding: EdgeInsets.only(right: 10),
-//                                 width: double.infinity,
-//                                 height: currentHeight,
-//                                 duration: const Duration(milliseconds: 300),
-//                                 curve: Curves.easeInOut,
-//                                 decoration: BoxDecoration(
-//                                   border: Border.all(
-//                                     color: AppColors.disableBackgroundButton,
-//                                     width: 2,
-//                                   ),
-//                                   color: Colors.white,
-//                                   borderRadius: BorderRadius.circular(12),
-//                                 ),
-//                                 child: ClipRRect(
-//                                   borderRadius: BorderRadius.circular(15),
-//                                   child: Stack(
-//                                     children: [
-//                                       Positioned(
-//                                         top: 20,
-//                                         left: 20,
-//                                         child: Text(
-//                                           state.subChapters[index].title,
-//                                           overflow: TextOverflow.ellipsis,
-//                                           maxLines: 3,
-//                                           style: TextStyle(
-//                                             fontFamily: 'JetBrainsMono',
-//                                             fontWeight: FontWeight.w700,
-//                                             color: Colors.black,
-//                                             fontSize: 18,
-//                                           ),
-//                                         ),
-//                                       ),
-//                                       if (isExpanded) ...[
-//                                         Positioned(
-//                                           top: 55,
-//                                           left: 20,
-//                                           right: 10,
-//                                           child: Column(
-//                                             children: [
-//                                               Text(
-//                                                 state
-//                                                     .subChapters[index]
-//                                                     .description,
-//                                                 style: TextStyle(
-//                                                   color:
-//                                                       AppColors.secondaryText,
-//                                                   fontSize: 14,
-//                                                   fontFamily: 'Inter',
-//                                                   fontWeight: FontWeight.w500,
-//                                                 ),
-//                                               ),
-//                                               SizedBox(height: 20),
-//                                               // showModules(
-//                                               //   state.modules,
-//                                               //   state
-//                                               //       .subChapters[index]
-//                                               //       .subchapterId,
-//                                               // ),
-//                                               showModules(
-//                                                 widget.courseId,
-//                                                 widget.chapterOrder,
-//                                                 state
-//                                                     .subChapters[index]
-//                                                     .subchapterId,
-//                                                 index,
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         ),
-//                                       ],
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ),
