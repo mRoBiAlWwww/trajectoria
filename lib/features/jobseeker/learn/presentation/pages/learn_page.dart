@@ -17,6 +17,7 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/pages/subchapter_page.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/select_course_path.dart';
+import 'package:trajectoria/main.dart';
 
 class LearnPage extends StatefulWidget {
   const LearnPage({super.key});
@@ -25,7 +26,7 @@ class LearnPage extends StatefulWidget {
   State<LearnPage> createState() => _LearnPageState();
 }
 
-class _LearnPageState extends State<LearnPage> {
+class _LearnPageState extends State<LearnPage> with RouteAware {
   bool isExpanded = false;
   CourseEntity? course;
   String? titleToShow;
@@ -43,6 +44,28 @@ class _LearnPageState extends State<LearnPage> {
       setState(() {
         jobseeker = result;
       });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() async {
+    final eitherUser = await context.read<AuthStateCubit>().getCurrentUser();
+    final result = eitherUser.getOrElse(() => null);
+
+    setState(() {
+      jobseeker = result;
     });
   }
 
@@ -382,12 +405,7 @@ class _LearnPageState extends State<LearnPage> {
   Widget _roadMap(BuildContext context) {
     return Expanded(
       child: SingleChildScrollView(
-        padding: EdgeInsets.only(
-          top: 50,
-          right: 40,
-          left: 40,
-          // bottom: 800, // Anda bisa sesuaikan ini
-        ),
+        padding: EdgeInsets.only(top: 50, right: 40, left: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

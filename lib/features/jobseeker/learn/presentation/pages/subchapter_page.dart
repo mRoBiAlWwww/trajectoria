@@ -27,9 +27,6 @@ class SubchapterPage extends StatefulWidget {
 class _SubchapterPageState extends State<SubchapterPage> {
   final Set<int> _expandedIndices = {};
 
-  // final double _defaultHeight = 75.0;
-  // final double _expandedHeight = 350.0;
-
   void _toggleExpand(int index) {
     setState(() {
       if (_expandedIndices.contains(index)) {

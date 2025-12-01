@@ -16,6 +16,7 @@ import 'package:trajectoria/features/splash/presentation/pages/splash.dart';
 import 'package:trajectoria/service_locator.dart';
 import 'firebase_options.dart';
 
+final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.appTheme,
         debugShowCheckedModeBanner: false,
         home: const SplashPage(),
+        navigatorObservers: [routeObserver],
       ),
     );
   }
