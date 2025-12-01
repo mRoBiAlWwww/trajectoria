@@ -266,7 +266,6 @@ class _SubchapterPageState extends State<SubchapterPage> {
             if (state.modules.isNotEmpty) {
               return Column(
                 children: List.generate(state.modules.length, (index) {
-                  // bool isCompleted = state.user.finishedModule.contains(
                   bool isCompleted = state.user.contains(
                     state.modules[index].moduleId,
                   );
