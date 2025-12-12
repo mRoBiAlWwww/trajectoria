@@ -6,7 +6,7 @@ import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/course_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/course_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_course_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_state.dart';
 
 class SelectCourseSheetContent extends StatelessWidget {

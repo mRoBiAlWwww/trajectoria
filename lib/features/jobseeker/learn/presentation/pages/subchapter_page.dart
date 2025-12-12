@@ -11,6 +11,7 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/module_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/module_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/pages/modul_quiz_page.dart';
+import 'package:trajectoria/main.dart';
 
 class SubchapterPage extends StatefulWidget {
   final String courseId;
@@ -25,7 +26,7 @@ class SubchapterPage extends StatefulWidget {
   State<SubchapterPage> createState() => _SubchapterPageState();
 }
 
-class _SubchapterPageState extends State<SubchapterPage> {
+class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
   final Set<String> _expandedIds = {};
 
   void _toggleExpand(
@@ -45,267 +46,284 @@ class _SubchapterPageState extends State<SubchapterPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    context.read<ChapterCubit>().getChapterAndSubchaptersAndFinishedSubchapters(
+      widget.courseId,
+      widget.chapterOrder,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPopNext() {
+    context.read<ChapterCubit>().getChapterAndSubchaptersAndFinishedSubchapters(
+      widget.courseId,
+      widget.chapterOrder,
+    );
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          ChapterCubit()
-            ..getChapterAndSubchapters(widget.courseId, widget.chapterOrder),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              scrolledUnderElevation: 0.0,
-              backgroundColor: Colors.transparent,
-              systemOverlayStyle: SystemUiOverlayStyle.dark,
-              elevation: 0,
-              centerTitle: true,
-              title: const Text(
-                "Kursus",
-                style: TextStyle(
-                  fontFamily: 'JetBrainsMono',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                  color: Colors.black,
-                ),
-              ),
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.black,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-            body: BlocBuilder<ChapterCubit, ChapterState>(
-              builder: (context, state) {
-                if (state is ChapterAndSubchaptersLoaded) {
-                  return Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          state.courseChapter.title,
-                          style: TextStyle(
-                            fontFamily: 'JetBrainsMono',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          state.courseChapter.description,
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: AppColors.secondaryText,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: SizedBox(
-                            width: 225,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.watch_later_outlined),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      "//${state.courseChapter.duration} Jam",
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14,
-                                        color: AppColors.secondaryText,
-                                      ),
-                                    ),
-                                  ],
+    return Scaffold(
+      appBar: AppBar(
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          "Kursus",
+          style: TextStyle(
+            fontFamily: 'JetBrainsMono',
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
+            color: Colors.black,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: BlocBuilder<ChapterCubit, ChapterState>(
+        builder: (context, state) {
+          if (state is ChapterAndSubchaptersAndFinishedSubchaptersLoaded) {
+            return Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                children: [
+                  Text(
+                    state.courseChapter.title,
+                    style: TextStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    state.courseChapter.description,
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: AppColors.secondaryText,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 225,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined),
+                              SizedBox(width: 5),
+                              Text(
+                                "//${state.courseChapter.duration} Jam",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: AppColors.secondaryText,
                                 ),
-                                SizedBox(width: 20),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                      colors: [
-                                        Color(0xFF87B7B7),
-                                        Color(0xFFC7E8E8),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "${state.courseChapter.maximumScore} XP",
-                                    style: TextStyle(
-                                      fontFamily: 'JetBrainsMono',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [Color(0xFF87B7B7), Color(0xFFC7E8E8)],
+                              ),
+                            ),
+                            child: Text(
+                              "${state.courseChapter.maximumScore} XP",
+                              style: TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 20),
-
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: List.generate(state.subChapters.length, (
-                                index,
-                              ) {
-                                final subchapter = state.subChapters[index];
-                                final itemId = subchapter.subchapterId;
-                                final isExpanded = _expandedIds.contains(
-                                  itemId,
-                                );
-                                return BlocProvider(
-                                  create: (context) => ModuleCubit(),
-                                  child: Builder(
-                                    builder: (context) {
-                                      return Padding(
-                                        key: ValueKey(itemId),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            if (!isExpanded) {
-                                              context
-                                                  .read<ModuleCubit>()
-                                                  .getModulesAndFinishedModules(
-                                                    widget.courseId,
-                                                    widget.chapterOrder,
-                                                    itemId,
-                                                  );
-                                            }
-                                            _toggleExpand(
-                                              context,
-                                              index,
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: List.generate(state.subChapters.length, (
+                          index,
+                        ) {
+                          final subchapter = state.subChapters[index];
+                          final itemId = subchapter.subchapterId;
+                          final isExpanded = _expandedIds.contains(itemId);
+                          bool isCompletedSubchapter = state.user.contains(
+                            state.subChapters[index].subchapterId,
+                          );
+                          return BlocProvider(
+                            create: (context) => ModuleCubit(),
+                            child: Builder(
+                              builder: (context) {
+                                return Padding(
+                                  key: ValueKey(itemId),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (!isExpanded) {
+                                        context
+                                            .read<ModuleCubit>()
+                                            .getModulesAndFinishedModules(
                                               widget.courseId,
                                               widget.chapterOrder,
-                                              state
-                                                  .subChapters[index]
-                                                  .subchapterId,
+                                              itemId,
                                             );
-                                          },
-                                          child: AnimatedContainer(
-                                            padding: EdgeInsets.all(20),
-                                            duration: Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.grey,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  state
-                                                      .subChapters[index]
-                                                      .title,
-                                                  style: TextStyle(
-                                                    fontFamily: 'JetBrainsMono',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.black,
-                                                    fontSize: 18,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 3,
-                                                ),
-                                                AnimatedSize(
-                                                  duration: const Duration(
-                                                    milliseconds: 350,
-                                                  ),
-                                                  curve: Curves.easeInOut,
-                                                  alignment:
-                                                      Alignment.topCenter,
-                                                  child: isExpanded
-                                                      ? Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                top: 10,
-                                                              ),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                state
-                                                                    .subChapters[index]
-                                                                    .description,
-                                                                style: TextStyle(
-                                                                  color: AppColors
-                                                                      .secondaryText,
-                                                                  fontSize: 14,
-                                                                  fontFamily:
-                                                                      'Inter',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              showModules(
-                                                                context,
-                                                                widget
-                                                                    .chapterOrder,
-                                                                state
-                                                                    .subChapters[index]
-                                                                    .subchapterId,
-                                                                state
-                                                                    .courseChapter
-                                                                    .badge,
-                                                                index,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                      : const SizedBox.shrink(),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      }
+                                      _toggleExpand(
+                                        context,
+                                        index,
+                                        widget.courseId,
+                                        widget.chapterOrder,
+                                        state.subChapters[index].subchapterId,
                                       );
                                     },
+                                    child: AnimatedContainer(
+                                      padding: EdgeInsets.all(20),
+                                      duration: Duration(milliseconds: 300),
+                                      decoration: BoxDecoration(
+                                        color: isCompletedSubchapter
+                                            ? Colors.green
+                                            : null,
+                                        border: Border.all(
+                                          color: isCompletedSubchapter
+                                              ? Colors.white
+                                              : Colors.grey,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            state.subChapters[index].title,
+                                            style: TextStyle(
+                                              fontFamily: 'JetBrainsMono',
+                                              fontWeight: FontWeight.w700,
+                                              color: isCompletedSubchapter
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 3,
+                                          ),
+                                          AnimatedSize(
+                                            duration: const Duration(
+                                              milliseconds: 350,
+                                            ),
+                                            curve: Curves.easeInOut,
+                                            alignment: Alignment.topCenter,
+                                            child: isExpanded
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          top: 10,
+                                                        ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          state
+                                                              .subChapters[index]
+                                                              .description,
+                                                          style: TextStyle(
+                                                            color:
+                                                                isCompletedSubchapter
+                                                                ? Colors.white
+                                                                : AppColors
+                                                                      .secondaryText,
+                                                            fontSize: 14,
+                                                            fontFamily: 'Inter',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        showModules(
+                                                          context,
+                                                          widget.chapterOrder,
+                                                          state
+                                                              .subChapters[index]
+                                                              .subchapterId,
+                                                          state
+                                                              .courseChapter
+                                                              .badge,
+                                                          index,
+                                                          isCompletedSubchapter,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : const SizedBox.shrink(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 );
-                              }),
+                              },
                             ),
-                          ),
-                        ),
-                      ],
+                          );
+                        }),
+                      ),
                     ),
-                  );
-                }
-                if (state is ChapterLoading) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                return SizedBox.shrink();
-              },
-            ),
-          );
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is ChapterLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return SizedBox.shrink();
         },
       ),
     );
@@ -317,6 +335,7 @@ class _SubchapterPageState extends State<SubchapterPage> {
     String subchapterId,
     String badge,
     int itemId,
+    bool isCompletedSubchapter,
   ) {
     return BlocBuilder<ModuleCubit, ModuleState>(
       builder: (context, state) {
@@ -324,12 +343,12 @@ class _SubchapterPageState extends State<SubchapterPage> {
           if (state.modules.isNotEmpty) {
             return Column(
               children: List.generate(state.modules.length, (index) {
-                bool isCompleted = state.user.contains(
+                bool isCompletedModule = state.user.contains(
                   state.modules[index].moduleId,
                 );
                 //cek apakah ada module yg sudah selesai
                 return InkWell(
-                  onTap: isCompleted
+                  onTap: isCompletedModule
                       ? null
                       : () {
                           AppNavigator.push(
@@ -373,19 +392,26 @@ class _SubchapterPageState extends State<SubchapterPage> {
                         Expanded(
                           child: Row(
                             children: [
-                              Icon(Icons.description, color: Colors.grey),
+                              Icon(
+                                Icons.description,
+                                color: isCompletedSubchapter
+                                    ? Colors.white
+                                    : Colors.grey,
+                              ),
                               SizedBox(width: 8),
                               Flexible(
                                 child: Text(
                                   state.modules[index].title,
 
                                   style: TextStyle(
-                                    decoration: isCompleted
+                                    decoration: isCompletedModule
                                         ? TextDecoration.lineThrough
                                         : null,
                                     fontFamily: 'Inter',
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.secondaryText,
+                                    color: isCompletedSubchapter
+                                        ? Colors.white
+                                        : AppColors.secondaryText,
                                     fontSize: 14,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -401,7 +427,9 @@ class _SubchapterPageState extends State<SubchapterPage> {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
-                            color: Colors.teal,
+                            color: isCompletedSubchapter
+                                ? Colors.white
+                                : Colors.teal,
                             fontSize: 14,
                           ),
                         ),

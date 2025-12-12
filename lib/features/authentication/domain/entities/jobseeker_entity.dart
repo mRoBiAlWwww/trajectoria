@@ -11,6 +11,7 @@ class JobSeekerEntity extends UserEntity {
   final List<String> finishedModule;
   final List<String> competitionsOnprogress;
   final List<String> competitionsDone;
+  final List<String> finishedSubchapter;
 
   JobSeekerEntity({
     required super.userId,
@@ -28,6 +29,7 @@ class JobSeekerEntity extends UserEntity {
     required this.finishedModule,
     required this.competitionsOnprogress,
     required this.competitionsDone,
+    required this.finishedSubchapter,
   });
   JobSeekerEntity copyWith({
     String? userId,
@@ -45,6 +47,7 @@ class JobSeekerEntity extends UserEntity {
     List<String>? finishedModule,
     List<String>? competitionsOnprogress,
     List<String>? competitionsDone,
+    List<String>? finishedSubchapter,
   }) {
     return JobSeekerEntity(
       userId: userId ?? this.userId,
@@ -63,6 +66,7 @@ class JobSeekerEntity extends UserEntity {
       competitionsOnprogress:
           competitionsOnprogress ?? this.competitionsOnprogress,
       competitionsDone: competitionsDone ?? this.competitionsDone,
+      finishedSubchapter: finishedSubchapter ?? this.finishedSubchapter,
     );
   }
 }

@@ -12,9 +12,10 @@ import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/course.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/course_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_course_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/pages/subchapter_page.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/select_course_path.dart';
@@ -359,11 +360,18 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                         if (course != null) {
                           AppNavigator.push(
                             context,
-                            BlocProvider.value(
-                              value: context.read<BottomNavCubit>(),
+                            MultiBlocProvider(
+                              providers: [
+                                BlocProvider.value(
+                                  value: context.read<BottomNavCubit>(),
+                                ),
+                                BlocProvider(
+                                  create: (context) => ChapterCubit(),
+                                ),
+                              ],
                               child: SubchapterPage(
                                 courseId: course!.courseId,
-                                chapterOrder: 1, //masih statis
+                                chapterOrder: 1,
                               ),
                             ),
                           );
@@ -537,12 +545,16 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                   left: 80,
                   child: GestureDetector(
                     onTap: () {
-                      // final currentState = context.read<CourseCubit>().state;
                       if (course != null) {
                         AppNavigator.push(
                           context,
-                          BlocProvider.value(
-                            value: context.read<BottomNavCubit>(),
+                          MultiBlocProvider(
+                            providers: [
+                              BlocProvider.value(
+                                value: context.read<BottomNavCubit>(),
+                              ),
+                              BlocProvider(create: (context) => ChapterCubit()),
+                            ],
                             child: SubchapterPage(
                               courseId: course!.courseId,
                               chapterOrder: 0,
@@ -589,12 +601,18 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                     color: AppColors.splashBackground,
                     child: GestureDetector(
                       onTap: () {
-                        // final currentState = context.read<CourseCubit>().state;
                         if (course != null) {
                           AppNavigator.push(
                             context,
-                            BlocProvider.value(
-                              value: context.read<BottomNavCubit>(),
+                            MultiBlocProvider(
+                              providers: [
+                                BlocProvider.value(
+                                  value: context.read<BottomNavCubit>(),
+                                ),
+                                BlocProvider(
+                                  create: (context) => ChapterCubit(),
+                                ),
+                              ],
                               child: SubchapterPage(
                                 courseId: course!.courseId,
                                 chapterOrder: 1,

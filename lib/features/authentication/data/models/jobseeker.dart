@@ -12,6 +12,7 @@ class JobSeekerModel extends UserModel {
   final List<String> finishedModule;
   final List<String> competitionsOnprogress;
   final List<String> competitionsDone;
+  final List<String> finishedSubchapter;
 
   JobSeekerModel({
     required super.userId,
@@ -29,6 +30,7 @@ class JobSeekerModel extends UserModel {
     required this.finishedModule,
     required this.competitionsOnprogress,
     required this.competitionsDone,
+    required this.finishedSubchapter,
   });
 
   factory JobSeekerModel.fromMap(Map<String, dynamic> map) {
@@ -55,6 +57,9 @@ class JobSeekerModel extends UserModel {
       competitionsDone: map['competitions_done'] != null
           ? List<String>.from(map['competitions_done'] as List)
           : <String>[],
+      finishedSubchapter: map['finished_subchapter'] != null
+          ? List<String>.from(map['finished_subchapter'] as List)
+          : <String>[],
     );
   }
 
@@ -76,6 +81,7 @@ class JobSeekerModel extends UserModel {
       'finished_module': finishedModule,
       'competitions_onprogress': competitionsOnprogress,
       'competitions_done': competitionsDone,
+      'finished_subchapter': finishedSubchapter,
     };
   }
 
@@ -97,6 +103,7 @@ class JobSeekerModel extends UserModel {
       finishedModule: finishedModule,
       competitionsOnprogress: competitionsOnprogress,
       competitionsDone: competitionsDone,
+      finishedSubchapter: finishedSubchapter,
     );
   }
 
@@ -117,6 +124,7 @@ class JobSeekerModel extends UserModel {
       finishedModule: entity.finishedModule,
       competitionsOnprogress: entity.competitionsOnprogress,
       competitionsDone: entity.competitionsDone,
+      finishedSubchapter: entity.finishedSubchapter,
     );
   }
 }

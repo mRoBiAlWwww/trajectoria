@@ -47,6 +47,7 @@ class UserSignupReq {
       finishedModule: <String>[],
       competitionsOnprogress: <String>[],
       competitionsDone: <String>[],
+      finishedSubchapter: <String>[],
     );
   }
 
@@ -87,6 +88,7 @@ extension UserSignupReqX on UserSignupReq {
       finishedModule: <String>[],
       competitionsOnprogress: <String>[],
       competitionsDone: <String>[],
+      finishedSubchapter: <String>[],
     );
   }
 

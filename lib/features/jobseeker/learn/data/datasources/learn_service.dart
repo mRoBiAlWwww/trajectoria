@@ -23,6 +23,7 @@ abstract class LearnService {
     String moduleId,
   );
   Future<String> addFinishedModule(String moduleId);
+  Future<String> addFinishedSubchapter(String subchapterId);
   Future<String> addUserScore(double score);
   // Future<JobSeekerModel> getFinishedModules();
 }
@@ -222,6 +223,24 @@ class LearnServiceImpl extends LearnService {
           });
 
       return "Modul yang selesai berhasil ditambahkan ke daftar";
+    } catch (e) {
+      throw Exception("Error modul gagal ditambahkan ke daftar $e");
+    }
+  }
+
+  @override
+  Future<String> addFinishedSubchapter(String subchapterId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser?.uid)
+          .update({
+            "finished_subchapter": FieldValue.arrayUnion([subchapterId]),
+          });
+
+      return "Subchapter selesai berhasil ditambahkan ke daftar";
     } catch (e) {
       throw Exception("Error modul gagal ditambahkan ke daftar $e");
     }

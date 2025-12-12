@@ -18,6 +18,7 @@ class JobseekerSignupReq {
   final List<String>? finishedModule;
   final List<String>? competitionsOnprogress;
   final List<String>? competitionsDone;
+  final List<String>? finishedSubchapter;
 
   JobseekerSignupReq({
     required this.email,
@@ -35,6 +36,7 @@ class JobseekerSignupReq {
     this.finishedModule,
     this.competitionsOnprogress,
     this.competitionsDone,
+    this.finishedSubchapter,
   });
 
   JobSeekerModel toJobseekerModel() {
@@ -54,6 +56,7 @@ class JobseekerSignupReq {
       finishedModule: finishedModule ?? <String>[],
       competitionsOnprogress: competitionsOnprogress ?? <String>[],
       competitionsDone: competitionsDone ?? <String>[],
+      finishedSubchapter: finishedSubchapter ?? <String>[],
     );
   }
 
@@ -74,6 +77,7 @@ class JobseekerSignupReq {
       finishedModule: finishedModule ?? <String>[],
       competitionsOnprogress: competitionsOnprogress ?? <String>[],
       competitionsDone: competitionsDone ?? <String>[],
+      finishedSubchapter: finishedSubchapter ?? <String>[],
     );
   }
 }

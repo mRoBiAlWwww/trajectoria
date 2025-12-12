@@ -13,7 +13,7 @@ import 'package:trajectoria/features/company/dashboard/presentation/cubit/jobsee
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competitions_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/hydrated_history_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_course_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/splash/presentation/pages/splash.dart';
 import 'package:trajectoria/service_locator.dart';
 import 'firebase_options.dart';

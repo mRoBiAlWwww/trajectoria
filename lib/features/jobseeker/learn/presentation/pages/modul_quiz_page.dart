@@ -6,7 +6,7 @@ import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/quiz.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/modul_or_quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/next_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/quiz_cubit.dart';
@@ -483,10 +483,7 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                             await context
                                                 .read<QuizCubit>()
                                                 .submitQuizAction(
-                                                  widget.module.courseId,
-                                                  widget.module.chapterId,
-                                                  widget.module.subchapterId,
-                                                  widget.module.moduleId,
+                                                  widget.module,
                                                   finalScore,
                                                 );
                                             if (context.mounted) {
@@ -499,7 +496,7 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                                           'courseId': widget
                                                               .module
                                                               .courseId,
-                                                          'score': 20,
+                                                          'score': 3,
                                                         })
                                                   : null;
                                             }
@@ -507,7 +504,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
 
                                             // 7. BARU navigasi SETELAH submit selesai
                                             if (context.mounted) {
-                                              debugPrint('gaboleh');
                                               AppNavigator.push(
                                                 context,
                                                 ScorePage(

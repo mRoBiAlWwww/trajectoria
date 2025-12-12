@@ -104,6 +104,16 @@ class LearnRepositoryImpl extends LearnRepository {
   }
 
   @override
+  Future<Either> addFinishedSubchapter(String subchapterId) async {
+    try {
+      final result = await service.addFinishedSubchapter(subchapterId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
   Future<Either> addUserScore(double score) async {
     try {
       final result = await service.addUserScore(score);

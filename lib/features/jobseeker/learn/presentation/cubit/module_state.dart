@@ -13,10 +13,5 @@ class ModulesAndFinishedModulesLoaded extends ModuleState {
   final List<String> user;
   ModulesAndFinishedModulesLoaded(this.modules, this.user);
 }
-// class ModulesAndFinishedModulesLoaded extends ModuleState {
-//   final List<ModuleEntity> modules;
-//   final JobSeekerEntity user;
-//   ModulesAndFinishedModulesLoaded(this.modules, this.user);
-// }
 
 class ModuleFailure extends ModuleState {}

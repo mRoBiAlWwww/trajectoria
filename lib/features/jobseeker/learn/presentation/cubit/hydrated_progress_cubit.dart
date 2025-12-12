@@ -4,16 +4,41 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated
 class HydratedProgressCubit extends HydratedCubit<HydratedProgressState> {
   HydratedProgressCubit() : super(HydratedProgressStateInitial());
 
-  /// Menambahkan item baru ke dalam list
-  void addItem(Map<String, dynamic> newItem) {
+  void addItem(Map<String, dynamic> input) {
     final currentState = state;
+
+    // Ambil data dari input
+    final String targetCourseId = input['courseId'];
+    final int scoreToAdd = input['score'] as int;
+
+    List<Map<String, dynamic>> currentList = [];
+
+    // 1. Ambil list saat ini (jika ada)
     if (currentState is HydratedProgressStateLoaded) {
-      final updatedList = List<Map<String, dynamic>>.from(currentState.items)
-        ..add(newItem);
-      emit(HydratedProgressStateLoaded(updatedList));
-    } else {
-      emit(HydratedProgressStateLoaded([newItem]));
+      currentList = List<Map<String, dynamic>>.from(currentState.items);
     }
+
+    // 2. Cari apakah courseId sudah ada di dalam list
+    final index = currentList.indexWhere(
+      (item) => item['courseId'] == targetCourseId,
+    );
+    if (index != -1) {
+      // KASUS A: SUDAH ADA (Update/Sum)
+      final existingItem = currentList[index];
+      final int currentScore = (existingItem['score'] ?? 0) as int;
+
+      // Update item di index tersebut dengan Score Lama + Score Baru
+      currentList[index] = {
+        'courseId': targetCourseId,
+        'score': currentScore + scoreToAdd,
+      };
+    } else {
+      // KASUS B: BELUM ADA (Insert Baru)
+      currentList.add({'courseId': targetCourseId, 'score': scoreToAdd});
+    }
+
+    // 3. Emit state baru
+    emit(HydratedProgressStateLoaded(currentList));
   }
 
   /// Menghapus item berdasarkan index
@@ -36,11 +61,12 @@ class HydratedProgressCubit extends HydratedCubit<HydratedProgressState> {
   int getScoreByCourseId(String courseId) {
     if (state is HydratedProgressStateLoaded) {
       final loaded = state as HydratedProgressStateLoaded;
-      final item = loaded.items.firstWhere(
-        (e) => e['courseId'] == courseId,
-        orElse: () => {},
-      );
-      return (item['score'] ?? 0) as int;
+      try {
+        final item = loaded.items.firstWhere((e) => e['courseId'] == courseId);
+        return (item['score'] ?? 0) as int;
+      } catch (e) {
+        return 0;
+      }
     }
     return 0;
   }

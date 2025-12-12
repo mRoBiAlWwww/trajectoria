@@ -16,5 +16,6 @@ abstract class LearnRepository {
     String moduleId,
   );
   Future<Either> addFinishedModule(String moduleId);
+  Future<Either> addFinishedSubchapter(String subchapterId);
   Future<Either> addUserScore(double score);
 }

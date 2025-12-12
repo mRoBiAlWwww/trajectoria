@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_subchapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_user_score.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_quiz.dart';
@@ -35,18 +37,11 @@ class QuizCubit extends Cubit<QuizState> {
     );
   }
 
-  Future<void> submitQuizAction(
-    String courseId,
-    String chapterId,
-    String subChapterId,
-    String moduleId,
-    double score,
-  ) async {
-    debugPrint("aman kok");
+  Future<void> submitQuizAction(ModuleEntity module, double score) async {
     emit(QuizLoading());
 
     var changeStatusResult = await sl<AddFinishedModuleStatusUseCase>().call(
-      moduleId,
+      module.moduleId,
     );
 
     changeStatusResult.fold((error) {
@@ -54,13 +49,23 @@ class QuizCubit extends Cubit<QuizState> {
       return null;
     }, (data) => data);
 
+    if (module.orderIndex == 3) {
+      var changeStatusResult = await sl<AddFinishedSubchapterStatusUseCase>()
+          .call(module.subchapterId);
+
+      changeStatusResult.fold((error) {
+        emit(QuizFailure());
+        return null;
+      }, (data) => data);
+    }
+
     var addScoreResult = await sl<AddUserScoreUseCase>().call(score);
 
     final scoreData = addScoreResult.fold((error) {
       emit(QuizFailure());
       return null;
     }, (data) => data);
-    debugPrint(scoreData);
+
     emit(SuccessfulProcess(scoreData));
   }
 }
