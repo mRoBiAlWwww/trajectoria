@@ -187,7 +187,7 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
                                   context
                                       .read<CreateCompImageCubit>()
                                       .pickAndUploadImage(
-                                        'trajectoria/image_profile',
+                                        'trajectoria/competition_image',
                                       );
                                 },
                                 style: ButtonStyle(
@@ -439,14 +439,12 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
                                     >(
                                       builder: (context, state) {
                                         if (state is SubmissionLoading) {
-                                          return Center(
-                                            child: Column(
-                                              children: [
-                                                SizedBox(height: 80),
-                                                CircularProgressIndicator(
-                                                  color: Colors.teal,
-                                                ),
-                                              ],
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 50,
+                                            ),
+                                            child: CircularProgressIndicator(
+                                              color: Colors.teal,
                                             ),
                                           );
                                         }
@@ -601,7 +599,6 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
   }
 
   Widget _buildFilesList(BuildContext context) {
-    debugPrint("plz wokk");
     return ListView.builder(
       padding: EdgeInsets.fromLTRB(3, 0, 3, 80),
       shrinkWrap: true,

@@ -42,10 +42,7 @@ class _PremiumPageState extends State<PremiumPage> {
       await Future.delayed(Duration(seconds: 3));
 
       if (!mounted) return false;
-
-      int nextPage = currentIndex + 1;
-      if (nextPage == myImages.length) nextPage = 0;
-
+      int nextPage = _controller.page!.round() + 1;
       _controller.animateToPage(
         nextPage,
         duration: Duration(milliseconds: 400),
@@ -109,13 +106,17 @@ class _PremiumPageState extends State<PremiumPage> {
                       height: 180,
                       child: PageView.builder(
                         controller: _controller,
-                        itemCount: myImages.length,
-                        onPageChanged: (i) => setState(() => currentIndex = i),
+                        onPageChanged: (i) {
+                          setState(() {
+                            currentIndex = i % myImages.length;
+                          });
+                        },
                         itemBuilder: (context, index) {
+                          final realIndex = index % myImages.length;
                           return ClipRRect(
                             borderRadius: BorderRadius.circular(16),
                             child: Image.asset(
-                              myImages[index],
+                              myImages[realIndex],
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ),
@@ -123,9 +124,7 @@ class _PremiumPageState extends State<PremiumPage> {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 25),
-
                     SizedBox(
                       height: 150,
                       child: Column(
@@ -156,9 +155,7 @@ class _PremiumPageState extends State<PremiumPage> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
@@ -177,7 +174,6 @@ class _PremiumPageState extends State<PremiumPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
                   ],
                 ),

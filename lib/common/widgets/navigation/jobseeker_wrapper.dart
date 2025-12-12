@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trajectoria/common/bloc/navigation/bottom_navigation_jobseeker_cubit.dart';
+import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/onboarding_compete_page.dart';
@@ -38,6 +38,7 @@ class JobseekerWrapper extends StatelessWidget {
 
   BottomAppBar _mainWrapperBottomNavBar(BuildContext context) {
     return BottomAppBar(
+      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
       color: AppColors.splashBackground,
       child: Container(
         decoration: BoxDecoration(

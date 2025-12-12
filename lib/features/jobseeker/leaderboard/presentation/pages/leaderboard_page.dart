@@ -132,85 +132,91 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    index == 0
-                                        ? Image.asset(
-                                            AppImages.satu,
-                                            width: 50,
-                                            height: 50,
-                                          )
-                                        : index == 1
-                                        ? Image.asset(
-                                            AppImages.dua,
-                                            width: 50,
-                                            height: 50,
-                                          )
-                                        : index == 2
-                                        ? Image.asset(
-                                            AppImages.tiga,
-                                            width: 50,
-                                            height: 50,
-                                          )
-                                        : SizedBox(
-                                            width: 50,
-                                            height: 50,
-                                            child: Center(
-                                              child: Text(
-                                                (index + 1).toString(),
-                                                style: TextStyle(
-                                                  fontFamily: "JetBrainsMono",
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 18,
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      index == 0
+                                          ? Image.asset(
+                                              AppImages.satu,
+                                              width: 50,
+                                              height: 50,
+                                            )
+                                          : index == 1
+                                          ? Image.asset(
+                                              AppImages.dua,
+                                              width: 50,
+                                              height: 50,
+                                            )
+                                          : index == 2
+                                          ? Image.asset(
+                                              AppImages.tiga,
+                                              width: 50,
+                                              height: 50,
+                                            )
+                                          : SizedBox(
+                                              width: 50,
+                                              height: 50,
+                                              child: Center(
+                                                child: Text(
+                                                  (index + 1).toString(),
+                                                  style: TextStyle(
+                                                    fontFamily: "JetBrainsMono",
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 18,
+                                                  ),
                                                 ),
                                               ),
                                             ),
+                                      SizedBox(width: 8),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                        child: Image.network(
+                                          leaderbord.profileImage,
+                                          fit: BoxFit.cover,
+                                          width: 40,
+                                          height: 40,
+                                          // loadingBuilder:
+                                          //     (context, child, loadingProgress) {
+                                          //       if (loadingProgress == null) {
+                                          //         return child;
+                                          //       }
+                                          //       return Container(
+                                          //         width: 40,
+                                          //         height: 40,
+                                          //         color: Colors.grey,
+                                          //         child: const Center(
+                                          //           child:
+                                          //               CircularProgressIndicator(
+                                          //                 color: Colors.white,
+                                          //               ),
+                                          //         ),
+                                          //       );
+                                          //     },
+                                          // errorBuilder:
+                                          //     (context, error, stackTrace) {
+                                          //       return const Center(
+                                          //         child: Text('Gagal memuat.'),
+                                          //       );
+                                          //     },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          leaderbord.name,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16,
                                           ),
-                                    SizedBox(width: 8),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: Image.network(
-                                        leaderbord.profileImage,
-                                        fit: BoxFit.cover,
-                                        width: 40,
-                                        height: 40,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Container(
-                                                width: 40,
-                                                height: 40,
-                                                color: Colors.grey,
-                                                child: const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        color: Colors.white,
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                              return const Center(
-                                                child: Text('Gagal memuat.'),
-                                              );
-                                            },
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      leaderbord.name,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 Text(
                                   "${leaderbord.coursesScore.toString()} XP",

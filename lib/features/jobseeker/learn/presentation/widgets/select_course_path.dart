@@ -64,9 +64,6 @@ class SelectCourseSheetContent extends StatelessWidget {
                                     ),
                                     child: InkWell(
                                       onTap: () {
-                                        // context
-                                        //     .read<CourseCubit>()
-                                        //     .selectCourse(state.course[index]);
                                         context
                                             .read<HydratedSelectedCourseCubit>()
                                             .setCourse(state.course[index]);

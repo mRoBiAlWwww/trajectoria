@@ -50,26 +50,13 @@ class _FilterCompetitionSheetState extends State<FilterCompetitionSheet> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Kategori",
-                              style: TextStyle(
-                                fontFamily: 'JetBrainsMono',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              "Lihat semua",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: "JetBrainsMono",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "Kategori",
+                          style: TextStyle(
+                            fontFamily: 'JetBrainsMono',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         SizedBox(height: 10),
                         Wrap(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
@@ -358,9 +359,12 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                         if (course != null) {
                           AppNavigator.push(
                             context,
-                            SubchapterPage(
-                              courseId: course!.courseId,
-                              chapterOrder: 1, //masih statis
+                            BlocProvider.value(
+                              value: context.read<BottomNavCubit>(),
+                              child: SubchapterPage(
+                                courseId: course!.courseId,
+                                chapterOrder: 1, //masih statis
+                              ),
                             ),
                           );
                         } else {
@@ -405,7 +409,7 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
   Widget _roadMap(BuildContext context) {
     return Expanded(
       child: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 50, right: 40, left: 40),
+        padding: EdgeInsets.fromLTRB(40, 50, 40, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -466,7 +470,9 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                             ),
                             child: ElevatedButton(
                               onPressed: () {
-                                // Aksi tombol
+                                context
+                                    .read<BottomNavCubit>()
+                                    .changeSelectedIndexJobseeker(3);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
@@ -535,9 +541,12 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                       if (course != null) {
                         AppNavigator.push(
                           context,
-                          SubchapterPage(
-                            courseId: course!.courseId,
-                            chapterOrder: 0,
+                          BlocProvider.value(
+                            value: context.read<BottomNavCubit>(),
+                            child: SubchapterPage(
+                              courseId: course!.courseId,
+                              chapterOrder: 0,
+                            ),
                           ),
                         );
                       } else {
@@ -584,9 +593,12 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                         if (course != null) {
                           AppNavigator.push(
                             context,
-                            SubchapterPage(
-                              courseId: course!.courseId,
-                              chapterOrder: 1,
+                            BlocProvider.value(
+                              value: context.read<BottomNavCubit>(),
+                              child: SubchapterPage(
+                                courseId: course!.courseId,
+                                chapterOrder: 1,
+                              ),
                             ),
                           );
                         } else {

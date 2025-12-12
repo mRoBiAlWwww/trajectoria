@@ -84,8 +84,9 @@ class FinalisWidget extends StatelessWidget {
                                   height: 50,
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
+                                        if (loadingProgress == null) {
                                           return child;
+                                        }
                                         return Container(
                                           width: 100,
                                           height: 100,
@@ -194,7 +195,7 @@ class FinalisWidget extends StatelessWidget {
                   Image.asset(AppImages.not, width: 100, height: 100),
                   SizedBox(height: 10),
                   Text(
-                    "Belum ada unggahan",
+                    "Belum ada finalis",
                     style: TextStyle(
                       fontFamily: 'JetBrainsMono',
                       fontWeight: FontWeight.w800,
@@ -204,7 +205,7 @@ class FinalisWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    "Tunggu peserta mengirim jawaban di periode kompetisi",
+                    "Anda belum menambahkan partisipan kompetisi anda ke final sama sekali",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -216,6 +217,9 @@ class FinalisWidget extends StatelessWidget {
                 ],
               );
             }
+          }
+          if (finalisState is UserFinalisLoading) {
+            return Center(child: CircularProgressIndicator(color: Colors.teal));
           }
           return SizedBox.shrink();
         },

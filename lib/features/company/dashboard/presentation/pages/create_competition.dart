@@ -58,15 +58,13 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SingleChildScrollView(
-            child: IndexedStack(
-              index: page - 1,
-              children: const [
-                CreateDetailWidget(),
-                CreateRubrikWidget(),
-                CreateScheduleWidget(),
-              ],
-            ),
+          child: IndexedStack(
+            index: page - 1,
+            children: [
+              SingleChildScrollView(child: CreateDetailWidget()),
+              SingleChildScrollView(child: CreateRubrikWidget()),
+              SingleChildScrollView(child: CreateScheduleWidget()),
+            ],
           ),
         ),
         bottomNavigationBar: Padding(

@@ -8,6 +8,7 @@ class CourseChapterModel {
   final String duration;
   final int orderIndex;
   final int maximumScore;
+  final String badge;
 
   CourseChapterModel({
     required this.chapterId,
@@ -17,6 +18,7 @@ class CourseChapterModel {
     required this.orderIndex,
     required this.maximumScore,
     required this.duration,
+    required this.badge,
   });
 
   factory CourseChapterModel.fromMap(Map<String, dynamic> map) {
@@ -28,6 +30,7 @@ class CourseChapterModel {
       orderIndex: map['order_index'] ?? '',
       maximumScore: map['maximum_score'] ?? 0,
       duration: map['duration'] ?? '',
+      badge: map['badge'] ?? '',
     );
   }
 
@@ -39,6 +42,7 @@ class CourseChapterModel {
     'order_index': orderIndex,
     'maximum_score': maximumScore,
     'duration': duration,
+    'badge': badge,
   };
 
   CourseChapterEntity toEntity() => CourseChapterEntity(
@@ -49,6 +53,7 @@ class CourseChapterModel {
     orderIndex: orderIndex,
     maximumScore: maximumScore,
     duration: duration,
+    badge: badge,
   );
 
   factory CourseChapterModel.fromEntity(CourseChapterEntity entity) =>
@@ -60,5 +65,6 @@ class CourseChapterModel {
         orderIndex: entity.orderIndex,
         maximumScore: entity.maximumScore,
         duration: entity.duration,
+        badge: entity.badge,
       );
 }

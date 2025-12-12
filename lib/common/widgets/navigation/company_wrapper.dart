@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trajectoria/common/bloc/navigation/bottom_navigation_jobseeker_cubit.dart';
+import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';

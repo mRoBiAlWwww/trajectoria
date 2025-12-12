@@ -6,6 +6,7 @@ class CourseChapterEntity {
   final String duration;
   final int orderIndex;
   final int maximumScore;
+  final String badge;
 
   CourseChapterEntity({
     required this.chapterId,
@@ -15,5 +16,6 @@ class CourseChapterEntity {
     required this.orderIndex,
     required this.maximumScore,
     required this.duration,
+    required this.badge,
   });
 }

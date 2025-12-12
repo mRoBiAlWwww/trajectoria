@@ -16,6 +16,7 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/pages/score_pa
 
 class ModulQuizPage extends StatefulWidget {
   final ModuleEntity module;
+  final String badge;
   final int chapterOrder;
   final String nextModule;
   final int nextMaximumScore;
@@ -25,6 +26,7 @@ class ModulQuizPage extends StatefulWidget {
     required this.chapterOrder,
     required this.nextModule,
     required this.nextMaximumScore,
+    required this.badge,
   });
 
   @override
@@ -45,7 +47,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("${widget.nextMaximumScore.toString()} XP 1");
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -510,6 +511,7 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                               AppNavigator.push(
                                                 context,
                                                 ScorePage(
+                                                  badge: widget.badge,
                                                   finalScore: finalScore,
                                                   maximumScore: widget
                                                       .module

@@ -10,12 +10,14 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/gift.d
 class ScorePage extends StatefulWidget {
   final double? finalScore;
   final String nextModule;
+  final String badge;
   final int maximumScore;
   final int nextMaximumScore;
   const ScorePage({
     super.key,
     required this.finalScore,
     required this.nextModule,
+    required this.badge,
     required this.nextMaximumScore,
     required this.maximumScore,
   });
@@ -42,7 +44,6 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("${widget.nextMaximumScore.toString()} XP 2");
     return BlocProvider(
       create: (context) => QuizCubit(),
       child: Scaffold(
@@ -94,7 +95,7 @@ class _ScorePageState extends State<ScorePage> {
                             ),
                           ),
                           Text(
-                            "badge “Full-Stack Rookie”",
+                            "badge “${widget.badge}”",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 14,

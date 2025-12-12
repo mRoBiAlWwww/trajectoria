@@ -228,6 +228,11 @@ class RankWidget extends StatelessWidget {
                         ],
                       );
                     }
+                    if (userState is UserCompeLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(color: Colors.teal),
+                      );
+                    }
                     return SizedBox.shrink();
                   },
                 ),
@@ -262,6 +267,9 @@ class RankWidget extends StatelessWidget {
                 ],
               );
             }
+          }
+          if (incrementState is JobseekerSubmissionLoading) {
+            return Center(child: CircularProgressIndicator(color: Colors.teal));
           }
           return SizedBox.shrink();
         },

@@ -32,14 +32,14 @@ class DetailSubmissionPage extends StatefulWidget {
 }
 
 class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
-  final TextEditingController _catatanController = TextEditingController();
+  late final TextEditingController _catatanController;
   List<double> sliderValue = [0, 0, 0];
   List<int> bobotList = [];
   List<String> urls = [];
+  List<String> common = [];
+  List<String> summary = [];
 
   int multiplyScore(List<double> a, List<int> b) {
-    debugPrint(a.length.toString());
-    debugPrint(b.length.toString());
     if (a.length != b.length) {
       throw Exception("List harus memiliki panjang yang sama");
     }
@@ -53,6 +53,12 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   @override
   void initState() {
     super.initState();
+    _catatanController = TextEditingController(
+      text: (widget.submission.feedback.isNotEmpty)
+          ? widget.submission.feedback
+          : "",
+    );
+
     for (var item in widget.competition.rubrik) {
       bobotList.add(item.bobot);
     }
@@ -529,59 +535,70 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(15),
                                     ),
-                                    constraints: const BoxConstraints(
-                                      minHeight: 180,
-                                      maxHeight: 180,
-                                    ),
                                     width: double.infinity,
-                                    child: ConstrainedBox(
-                                      constraints: const BoxConstraints(
-                                        minHeight: 180,
-                                      ),
-                                      child:
-                                          BlocConsumer<
-                                            OrganizeCompetitionCubit,
-                                            OrganizeCompetitionState
-                                          >(
-                                            listener: (context, state) {
-                                              if (state
-                                                  is OrganizeCompetitionLoading) {
-                                                GlobalLoadingAi.show(context);
-                                              } else {
-                                                GlobalLoadingAi.hide();
-                                              }
-                                            },
-                                            builder: (context, state) {
-                                              if (state
-                                                  is OrganizeAISummaryLoaded) {
-                                                final data = state.data;
+                                    child:
+                                        BlocConsumer<
+                                          OrganizeCompetitionCubit,
+                                          OrganizeCompetitionState
+                                        >(
+                                          listener: (context, state) {
+                                            //untuk kondisi setelah klik tombol simpan
+                                            if (state
+                                                is OrganizeAISummaryLoaded) {
+                                              setState(() {
+                                                common =
+                                                    state.data.commonPattern;
+                                                summary = state.data.summary;
+                                              });
+                                            }
+                                            if (state
+                                                is OrganizeCompetitionLoading) {
+                                              GlobalLoadingAi.show(context);
+                                            } else {
+                                              GlobalLoadingAi.hide();
+                                            }
+                                          },
+                                          builder: (context, state) {
+                                            //kondisi setelah klik analisis
+                                            if (state
+                                                is OrganizeAISummaryLoaded) {
+                                              return _buildAISummary(
+                                                common:
+                                                    state.data.commonPattern,
+                                                summary: state.data.summary,
+                                              );
+                                            }
 
-                                                return _buildAISummary(
-                                                  common: data.commonPattern,
-                                                  summary: data.summary,
-                                                );
-                                              }
-                                              if (widget
-                                                  .submission
-                                                  .aiAnalyzed
-                                                  .summary
-                                                  .isNotEmpty) {
-                                                return _buildAISummary(
-                                                  common: widget
-                                                      .submission
-                                                      .aiAnalyzed
-                                                      .commonPattern,
-                                                  summary: widget
-                                                      .submission
-                                                      .aiAnalyzed
-                                                      .summary,
-                                                );
-                                              }
+                                            //untuk kondisi masuk ke halaman detail unggahan
+                                            if (widget
+                                                .submission
+                                                .aiAnalyzed
+                                                .summary
+                                                .isNotEmpty) {
+                                              return _buildAISummary(
+                                                common: widget
+                                                    .submission
+                                                    .aiAnalyzed
+                                                    .commonPattern,
+                                                summary: widget
+                                                    .submission
+                                                    .aiAnalyzed
+                                                    .summary,
+                                              );
+                                            }
 
-                                              return _buildEmptyAI(context);
-                                            },
-                                          ),
-                                    ),
+                                            //untuk kondisi setelah klik tombol simpan
+                                            if (common.isNotEmpty &&
+                                                summary.isNotEmpty) {
+                                              return _buildAISummary(
+                                                common: common,
+                                                summary: summary,
+                                              );
+                                            }
+
+                                            return _buildEmptyAI(context);
+                                          },
+                                        ),
                                   ),
                                 ),
                               ],
@@ -737,100 +754,100 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
     required List<String> common,
     required List<String> summary,
   }) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        Text(
+          "Problem Solution",
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        ),
 
-          Text(
-            "Problem Solution",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-          ),
+        SizedBox(height: 10),
 
-          SizedBox(height: 10),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: common.length,
+          itemBuilder: (_, i) => _buildBulletText(common[i]),
+        ),
 
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: common.length,
-            itemBuilder: (_, i) => _buildBulletText(common[i]),
-          ),
+        SizedBox(height: 20),
+        Text(
+          "AI Summary",
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        ),
 
-          SizedBox(height: 20),
-          Text(
-            "AI Summary",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-          ),
+        SizedBox(height: 10),
 
-          SizedBox(height: 10),
-
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: summary.length,
-            itemBuilder: (_, i) => _buildBulletText(summary[i]),
-          ),
-        ],
-      ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: summary.length,
+          itemBuilder: (_, i) => _buildBulletText(summary[i]),
+        ),
+      ],
     );
   }
 
   Widget _buildEmptyAI(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "Belum ada analisis dari AI",
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          "Tekan tombol di bawah untuk melihat rangkuman otomatis dari submission ini.",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12),
-        ),
-        SizedBox(height: 15),
-        GestureDetector(
-          onTap: () {
-            context.read<OrganizeCompetitionCubit>().analyzed(
-              widget.submission.submissionId,
-              widget.competition.problemStatement,
-              urls,
-            );
-          },
-          child: IntrinsicWidth(
-            child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color(0xFF4B3480),
-                    Color(0xFFC267FF),
-                    Color(0xFFE5FF9E),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Belum ada analisis dari AI",
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          Text(
+            "Tekan tombol di bawah untuk melihat rangkuman otomatis dari submission ini.",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12),
+          ),
+          SizedBox(height: 15),
+          GestureDetector(
+            onTap: () {
+              context.read<OrganizeCompetitionCubit>().analyzed(
+                widget.submission.submissionId,
+                widget.competition.problemStatement,
+                urls,
+              );
+            },
+            child: IntrinsicWidth(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF4B3480),
+                      Color(0xFFC267FF),
+                      Color(0xFFE5FF9E),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(AppImages.blink, width: 20, height: 20),
+                    Text(
+                      "Analisis",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Image.asset(AppImages.blink, width: 20, height: 20),
-                  Text(
-                    "Analisis",
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

@@ -234,18 +234,17 @@ class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
   }
 
   Future<void> fetchCompetitionById(String competitionId) async {
+    emit(state.copyWith(isLoading: true));
     final result = await sl<GetCompetitionByIdCompanyUseCase>().call(
       competitionId,
     );
 
     result.fold(
       (failure) {
-        debugPrint("Competition Data Fetched: ");
-        debugPrint("Error getCompetitionById: $failure");
+        (failure) => emit(state.copyWith(isLoading: false, error: failure));
       },
       (data) {
-        // Update state.competition
-        emit(state.copyWith(competition: data));
+        emit(state.copyWith(isLoading: false, competition: data));
 
         // Atur ulang pickedDate / pickedTime agar date picker menampilkan data lama
         final created = data.createdAt.toDate();
@@ -255,8 +254,6 @@ class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
         final deadline = data.deadline.toDate();
         deadlineDate = DateTime(deadline.year, deadline.month, deadline.day);
         deadlineTime = TimeOfDay(hour: deadline.hour, minute: deadline.minute);
-
-        debugPrint("Competition Loaded into CreateCompetitionCubit");
       },
     );
   }
