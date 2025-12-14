@@ -1,7 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/subchapter.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_subchapter.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_onprogres_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_user_score.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_quiz.dart';
@@ -37,26 +40,56 @@ class QuizCubit extends Cubit<QuizState> {
     );
   }
 
-  Future<void> submitQuizAction(ModuleEntity module, double score) async {
+  Future<void> addOnprogresChapter(String chapterId) async {
     emit(QuizLoading());
 
-    var changeStatusResult = await sl<AddFinishedModuleStatusUseCase>().call(
+    var returnedData = await sl<AddOnprogresChapterCubit>().call(chapterId);
+
+    returnedData.fold(
+      (error) {
+        emit(QuizFailure());
+      },
+      (message) {
+        emit(SuccessfulProcess(message));
+      },
+    );
+  }
+
+  Future<void> submitQuizAction(
+    ModuleEntity module,
+    SubChapterEntity subchapter,
+    double score,
+  ) async {
+    emit(QuizLoading());
+
+    var moduleResult = await sl<AddFinishedModuleStatusUseCase>().call(
       module.moduleId,
     );
 
-    changeStatusResult.fold((error) {
+    moduleResult.fold((error) {
       emit(QuizFailure());
       return null;
     }, (data) => data);
 
     if (module.orderIndex == 3) {
-      var changeStatusResult = await sl<AddFinishedSubchapterStatusUseCase>()
+      var subchapterResult = await sl<AddFinishedSubchapterStatusUseCase>()
           .call(module.subchapterId);
 
-      changeStatusResult.fold((error) {
+      if (subchapterResult.isLeft()) {
         emit(QuizFailure());
-        return null;
-      }, (data) => data);
+        return;
+      }
+
+      if (subchapter.orderIndex == 3) {
+        var chapterResult = await sl<AddFinishedChapterStatusUseCase>().call(
+          subchapter.chapterId,
+        );
+
+        if (chapterResult.isLeft()) {
+          emit(QuizFailure());
+          return;
+        }
+      }
     }
 
     var addScoreResult = await sl<AddUserScoreUseCase>().call(score);

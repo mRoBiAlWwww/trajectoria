@@ -9,9 +9,11 @@ class JobSeekerEntity extends UserEntity {
   final String statusEmployment;
   final int coursesScore;
   final List<String> finishedModule;
-  final List<String> competitionsOnprogress;
+  final List<String> competitionsOnprogres;
   final List<String> competitionsDone;
   final List<String> finishedSubchapter;
+  final List<String> finishedChapter;
+  final List<String> onprogresChapter;
 
   JobSeekerEntity({
     required super.userId,
@@ -27,9 +29,11 @@ class JobSeekerEntity extends UserEntity {
     required this.statusEmployment,
     required this.coursesScore,
     required this.finishedModule,
-    required this.competitionsOnprogress,
+    required this.competitionsOnprogres,
     required this.competitionsDone,
     required this.finishedSubchapter,
+    required this.finishedChapter,
+    required this.onprogresChapter,
   });
   JobSeekerEntity copyWith({
     String? userId,
@@ -45,9 +49,11 @@ class JobSeekerEntity extends UserEntity {
     String? statusEmployment,
     int? coursesScore,
     List<String>? finishedModule,
-    List<String>? competitionsOnprogress,
+    List<String>? competitionsOnprogres,
     List<String>? competitionsDone,
     List<String>? finishedSubchapter,
+    List<String>? finishedChapter,
+    List<String>? onprogresChapter,
   }) {
     return JobSeekerEntity(
       userId: userId ?? this.userId,
@@ -63,10 +69,12 @@ class JobSeekerEntity extends UserEntity {
       statusEmployment: statusEmployment ?? this.statusEmployment,
       coursesScore: coursesScore ?? this.coursesScore,
       finishedModule: finishedModule ?? this.finishedModule,
-      competitionsOnprogress:
-          competitionsOnprogress ?? this.competitionsOnprogress,
+      competitionsOnprogres:
+          competitionsOnprogres ?? this.competitionsOnprogres,
       competitionsDone: competitionsDone ?? this.competitionsDone,
       finishedSubchapter: finishedSubchapter ?? this.finishedSubchapter,
+      finishedChapter: finishedChapter ?? this.finishedChapter,
+      onprogresChapter: onprogresChapter ?? this.onprogresChapter,
     );
   }
 }

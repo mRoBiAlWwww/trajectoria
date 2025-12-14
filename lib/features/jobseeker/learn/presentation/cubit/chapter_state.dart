@@ -9,6 +9,11 @@ class ChapterInitial extends ChapterState {}
 
 class ChapterLoading extends ChapterState {}
 
+class ChapterLoaded extends ChapterState {
+  final List<CourseChapterEntity> courseChapter;
+  ChapterLoaded(this.courseChapter);
+}
+
 class ChapterAndSubchaptersAndFinishedSubchaptersLoaded extends ChapterState {
   final CourseChapterEntity courseChapter;
   final List<SubChapterEntity> subChapters;

@@ -10,9 +10,11 @@ class JobSeekerModel extends UserModel {
   final String statusEmployment;
   final int coursesScore;
   final List<String> finishedModule;
-  final List<String> competitionsOnprogress;
+  final List<String> competitionsOnprogres;
   final List<String> competitionsDone;
   final List<String> finishedSubchapter;
+  final List<String> finishedChapter;
+  final List<String> onprogresChapter;
 
   JobSeekerModel({
     required super.userId,
@@ -28,9 +30,11 @@ class JobSeekerModel extends UserModel {
     required this.statusEmployment,
     required this.coursesScore,
     required this.finishedModule,
-    required this.competitionsOnprogress,
+    required this.competitionsOnprogres,
     required this.competitionsDone,
     required this.finishedSubchapter,
+    required this.finishedChapter,
+    required this.onprogresChapter,
   });
 
   factory JobSeekerModel.fromMap(Map<String, dynamic> map) {
@@ -51,14 +55,20 @@ class JobSeekerModel extends UserModel {
       finishedModule: map['finished_module'] != null
           ? List<String>.from(map['finished_module'] as List)
           : <String>[],
-      competitionsOnprogress: map['competitions_onprogress'] != null
-          ? List<String>.from(map['competitions_onprogress'] as List)
+      competitionsOnprogres: map['competitions_onprogres'] != null
+          ? List<String>.from(map['competitions_onprogres'] as List)
           : <String>[],
       competitionsDone: map['competitions_done'] != null
           ? List<String>.from(map['competitions_done'] as List)
           : <String>[],
       finishedSubchapter: map['finished_subchapter'] != null
           ? List<String>.from(map['finished_subchapter'] as List)
+          : <String>[],
+      finishedChapter: map['finished_chapter'] != null
+          ? List<String>.from(map['finished_chapter'] as List)
+          : <String>[],
+      onprogresChapter: map['onprogres_chapter'] != null
+          ? List<String>.from(map['onprogres_chapter'] as List)
           : <String>[],
     );
   }
@@ -79,9 +89,11 @@ class JobSeekerModel extends UserModel {
       'status_employment': statusEmployment,
       'courses_score': coursesScore,
       'finished_module': finishedModule,
-      'competitions_onprogress': competitionsOnprogress,
+      'competitions_onprogres': competitionsOnprogres,
       'competitions_done': competitionsDone,
       'finished_subchapter': finishedSubchapter,
+      'finished_chapter': finishedChapter,
+      'onprogres_chapter': onprogresChapter,
     };
   }
 
@@ -101,9 +113,11 @@ class JobSeekerModel extends UserModel {
       statusEmployment: statusEmployment,
       coursesScore: coursesScore,
       finishedModule: finishedModule,
-      competitionsOnprogress: competitionsOnprogress,
+      competitionsOnprogres: competitionsOnprogres,
       competitionsDone: competitionsDone,
       finishedSubchapter: finishedSubchapter,
+      finishedChapter: finishedChapter,
+      onprogresChapter: onprogresChapter,
     );
   }
 
@@ -122,9 +136,11 @@ class JobSeekerModel extends UserModel {
       profileImage: entity.profileImage,
       coursesScore: entity.coursesScore,
       finishedModule: entity.finishedModule,
-      competitionsOnprogress: entity.competitionsOnprogress,
+      competitionsOnprogres: entity.competitionsOnprogres,
       competitionsDone: entity.competitionsDone,
       finishedSubchapter: entity.finishedSubchapter,
+      finishedChapter: entity.finishedChapter,
+      onprogresChapter: entity.onprogresChapter,
     );
   }
 }

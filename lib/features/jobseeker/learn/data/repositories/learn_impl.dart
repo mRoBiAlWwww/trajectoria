@@ -26,6 +26,20 @@ class LearnRepositoryImpl extends LearnRepository {
   }
 
   @override
+  Future<Either> getAllCourseChapters(String courseId) async {
+    try {
+      final result = await service.getAllCourseChapters(courseId);
+      return Right(
+        List.from(
+          result,
+        ).map((e) => CourseChapterModel.fromMap(e).toEntity()).toList(),
+      );
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
   Future<Either> getCourseChapter(String courseId, int chapterOrder) async {
     try {
       final result = await service.getCourseChapter(courseId, chapterOrder);
@@ -117,6 +131,26 @@ class LearnRepositoryImpl extends LearnRepository {
   Future<Either> addUserScore(double score) async {
     try {
       final result = await service.addUserScore(score);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
+  Future<Either> addFinishedChapter(String chapterId) async {
+    try {
+      final result = await service.addFinishedChapter(chapterId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
+  Future<Either> addOnprogresChapter(String chapterId) async {
+    try {
+      final result = await service.addOnprogresChapter(chapterId);
       return Right(result);
     } catch (e) {
       return Left(e.toString().replaceFirst("Exception: ", ""));

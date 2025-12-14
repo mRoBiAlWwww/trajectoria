@@ -6,10 +6,11 @@ import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart'
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/subchapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_state.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/module_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/module_state.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/finished_chapter_module_cubit.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/finished_chapter_module_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/pages/modul_quiz_page.dart';
 import 'package:trajectoria/main.dart';
 
@@ -141,7 +142,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                               Icon(Icons.watch_later_outlined),
                               SizedBox(width: 5),
                               Text(
-                                "//${state.courseChapter.duration} Jam",
+                                "${state.courseChapter.duration} Jam",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w500,
@@ -193,7 +194,8 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                             state.subChapters[index].subchapterId,
                           );
                           return BlocProvider(
-                            create: (context) => ModuleCubit(),
+                            create: (context) =>
+                                FinishedChapterAndModuleCubit(),
                             child: Builder(
                               builder: (context) {
                                 return Padding(
@@ -205,7 +207,9 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                     onTap: () {
                                       if (!isExpanded) {
                                         context
-                                            .read<ModuleCubit>()
+                                            .read<
+                                              FinishedChapterAndModuleCubit
+                                            >()
                                             .getModulesAndFinishedModules(
                                               widget.courseId,
                                               widget.chapterOrder,
@@ -291,8 +295,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                                           context,
                                                           widget.chapterOrder,
                                                           state
-                                                              .subChapters[index]
-                                                              .subchapterId,
+                                                              .subChapters[index],
                                                           state
                                                               .courseChapter
                                                               .badge,
@@ -332,12 +335,15 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
   Widget showModules(
     BuildContext context,
     int chapterOrder,
-    String subchapterId,
+    SubChapterEntity subchapter,
     String badge,
     int itemId,
     bool isCompletedSubchapter,
   ) {
-    return BlocBuilder<ModuleCubit, ModuleState>(
+    return BlocBuilder<
+      FinishedChapterAndModuleCubit,
+      FinishedChapterAndModuleState
+    >(
       builder: (context, state) {
         if (state is ModulesAndFinishedModulesLoaded) {
           if (state.modules.isNotEmpty) {
@@ -357,6 +363,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                               badge: badge,
                               chapterOrder: chapterOrder,
                               module: state.modules[index],
+                              subchapter: subchapter,
                               nextModule: index + 1 < state.modules.length
                                   ? state.modules[index + 1].title
                                   : "",
@@ -370,7 +377,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                             index,
                             widget.courseId,
                             widget.chapterOrder,
-                            subchapterId,
+                            subchapter.subchapterId,
                           );
                         },
                   child: Container(
@@ -554,7 +561,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
           }
         }
 
-        if (state is ModuleLoading) {
+        if (state is FinishedChapterAndModuleLoading) {
           return Center(child: const CircularProgressIndicator());
         }
 

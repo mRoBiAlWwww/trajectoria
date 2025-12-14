@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class LearnService {
   Future<List<Map<String, dynamic>>> getCourses();
+  Future<List<Map<String, dynamic>>> getAllCourseChapters(String courseId);
   Future<Map<String, dynamic>> getCourseChapter(
     String courseId,
     int chapterOrder,
@@ -25,7 +26,8 @@ abstract class LearnService {
   Future<String> addFinishedModule(String moduleId);
   Future<String> addFinishedSubchapter(String subchapterId);
   Future<String> addUserScore(double score);
-  // Future<JobSeekerModel> getFinishedModules();
+  Future<String> addFinishedChapter(String chapterId);
+  Future<String> addOnprogresChapter(String chapterId);
 }
 
 class LearnServiceImpl extends LearnService {
@@ -45,13 +47,31 @@ class LearnServiceImpl extends LearnService {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getAllCourseChapters(
+    String courseId,
+  ) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    try {
+      var getCoursesChapter = await firestoreInstance
+          .collection("Courses")
+          .doc(courseId)
+          .collection("course_chapters")
+          .orderBy("order_index", descending: false)
+          .get();
+      return getCoursesChapter.docs.map((e) => e.data()).toList();
+    } catch (e) {
+      throw Exception("Error gagal mendapatkan chapter dari course $e");
+    }
+  }
+
+  @override
   Future<Map<String, dynamic>> getCourseChapter(
     String courseId,
     int chapterOrder,
   ) async {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     try {
-      var getCourses = await firestoreInstance
+      var getCoursesChapter = await firestoreInstance
           .collection("Courses")
           .doc(courseId)
           .collection("course_chapters")
@@ -59,7 +79,7 @@ class LearnServiceImpl extends LearnService {
           .orderBy("order_index", descending: false)
           .get();
 
-      return getCourses.docs.first.data();
+      return getCoursesChapter.docs.first.data();
     } catch (e) {
       throw Exception("Error gagal mendapatkan chapter dari course $e");
     }
@@ -188,6 +208,7 @@ class LearnServiceImpl extends LearnService {
               .collection("modules")
               .where("module_id", isEqualTo: moduleId)
               .get();
+
       QuerySnapshot<Map<String, dynamic>> quizzesSnapshot =
           await FirebaseFirestore.instance
               .collection("Courses")
@@ -200,6 +221,7 @@ class LearnServiceImpl extends LearnService {
               .doc(modulesSnapshot.docs.first.id)
               .collection("quizzes")
               .get();
+
       List<Map<String, dynamic>> quiz = quizzesSnapshot.docs
           .map((doc) => doc.data())
           .toList();
@@ -242,7 +264,7 @@ class LearnServiceImpl extends LearnService {
 
       return "Subchapter selesai berhasil ditambahkan ke daftar";
     } catch (e) {
-      throw Exception("Error modul gagal ditambahkan ke daftar $e");
+      throw Exception("Error subchapter gagal ditambahkan ke daftar $e");
     }
   }
 
@@ -261,4 +283,48 @@ class LearnServiceImpl extends LearnService {
       throw Exception("Error skor gagal ditambahkan $e");
     }
   }
+
+  @override
+  Future<String> addFinishedChapter(String chapterId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser!.uid)
+          .update({
+            "finished_chapter": FieldValue.arrayUnion([chapterId]),
+          });
+
+      await firestoreInstance
+          .collection('Jobseeker')
+          .doc(currentUser.uid)
+          .update({
+            'onprogres_chapter': FieldValue.arrayRemove([chapterId]),
+          });
+
+      return "Chapter selesai berhasil ditambahkan ke daftar";
+    } catch (e) {
+      throw Exception("Error chapter gagal ditambahkan ke daftar $e");
+    }
+  }
+
+  @override
+  Future<String> addOnprogresChapter(String chapterId) async {
+    try {
+      final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+      var currentUser = FirebaseAuth.instance.currentUser;
+
+      await firestoreInstance
+          .collection('Jobseeker')
+          .doc(currentUser!.uid)
+          .update({
+            'onprogres_chapter': FieldValue.arrayUnion([chapterId]),
+          });
+      return "Chapter berhasil ditambahkan ke daftar chapter yg sedang dipelajari";
+    } catch (e) {
+      throw Exception("Error gagal menambahkan partisipan kompetisi $e");
+    }
+  }
 }
+// AddOnprogresChapterCubit

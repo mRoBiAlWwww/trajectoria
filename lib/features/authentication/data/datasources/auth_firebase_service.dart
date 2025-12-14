@@ -239,6 +239,8 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
             'competitions_done': <String>[],
             'finished_module': <String>[],
             'finished_subchapter': <String>[],
+            'finished_chapter': <String>[],
+            'onprogres_chapter': <String>[],
           };
           await FirebaseFirestore.instance
               .collection(role)

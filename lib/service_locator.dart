@@ -61,9 +61,12 @@ import 'package:trajectoria/features/jobseeker/leaderboard/domain/usecases/get_j
 import 'package:trajectoria/features/jobseeker/learn/data/datasources/learn_service.dart';
 import 'package:trajectoria/features/jobseeker/learn/data/repositories/learn_impl.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/repositories/learn.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_subchapter.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_onprogres_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_user_score.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_module.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_all_course_chapters.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_course_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_courses_path.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_modules.dart';
@@ -201,6 +204,15 @@ Future<void> initializeDependencies() async {
   );
   sl.registerSingleton<AddFinishedSubchapterStatusUseCase>(
     AddFinishedSubchapterStatusUseCase(repository: sl<LearnRepository>()),
+  );
+  sl.registerSingleton<AddFinishedChapterStatusUseCase>(
+    AddFinishedChapterStatusUseCase(repository: sl<LearnRepository>()),
+  );
+  sl.registerSingleton<GetAllCourseChaptersUseCase>(
+    GetAllCourseChaptersUseCase(repository: sl<LearnRepository>()),
+  );
+  sl.registerSingleton<AddOnprogresChapterCubit>(
+    AddOnprogresChapterCubit(repository: sl<LearnRepository>()),
   );
 
   //company mode

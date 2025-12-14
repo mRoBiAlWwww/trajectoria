@@ -45,9 +45,10 @@ class UserSignupReq {
       statusEmployment: '',
       coursesScore: 0,
       finishedModule: <String>[],
-      competitionsOnprogress: <String>[],
+      competitionsOnprogres: <String>[],
       competitionsDone: <String>[],
       finishedSubchapter: <String>[],
+      onprogresChapter: <String>[],
     );
   }
 
@@ -86,9 +87,11 @@ extension UserSignupReqX on UserSignupReq {
       statusEmployment: '',
       coursesScore: 0,
       finishedModule: <String>[],
-      competitionsOnprogress: <String>[],
+      competitionsOnprogres: <String>[],
       competitionsDone: <String>[],
       finishedSubchapter: <String>[],
+      finishedChapter: <String>[],
+      onprogresChapter: <String>[],
     );
   }
 

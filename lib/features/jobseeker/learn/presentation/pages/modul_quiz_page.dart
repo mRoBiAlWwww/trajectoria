@@ -6,6 +6,7 @@ import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/quiz.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/subchapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/modul_or_quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/next_cubit.dart';
@@ -16,6 +17,7 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/pages/score_pa
 
 class ModulQuizPage extends StatefulWidget {
   final ModuleEntity module;
+  final SubChapterEntity subchapter;
   final String badge;
   final int chapterOrder;
   final String nextModule;
@@ -27,6 +29,7 @@ class ModulQuizPage extends StatefulWidget {
     required this.nextModule,
     required this.nextMaximumScore,
     required this.badge,
+    required this.subchapter,
   });
 
   @override
@@ -484,6 +487,7 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                                 .read<QuizCubit>()
                                                 .submitQuizAction(
                                                   widget.module,
+                                                  widget.subchapter,
                                                   finalScore,
                                                 );
                                             if (context.mounted) {

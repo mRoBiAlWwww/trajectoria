@@ -24,7 +24,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   ];
   @override
   Widget build(BuildContext context) {
-    debugPrint("Widget build: LeaderboardPage");
     return BlocProvider(
       create: (context) => JobseekerLeaderboardCubit()..getJobseekerByScore(),
       child: BlocBuilder<JobseekerLeaderboardCubit, JobseekerLeaderboardState>(
