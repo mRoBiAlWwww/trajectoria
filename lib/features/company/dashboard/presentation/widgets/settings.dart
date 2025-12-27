@@ -9,7 +9,7 @@ import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_state.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competitions_cubit.dart';
-import 'package:trajectoria/features/company/dashboard/presentation/widgets/editable_teks.dart';
+import 'package:trajectoria/common/widgets/textfield/editable_teks.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/rubrik.dart';
 
 class SettingsWidget extends StatefulWidget {
@@ -110,14 +110,13 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                 setState(() {});
               },
               builder: (context, state) {
-                final DateTime deadlineDate = state.competition.deadline
-                    .toDate();
-                final String formattedDate = DateFormat(
-                  'd MMM y',
-                  'id_ID',
-                ).format(deadlineDate);
-                final isClosed = state.competition.status == "Ditutup";
+                //formatter date
+                final formatter = DateFormat('d MMM y', 'id_ID');
+                final formattedDate = formatter.format(
+                  state.competition.deadline.toDate(),
+                );
 
+                final isClosed = state.competition.status == "Ditutup";
                 if (state.isLoading) {
                   return Center(child: CircularProgressIndicator());
                 }
@@ -137,7 +136,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                           style: TextStyle(
                             fontFamily: 'JetBrainsMono',
                             fontWeight: FontWeight.w800,
-                            fontSize: 18,
+                            fontSize: 16,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -153,306 +152,322 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               width: 2,
                             ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Stack(
                             children: [
-                              // ======= JUDUL & STATUS =======
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Judul",
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                      color: AppColors.secondaryText,
-                                      fontSize: 18,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color:
-                                          state.competition.status == "Dirilis"
-                                          ? AppColors.secondPositiveColor
-                                          : state.competition.status ==
-                                                "Disimpan"
-                                          ? Colors.amber
-                                          : AppColors.doveRedColor,
-                                    ),
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: state.competition.status == "Dirilis"
+                                        ? AppColors.secondPositiveColor
+                                        : state.competition.status == "Disimpan"
+                                        ? Colors.amber
+                                        : AppColors.doveRedColor,
+                                  ),
+                                  child: Center(
                                     child: Text(
                                       state.competition.status,
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-
-                              // ======= TEXTFIELD JUDUL =======
-                              TextField(
-                                controller: _judulController,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
                                 ),
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.disableBackgroundButton,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.disableBackgroundButton,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                ),
-                                onChanged: (value) => providerContext
-                                    .read<CreateCompetitionCubit>()
-                                    .setTitle(value),
                               ),
-
-                              const SizedBox(height: 30),
-
-                              // ======= STATUS PUBLIKASI =======
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Status",
-                                        style: TextStyle(
-                                          color: AppColors.secondaryText,
-                                          fontSize: 18,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w700,
+                                  // ======= JUDUL & STATUS =======
+                                  Text(
+                                    "Judul",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+
+                                  // ======= TEXTFIELD JUDUL =======
+                                  TextField(
+                                    controller: _judulController,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                          ),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color:
+                                              AppColors.disableBackgroundButton,
+                                          width: 1.0,
                                         ),
                                       ),
-                                      Text(
-                                        "Publikasi ke halaman peserta",
-                                        style: TextStyle(
-                                          color: AppColors.disableTextButton,
-                                          fontSize: 14,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w500,
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color:
+                                              AppColors.disableBackgroundButton,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                    onChanged: (value) => providerContext
+                                        .read<CreateCompetitionCubit>()
+                                        .setTitle(value),
+                                  ),
+
+                                  const SizedBox(height: 30),
+
+                                  // ======= STATUS PUBLIKASI =======
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Status",
+                                            style: TextStyle(
+                                              color: AppColors.secondaryText,
+                                              fontSize: 16,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            "Publikasi ke halaman peserta",
+                                            style: TextStyle(
+                                              color:
+                                                  AppColors.disableTextButton,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      CustomToggle(
+                                        value: isActive,
+                                        onChanged: (val) {
+                                          setState(() => isActive = val);
+                                          providerContext
+                                              .read<CreateCompetitionCubit>()
+                                              .setStatus(
+                                                val ? "Dirilis" : "Disimpan",
+                                              );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 30),
+
+                                  // ======= DEADLINE =======
+                                  Text(
+                                    "Deadline",
+                                    style: TextStyle(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    formattedDate,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Divider(
+                                    color: AppColors.disableBackgroundButton,
+                                    thickness: 1,
+                                    height: 1,
+                                  ),
+
+                                  const SizedBox(height: 30),
+
+                                  // ======= RUBRIK =======
+                                  Text(
+                                    "Bobot penilaian(%)",
+                                    style: TextStyle(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  ...List.generate(texts.length, (index) {
+                                    if (index >= bobotList.length) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return _buildRubrikRow(index);
+                                  }),
+
+                                  const SizedBox(height: 30),
+
+                                  // ======= HADIAH =======
+                                  Text(
+                                    "Hadiah",
+                                    style: TextStyle(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: EditableTextItem(
+                                          isHaveBackground: true,
+                                          needWrapText: true,
+                                          text: providerContext
+                                              .watch<CreateCompetitionCubit>()
+                                              .state
+                                              .competition
+                                              .rewardDescription,
+                                          onChanged: (value) {
+                                            providerContext
+                                                .read<CreateCompetitionCubit>()
+                                                .setRewardDescription(value);
+                                          },
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          providerContext
+                                              .read<CreateCompetitionCubit>()
+                                              .setRewardDescription('');
+                                        },
+                                        padding: EdgeInsets.zero,
+                                        visualDensity: VisualDensity.compact,
+                                        icon: const Icon(
+                                          CupertinoIcons.trash,
+                                          color: Colors.red,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  CustomToggle(
-                                    value: isActive,
-                                    onChanged: (val) {
-                                      setState(() => isActive = val);
-                                      providerContext
-                                          .read<CreateCompetitionCubit>()
-                                          .setStatus(
-                                            val ? "Dirilis" : "Disimpan",
-                                          );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                  const SizedBox(height: 30),
 
-                              const SizedBox(height: 30),
-
-                              // ======= DEADLINE =======
-                              Text(
-                                "Deadline",
-                                style: TextStyle(
-                                  color: AppColors.secondaryText,
-                                  fontSize: 18,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                formattedDate,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Divider(
-                                color: AppColors.disableBackgroundButton,
-                                thickness: 1,
-                                height: 1,
-                              ),
-
-                              const SizedBox(height: 30),
-
-                              // ======= RUBRIK =======
-                              Text(
-                                "Bobot penilaian(%)",
-                                style: TextStyle(
-                                  color: AppColors.secondaryText,
-                                  fontSize: 18,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-
-                              ...List.generate(texts.length, (index) {
-                                if (index >= bobotList.length) {
-                                  return const SizedBox.shrink();
-                                }
-                                return _buildRubrikRow(index);
-                              }),
-
-                              const SizedBox(height: 30),
-
-                              // ======= HADIAH =======
-                              Text(
-                                "Hadiah",
-                                style: TextStyle(
-                                  color: AppColors.secondaryText,
-                                  fontSize: 18,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: EditableTextItem(
-                                      needWrapText: true,
-                                      text: providerContext
-                                          .watch<CreateCompetitionCubit>()
-                                          .state
-                                          .competition
-                                          .rewardDescription,
-                                      onChanged: (value) {
-                                        providerContext
-                                            .read<CreateCompetitionCubit>()
-                                            .setRewardDescription(value);
-                                      },
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      providerContext
-                                          .read<CreateCompetitionCubit>()
-                                          .setRewardDescription('');
-                                    },
-                                    icon: const Icon(
-                                      CupertinoIcons.trash,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 30),
-
-                              // ======= BUTTON SAVE / CANCEL =======
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: BasicAppButton(
-                                      onPressed: () {
-                                        setState(() => refreshKey++);
-                                      },
-                                      isBordered: true,
-                                      borderColor: Colors.black,
-                                      backgroundColor: Colors.white,
-                                      content: const Text(
-                                        "Batal",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  Expanded(
-                                    child: BasicAppButton(
-                                      onPressed:
-                                          _judulController.text
-                                              .trim()
-                                              .isNotEmpty
-                                          ? () async {
-                                              _saveRubrik(providerContext);
-                                              final competitionData =
-                                                  providerContext
-                                                      .read<
-                                                        CreateCompetitionCubit
-                                                      >()
-                                                      .state
-                                                      .competition;
-                                              context
-                                                  .read<
-                                                    OrganizeCompetitionCubit
-                                                  >()
-                                                  .submitCompetition(
-                                                    competitionData,
-                                                  );
-
-                                              _displaySuccessToast(
-                                                context,
-                                                "Perubahan berhasil disimpan",
-                                              );
-                                              Navigator.pop(context);
-                                            }
-                                          : null,
-                                      backgroundColor:
-                                          AppColors.thirdPositiveColor,
-                                      content: const Center(
-                                        child: Text(
-                                          "Simpan",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w700,
+                                  // ======= BUTTON SAVE / CANCEL =======
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: BasicAppButton(
+                                          onPressed: () {
+                                            setState(() => refreshKey++);
+                                          },
+                                          verticalPadding: 12,
+                                          isBordered: true,
+                                          borderColor: Colors.black,
+                                          backgroundColor: Colors.white,
+                                          content: const Text(
+                                            "Batal",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
                                         ),
                                       ),
+                                      const SizedBox(width: 20),
+                                      Expanded(
+                                        child: BasicAppButton(
+                                          onPressed:
+                                              _judulController.text
+                                                  .trim()
+                                                  .isNotEmpty
+                                              ? () async {
+                                                  _saveRubrik(providerContext);
+                                                  final competitionData =
+                                                      providerContext
+                                                          .read<
+                                                            CreateCompetitionCubit
+                                                          >()
+                                                          .state
+                                                          .competition;
+                                                  context
+                                                      .read<
+                                                        OrganizeCompetitionCubit
+                                                      >()
+                                                      .submitCompetition(
+                                                        competitionData,
+                                                      );
+
+                                                  _displaySuccessToast(
+                                                    context,
+                                                    "Perubahan berhasil disimpan",
+                                                  );
+                                                  Navigator.pop(context);
+                                                }
+                                              : null,
+                                          backgroundColor:
+                                              AppColors.thirdPositiveColor,
+                                          verticalPadding: 12,
+                                          content: const Center(
+                                            child: Text(
+                                              "Simpan",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 30),
+
+                                  // ======= DANGER ZONE =======
+                                  Text(
+                                    "Danger Zone",
+                                    style: TextStyle(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 16,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
+                                  const SizedBox(height: 10),
+                                  _buildDangerZone(
+                                    providerContext,
+                                    state,
+                                    isClosed,
+                                  ),
                                 ],
-                              ),
-
-                              const SizedBox(height: 30),
-
-                              // ======= DANGER ZONE =======
-                              Text(
-                                "Danger Zone",
-                                style: TextStyle(
-                                  color: AppColors.secondaryText,
-                                  fontSize: 18,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              _buildDangerZone(
-                                providerContext,
-                                state,
-                                isClosed,
                               ),
                             ],
                           ),
@@ -503,7 +518,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w900,
-                        fontSize: 6,
+                        fontSize: 8,
                         color: Colors.teal,
                       ),
                     ),
@@ -513,7 +528,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                       style: const TextStyle(
                         fontFamily: 'JetBrainsMono',
                         fontWeight: FontWeight.w700,
-                        fontSize: 18,
+                        fontSize: 16,
                       ),
                     ),
                   ],
@@ -613,6 +628,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                 : Colors.white,
             isBordered: !isClosed,
             borderColor: isClosed ? null : AppColors.doveRedColor,
+            verticalPadding: 15,
             content: Text(
               isClosed ? "Buka kompetisi" : "Tutup kompetisi",
               style: TextStyle(
@@ -627,6 +643,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           Text(
             "*Stop menerima submission baru. Bisa dibuka kembali.",
             style: TextStyle(
+              fontSize: 12,
               fontStyle: FontStyle.italic,
               color: AppColors.secondaryText,
             ),
@@ -639,6 +656,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               );
               Navigator.pop(context);
             },
+            verticalPadding: 15,
             backgroundColor: AppColors.doveRedColor,
             content: const Text(
               "Hapus kompetisi",
@@ -654,6 +672,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           Text(
             "*Menghapus kompetisi dan semua submission. Tidak dapat dibatalkan.",
             style: TextStyle(
+              fontSize: 12,
               fontStyle: FontStyle.italic,
               color: AppColors.secondaryText,
             ),

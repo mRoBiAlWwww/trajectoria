@@ -1,3 +1,4 @@
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/course_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
 
 abstract class FinishedChapterAndModuleState {
@@ -15,7 +16,7 @@ class ModulesAndFinishedModulesLoaded extends FinishedChapterAndModuleState {
 }
 
 class OnprogresOrFinishedChapterLoaded extends FinishedChapterAndModuleState {
-  final List<String> onprogresChapters;
+  final CourseChapterEntity? onprogresChapters;
   final List<String> finishedChapters;
   OnprogresOrFinishedChapterLoaded(
     this.onprogresChapters,

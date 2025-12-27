@@ -11,7 +11,12 @@ import 'package:trajectoria/features/company/dashboard/presentation/widgets/subm
 
 class DetailCompetitionPage extends StatefulWidget {
   final String competitionId;
-  const DetailCompetitionPage({super.key, required this.competitionId});
+  final String competitionName;
+  const DetailCompetitionPage({
+    super.key,
+    required this.competitionId,
+    required this.competitionName,
+  });
 
   @override
   State<DetailCompetitionPage> createState() => _DetailCompetitionPageState();
@@ -33,7 +38,7 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "AI Innovation Hackathon",
+          widget.competitionName,
           style: TextStyle(
             fontFamily: 'JetBrainsMono',
             fontWeight: FontWeight.w700,
@@ -105,6 +110,7 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
     final bool isSelected = selectedIndex == index;
 
     return Container(
+      width: 120,
       decoration: BoxDecoration(
         gradient: isSelected
             ? LinearGradient(
@@ -117,14 +123,13 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
       ),
       child: TextButton(
         style: TextButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 16),
           foregroundColor: isSelected
               ? Colors.white
               : AppColors.disableTextButton,
         ),
         onPressed: () {
           setState(() {
-            selectedIndex = index; // update tombol yg dipilih
+            selectedIndex = index;
           });
         },
         child: Text(

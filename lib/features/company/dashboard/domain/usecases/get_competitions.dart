@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
-import 'package:trajectoria/features/company/dashboard/domain/repositories/create_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/repositories/competition_organizer.dart';
 
-class GetCompetitionsCompanyUseCase {
-  final CreateCompetitionRepository repository;
-  GetCompetitionsCompanyUseCase({required this.repository});
+class GetCompetitionsByCurrentCompanyUseCase {
+  final CompetitionOrganizerRepository repository;
+  GetCompetitionsByCurrentCompanyUseCase({required this.repository});
 
   Future<Either> call() async {
-    return await repository.getCompetitions();
+    return await repository.getCompetitionsByCurrentCompany();
   }
 }

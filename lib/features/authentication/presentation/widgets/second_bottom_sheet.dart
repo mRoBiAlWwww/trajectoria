@@ -6,7 +6,7 @@ import 'package:trajectoria/common/helper/overlay/overlay.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
-import 'package:trajectoria/common/widgets/navigation/main_wrapper.dart';
+import 'package:trajectoria/core/navigation/main_wrapper.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/google_cubit.dart';
@@ -46,14 +46,13 @@ class _SecondSingupSheetContentState extends State<SecondSingupSheetContent> {
                   )
                 : AppNavigator.pushReplacement(context, MainWrapper());
           } else if (platform && widget.methode == "daftar") {
-            debugPrint("halo a2");
             AppNavigator.pushReplacement(context, MainWrapper());
           }
         }
       },
       child: SizedBox(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.5,
+        height: MediaQuery.of(context).size.height * 0.55,
         child: Padding(
           padding: EdgeInsetsGeometry.fromLTRB(20, 10, 10, 20),
           child: Stack(
@@ -137,9 +136,7 @@ class _SecondSingupSheetContentState extends State<SecondSingupSheetContent> {
         return BasicAppButton(
           isBordered: true,
           onPressed: () async {
-            debugPrint("sini loh");
             context.read<LoginFlowCubit>().setGooglePopupFlow(true);
-
             platform = true;
             await context.read<AuthStateCubit>().googleSignin(
               context.read<RoleCubit>().state.isNotEmpty
@@ -170,54 +167,3 @@ class _SecondSingupSheetContentState extends State<SecondSingupSheetContent> {
     );
   }
 }
-
-// Widget _emailButton(BuildContext context) {
-  //   return ElevatedButton(
-  //     onPressed: () {
-  //       Navigator.pop(context);
-  //       AppNavigator.push(context, SignupPage());
-  //     },
-  //     style: ElevatedButton.styleFrom(
-  //       minimumSize: const Size(double.infinity, 50),
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(4),
-  //         side: const BorderSide(
-  //           color: Colors.black,
-  //           width: 1.0,
-  //           style: BorderStyle.solid,
-  //         ),
-  //       ),
-  //       backgroundColor: Colors.white,
-  //       foregroundColor: Colors.black,
-  //     ),
-  //     child: Text(
-  //       'Lanjut dengan Email',
-  //       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-  //     ),
-  //   );
-  // }
-// Widget _googleButton(BuildContext context) {
-  //   return ElevatedButton(
-  //     onPressed: () {
-  //       Navigator.pop(context);
-  //       //dan ke halaman google login
-  //     },
-  //     style: ElevatedButton.styleFrom(
-  //       minimumSize: const Size(double.infinity, 50),
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(4),
-  //         side: const BorderSide(
-  //           color: Colors.black,
-  //           width: 1.0,
-  //           style: BorderStyle.solid,
-  //         ),
-  //       ),
-  //       backgroundColor: Colors.white,
-  //       foregroundColor: Colors.black,
-  //     ),
-  //     child: Text(
-  //       'Lanjut dengan Google',
-  //       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-  //     ),
-  //   );
-  // }

@@ -7,7 +7,6 @@ import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/subchapter.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/modul_or_quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/next_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/quiz_cubit.dart';
@@ -22,6 +21,7 @@ class ModulQuizPage extends StatefulWidget {
   final int chapterOrder;
   final String nextModule;
   final int nextMaximumScore;
+  final bool isChapterZero;
   const ModulQuizPage({
     super.key,
     required this.module,
@@ -30,6 +30,7 @@ class ModulQuizPage extends StatefulWidget {
     required this.nextMaximumScore,
     required this.badge,
     required this.subchapter,
+    required this.isChapterZero,
   });
 
   @override
@@ -325,7 +326,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                           fontFamily: 'Inter',
                                           fontWeight: FontWeight.w500,
                                           color: AppColors.disableTextButton,
-                                          fontSize: 14,
                                         ),
                                       ),
                                       SizedBox(height: 8),
@@ -406,8 +406,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                                             FontWeight.w500,
                                                         color: AppColors
                                                             .secondaryText,
-
-                                                        fontSize: 14,
                                                       ),
                                                     ),
                                                   ),
@@ -438,7 +436,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                     child: BasicAppButton(
-                      // --- LOGIKA onPressed ---
                       onPressed:
                           _isSubmitting // 1. Nonaktifkan jika sedang submit
                           ? null
@@ -489,21 +486,9 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                                   widget.module,
                                                   widget.subchapter,
                                                   finalScore,
+                                                  3,
+                                                  widget.isChapterZero,
                                                 );
-                                            if (context.mounted) {
-                                              widget.nextModule == ""
-                                                  ? context
-                                                        .read<
-                                                          HydratedProgressCubit
-                                                        >()
-                                                        .addItem({
-                                                          'courseId': widget
-                                                              .module
-                                                              .courseId,
-                                                          'score': 3,
-                                                        })
-                                                  : null;
-                                            }
                                             debugPrint("Submit ke DB selesai.");
 
                                             // 7. BARU navigasi SETELAH submit selesai
@@ -528,7 +513,6 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                                               });
                                             }
                                           } else {
-                                            // --- INI ADALAH LOGIKA LANJUT ---
                                             // Bukan pertanyaan terakhir, lanjut seperti biasa
                                             context.read<NextCubit>().next();
                                           }

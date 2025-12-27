@@ -6,8 +6,8 @@ class BasicAppButton extends StatelessWidget {
   final Color backgroundColor;
   final Widget content;
   final bool isBordered;
-  final double horizontalPadding;
-  final double verticalPadding;
+  final double? horizontalPadding;
+  final double? verticalPadding;
   final Color? borderColor;
   final Color? foregroundColor;
   final double? borderRad;
@@ -19,8 +19,8 @@ class BasicAppButton extends StatelessWidget {
     required this.content,
     this.borderColor,
     this.isBordered = false,
-    this.horizontalPadding = 0,
-    this.verticalPadding = 0,
+    this.horizontalPadding,
+    this.verticalPadding,
     this.foregroundColor,
     this.borderRad,
   });
@@ -33,13 +33,13 @@ class BasicAppButton extends StatelessWidget {
         foregroundColor ?? (isDark ? Colors.white : Colors.black);
 
     final padding = EdgeInsets.symmetric(
-      horizontal: horizontalPadding,
-      vertical: verticalPadding,
+      horizontal: horizontalPadding ?? 0,
+      vertical: verticalPadding ?? 15,
     );
 
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
       padding: padding,
-      minimumSize: const Size(double.infinity, 55),
+      minimumSize: Size(horizontalPadding == null ? double.infinity : 0, 0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRad ?? 100),
         side: isBordered

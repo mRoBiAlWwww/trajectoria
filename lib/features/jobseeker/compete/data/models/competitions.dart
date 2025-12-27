@@ -8,6 +8,8 @@ class CompetitionModel {
   final String competitionId;
   final String companyId;
   final String companyName;
+  final String companyEmail;
+  final String companyProfileImage;
   final String title;
   final String description;
   final String problemStatement;
@@ -21,12 +23,12 @@ class CompetitionModel {
   final List<FileItemModel> guidebook;
   final List<RubrikItemModel> rubrik;
 
-  // final List<GuidebookItem> guidebook;
-
   CompetitionModel({
     required this.competitionId,
     required this.companyId,
     required this.companyName,
+    required this.companyEmail,
+    required this.companyProfileImage,
     required this.title,
     required this.description,
     required this.problemStatement,
@@ -44,6 +46,8 @@ class CompetitionModel {
     String? competitionId,
     String? companyId,
     String? companyName,
+    String? companyEmail,
+    String? companyProfileImage,
     String? title,
     String? description,
     String? problemStatement,
@@ -61,6 +65,8 @@ class CompetitionModel {
       competitionId: competitionId ?? this.competitionId,
       companyId: companyId ?? this.companyId,
       companyName: companyName ?? this.companyName,
+      companyEmail: companyEmail ?? this.companyEmail,
+      companyProfileImage: companyProfileImage ?? this.companyProfileImage,
       title: title ?? this.title,
       description: description ?? this.description,
       problemStatement: problemStatement ?? this.problemStatement,
@@ -81,6 +87,8 @@ class CompetitionModel {
       'competition_id': competitionId,
       'company_id': companyId,
       'company_name': companyName,
+      'company_email': companyEmail,
+      'company_profile_image': companyProfileImage,
       'title': title,
       'description': description,
       'problem_statement': problemStatement,
@@ -101,6 +109,8 @@ class CompetitionModel {
       competitionId: map['competition_id']?.toString() ?? '',
       companyId: map['company_id']?.toString() ?? '',
       companyName: map['company_name']?.toString() ?? '',
+      companyEmail: map['company_email']?.toString() ?? '',
+      companyProfileImage: map['company_profile_image']?.toString() ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       problemStatement: map['problem_statement'] ?? '',
@@ -144,6 +154,8 @@ class CompetitionModel {
       competitionId: entity.competitionId,
       companyId: entity.companyId,
       companyName: entity.companyName,
+      companyEmail: entity.companyEmail,
+      companyProfileImage: entity.companyProfileImage,
       title: entity.title,
       description: entity.description,
       problemStatement: entity.problemStatement,
@@ -168,6 +180,8 @@ extension CompetitionXModel on CompetitionModel {
       competitionId: competitionId,
       companyId: companyId,
       companyName: companyName,
+      companyEmail: companyEmail,
+      companyProfileImage: companyProfileImage,
       title: title,
       description: description,
       problemStatement: problemStatement,

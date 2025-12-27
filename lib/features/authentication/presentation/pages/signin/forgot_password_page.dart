@@ -4,14 +4,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
-import 'package:trajectoria/common/widgets/textField/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/email_verification_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  ForgotPasswordPage({super.key});
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();

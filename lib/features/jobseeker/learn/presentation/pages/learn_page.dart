@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart';
-import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
+import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
+import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/course.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/course_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/course_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/finished_chapter_module_cubit.dart';
+import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/finished_chapter_module_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_course_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_cubit.dart';
-import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/hydrated_progress_state.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/quiz_cubit.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/pages/subchapter_page.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/roadmap.dart';
@@ -30,21 +30,20 @@ class LearnPage extends StatefulWidget {
 
 class _LearnPageState extends State<LearnPage> with RouteAware {
   bool isExpanded = false;
-  CourseEntity? course;
   String? titleToShow;
   JobSeekerEntity? jobseeker;
   late List<String> chapterStatus;
   late List<String> finishedChapters;
-  late List<String> onProgressChapters;
+  late String onProgresChapters;
+  int progress = 0;
+  late CourseChapterEntity localChapter;
 
   @override
   void initState() {
     super.initState();
-    course = context.read<HydratedSelectedCourseCubit>().state;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      context.read<ChapterCubit>().getAllChapters(course!.courseId);
-      context.read<FinishedChapterAndModuleCubit>().getFinishedChapters();
+      // fetch();
 
       final eitherUser = await context.read<AuthStateCubit>().getCurrentUser();
       final result = eitherUser.getOrElse(() => null);
@@ -69,164 +68,169 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
 
   @override
   void didPopNext() async {
-    context.read<ChapterCubit>().getAllChapters(course!.courseId);
-    context.read<FinishedChapterAndModuleCubit>().getFinishedChapters();
     final eitherUser = await context.read<AuthStateCubit>().getCurrentUser();
     final result = eitherUser.getOrElse(() => null);
+    fetch();
 
     setState(() {
       jobseeker = result;
     });
   }
 
+  void fetch() async {
+    //untuk roadmap
+    final initialCourse = context.read<HydratedSelectedCourseCubit>().state!;
+    context.read<ChapterCubit>().getAllChapters(initialCourse.courseId);
+    context.read<FinishedChapterAndModuleCubit>().getFinishedChapters(
+      initialCourse.courseId,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    titleToShow = course?.title ?? "Pilih Course...";
-
     return Scaffold(
       body: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => CourseCubit()),
           BlocProvider(create: (context) => QuizCubit()),
         ],
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 60, 30, 0),
-              child: Column(
-                children: [
-                  Column(
+        child: BlocBuilder<HydratedSelectedCourseCubit, CourseEntity?>(
+          builder: (context, selectedCourse) {
+            final titleToShow = selectedCourse?.title ?? "Pilih Course...";
+            selectedCourse == null ? null : fetch();
+            return Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 60, 30, 0),
+                  child: Column(
                     children: [
-                      Row(
+                      Column(
                         children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: AppColors.thirdBackGroundButton,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "${jobseeker?.coursesScore.toStringAsFixed(0) ?? 0} XP",
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: AppColors.thirdBackGroundButton,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${jobseeker?.coursesScore.toStringAsFixed(0) ?? 0} XP",
 
-                                  style: TextStyle(
-                                    fontFamily: 'JetBrainsMono',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 25,
+                                      style: TextStyle(
+                                        fontFamily: 'JetBrainsMono',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 25,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: AppColors.thirdBackGroundButton,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.local_fire_department_rounded,
+                                        size: 35,
+                                      ),
+                                      Text(
+                                        "0",
+                                        style: TextStyle(
+                                          fontFamily: 'JetBrainsMono',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 25,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: AppColors.thirdBackGroundButton,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
+                          SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: AppColors.thirdBackGroundButton,
+                                width: 2.0,
                               ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.local_fire_department_rounded,
-                                    size: 35,
-                                  ),
-                                  Text(
-                                    "0",
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: Text(
+                                    titleToShow,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: 'JetBrainsMono',
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 25,
+                                      fontSize: 15,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      setState(() {
+                                        isExpanded = !isExpanded;
+                                      });
+                                      await AppBottomsheet.display(
+                                        context,
+                                        const SelectCourseSheetContent(),
+                                      );
+                                      setState(() {
+                                        isExpanded = false;
+                                      });
+                                    },
+                                    child: Icon(
+                                      isExpanded
+                                          ? Icons.keyboard_arrow_up_outlined
+                                          : Icons.keyboard_arrow_down_outlined,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: AppColors.thirdBackGroundButton,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: Text(
-                                titleToShow!,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'JetBrainsMono',
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  setState(() {
-                                    isExpanded = !isExpanded;
-                                  });
-                                  await AppBottomsheet.display(
-                                    context,
-                                    const SelectCourseSheetContent(),
-                                  );
-                                  setState(() {
-                                    isExpanded = false;
-                                  });
-                                },
-                                child: Icon(
-                                  isExpanded
-                                      ? Icons.keyboard_arrow_up_outlined
-                                      : Icons.keyboard_arrow_down_outlined,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      BlocBuilder<HydratedProgressCubit, HydratedProgressState>(
-                        builder: (context, progressState) {
-                          int progress = context
-                              .read<HydratedProgressCubit>()
-                              .getScoreByCourseId(course?.courseId ?? "");
-                          return Container(
+                          SizedBox(height: 8),
+                          Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -255,17 +259,15 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                                             style: TextStyle(
                                               fontFamily: 'JetBrainsMono',
                                               fontWeight: FontWeight.w700,
-                                              fontSize: 14,
                                             ),
                                           ),
                                           Text(
-                                            titleToShow!,
+                                            titleToShow,
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
                                               fontFamily: 'JetBrainsMono',
                                               fontWeight: FontWeight.w700,
-                                              fontSize: 14,
                                             ),
                                           ),
                                         ],
@@ -274,7 +276,10 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          "${progress.toString()}%",
+                                          (jobseeker != null &&
+                                                  selectedCourse != null)
+                                              ? "${getProgressValue(jobseeker!, selectedCourse.courseId).toString()}%"
+                                              : "0%",
                                           style: TextStyle(
                                             fontFamily: 'JetBrainsMono',
                                             fontSize: 22,
@@ -337,70 +342,133 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                                 ),
                               ],
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 30),
-                  RoadmapWidget(course: course),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: BasicAppButton(
-                  onPressed: () {
-                    if (course != null) {
-                      AppNavigator.push(
-                        context,
-                        BlocProvider.value(
-                          value: context.read<BottomNavCubit>(),
-                          child: SubchapterPage(
-                            courseId: course!.courseId,
-                            chapterOrder: 1,
                           ),
-                        ),
-                      );
-                    } else {
-                      _displayErrorToast(
-                        context,
-                        "Silahkan pilih course terlebih dahulu",
-                      );
-                    }
-                  },
-                  verticalPadding: 18,
-                  backgroundColor: AppColors.secondaryBackgroundButton,
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 30,
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        "Lanjut belajar",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                        ),
-                      ),
+                      SizedBox(height: 30),
+                      selectedCourse != null
+                          ? BlocBuilder<
+                              FinishedChapterAndModuleCubit,
+                              FinishedChapterAndModuleState
+                            >(
+                              builder: (context, chapterModuleState) {
+                                if (chapterModuleState
+                                    is FinishedChapterAndModuleLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                if (chapterModuleState
+                                    is OnprogresOrFinishedChapterLoaded) {
+                                  return RoadmapWidget(
+                                    course: selectedCourse,
+                                    onProgChap:
+                                        chapterModuleState.onprogresChapters,
+                                    finishChap:
+                                        chapterModuleState.finishedChapters,
+                                    //untuk handle course pendahuluan yg cuma 3 subchapter
+                                    isChapterZero:
+                                        chapterModuleState
+                                            .onprogresChapters
+                                            ?.orderIndex ==
+                                        0,
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              },
+                            )
+                          : Text("Silahkan anda pilih course terlebih dahulu"),
                     ],
                   ),
                 ),
-              ),
-            ),
-          ],
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: BasicAppButton(
+                      onPressed: () {
+                        if (selectedCourse != null) {
+                          final state = context
+                              .read<FinishedChapterAndModuleCubit>()
+                              .state;
+
+                          // 2. Cek apakah datanya sudah siap (Loaded)?
+                          if (state is OnprogresOrFinishedChapterLoaded) {
+                            if (state.onprogresChapters != null) {
+                              AppNavigator.push(
+                                context,
+                                BlocProvider.value(
+                                  value: context.read<BottomNavCubit>(),
+                                  child: SubchapterPage(
+                                    courseId: selectedCourse.courseId,
+                                    chapterOrder:
+                                        state.onprogresChapters!.orderIndex,
+                                    //untuk handle course pendahuluan yg cuma 3 subchapter
+                                    isChapterZero:
+                                        state.onprogresChapters!.orderIndex == 0
+                                        ? true
+                                        : false,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _displayErrorToast(
+                                context,
+                                "Anda belum memilih chapter sama sekali",
+                              );
+                            }
+                          }
+                        } else {
+                          _displayErrorToast(
+                            context,
+                            "Silahkan pilih course terlebih dahulu",
+                          );
+                        }
+                      },
+                      verticalPadding: 18,
+                      backgroundColor: AppColors.secondaryBackgroundButton,
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.play_arrow_rounded,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            "Lanjut belajar",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
+  }
+
+  int getProgressValue(JobSeekerEntity jobseeker, String targetCourseId) {
+    var matches = jobseeker.progres.where(
+      (item) => item.courseId == targetCourseId,
+    );
+
+    if (matches.isNotEmpty) {
+      return matches.first.valueProgres;
+    } else {
+      return 0;
+    }
   }
 
   void _displayErrorToast(context, String message) {

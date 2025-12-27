@@ -5,7 +5,7 @@ import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_all_cou
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_course_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_subchapters.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/chapter_state.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class ChapterCubit extends Cubit<ChapterState> {
   ChapterCubit() : super(ChapterInitial());

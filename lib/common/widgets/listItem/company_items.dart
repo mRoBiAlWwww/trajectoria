@@ -13,16 +13,17 @@ class CompanyItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime deadlineDate = competition.deadline.toDate();
-    final String formattedDate = DateFormat(
-      'd MMM y',
-      'id_ID',
-    ).format(deadlineDate);
+    final formatter = DateFormat('d MMM y', 'id_ID');
+    final formattedDate = formatter.format(competition.deadline.toDate());
+
     return InkWell(
       onTap: () {
         AppNavigator.push(
           context,
-          DetailCompetitionPage(competitionId: competition.competitionId),
+          DetailCompetitionPage(
+            competitionId: competition.competitionId,
+            competitionName: competition.title,
+          ),
         );
       },
       child: Row(
@@ -61,7 +62,6 @@ class CompanyItems extends StatelessWidget {
                           ? Colors.amber
                           : AppColors.doveRedColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
                     ),
                   ),
                   Text(
@@ -91,7 +91,6 @@ class CompanyItems extends StatelessWidget {
                       Text(
                         formattedDate,
                         style: const TextStyle(
-                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.secondaryText,
                         ),

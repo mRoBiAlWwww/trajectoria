@@ -5,7 +5,7 @@ import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:gradient_borders/gradient_borders.dart';
-import 'package:trajectoria/common/widgets/navigation/main_wrapper.dart';
+import 'package:trajectoria/core/navigation/main_wrapper.dart';
 
 class GetStartePage extends StatelessWidget {
   const GetStartePage({super.key});

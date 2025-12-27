@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:trajectoria/features/company/dashboard/domain/repositories/create_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/repositories/competition_organizer.dart';
 
 class GetDraftCompetitionsUseCase {
-  final CreateCompetitionRepository repository;
+  final CompetitionOrganizerRepository repository;
 
   GetDraftCompetitionsUseCase({required this.repository});
 

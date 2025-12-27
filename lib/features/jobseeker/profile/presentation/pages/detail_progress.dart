@@ -46,7 +46,7 @@ class ProgressDetailPage extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'JetBrainsMono',
                   fontWeight: FontWeight.w700,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
               ),
               SizedBox(height: 35),
@@ -97,7 +97,7 @@ class ProgressDetailPage extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'JetBrainsMono',
                                 fontWeight: FontWeight.w700,
-                                fontSize: 20,
+                                fontSize: 16,
                               ),
                             ),
                           ],
@@ -136,7 +136,7 @@ class ProgressDetailPage extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'JetBrainsMono',
                                 fontWeight: FontWeight.w700,
-                                fontSize: 20,
+                                fontSize: 16,
                               ),
                             ),
                           ],
@@ -175,7 +175,7 @@ class ProgressDetailPage extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'JetBrainsMono',
                                 fontWeight: FontWeight.w700,
-                                fontSize: 20,
+                                fontSize: 16,
                               ),
                             ),
                           ],
@@ -190,6 +190,7 @@ class ProgressDetailPage extends StatelessWidget {
                 onPressed: () {},
                 backgroundColor: Colors.black,
                 borderRad: 15,
+                verticalPadding: 15,
                 content: Text(
                   "Bagikan",
                   style: TextStyle(
@@ -206,6 +207,7 @@ class ProgressDetailPage extends StatelessWidget {
                 isBordered: true,
                 borderColor: Colors.black,
                 borderRad: 15,
+                verticalPadding: 15,
                 content: Text(
                   "Unduh",
                   style: TextStyle(

@@ -73,10 +73,7 @@ class _SearchCategoryCompetitionPageState
                   decoration: InputDecoration(
                     filled: false,
                     hintText: "Cari Kompetisi",
-                    hintStyle: TextStyle(
-                      color: AppColors.secondaryText,
-                      fontSize: 14,
-                    ),
+                    hintStyle: TextStyle(color: AppColors.secondaryText),
                     border: InputBorder.none,
                   ),
                 ),

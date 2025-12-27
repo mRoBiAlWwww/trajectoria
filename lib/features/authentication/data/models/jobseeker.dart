@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trajectoria/features/authentication/data/models/user.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
+import 'package:trajectoria/features/jobseeker/learn/data/models/progres.dart';
 
 class JobSeekerModel extends UserModel {
   final String bio;
@@ -14,7 +15,10 @@ class JobSeekerModel extends UserModel {
   final List<String> competitionsDone;
   final List<String> finishedSubchapter;
   final List<String> finishedChapter;
-  final List<String> onprogresChapter;
+  final String onprogresChapter;
+  final String tokenNotification;
+  final List<String> bookmarks;
+  final List<ProgresModel> progres;
 
   JobSeekerModel({
     required super.userId,
@@ -35,6 +39,9 @@ class JobSeekerModel extends UserModel {
     required this.finishedSubchapter,
     required this.finishedChapter,
     required this.onprogresChapter,
+    required this.tokenNotification,
+    required this.bookmarks,
+    required this.progres,
   });
 
   factory JobSeekerModel.fromMap(Map<String, dynamic> map) {
@@ -50,7 +57,6 @@ class JobSeekerModel extends UserModel {
       skillSummary: map['skill_sumarry'] ?? '',
       experienceSummary: map['experience_sumarry'] ?? '',
       statusEmployment: map['status_employment'] ?? '',
-      // coursesScore: map['courses_score'] ?? 0,
       coursesScore: (map['courses_score'] as num?)?.toInt() ?? 0,
       finishedModule: map['finished_module'] != null
           ? List<String>.from(map['finished_module'] as List)
@@ -67,9 +73,16 @@ class JobSeekerModel extends UserModel {
       finishedChapter: map['finished_chapter'] != null
           ? List<String>.from(map['finished_chapter'] as List)
           : <String>[],
-      onprogresChapter: map['onprogres_chapter'] != null
-          ? List<String>.from(map['onprogres_chapter'] as List)
+      onprogresChapter: map['onprogres_chapter'] ?? '',
+      tokenNotification: map['token_notification'] ?? '',
+      bookmarks: map['bookmarks'] != null
+          ? List<String>.from(map['bookmarks'] as List)
           : <String>[],
+      progres: map['progres'] != null
+          ? (map['progres'] as List)
+                .map((e) => ProgresModel.fromMap(Map<String, dynamic>.from(e)))
+                .toList()
+          : [],
     );
   }
 
@@ -94,7 +107,36 @@ class JobSeekerModel extends UserModel {
       'finished_subchapter': finishedSubchapter,
       'finished_chapter': finishedChapter,
       'onprogres_chapter': onprogresChapter,
+      'token_notification': tokenNotification,
+      'bookmarks': bookmarks,
+      'progres': progres.map((e) => e.toMap()).toList(),
     };
+  }
+
+  factory JobSeekerModel.fromEntity(JobSeekerEntity entity) {
+    return JobSeekerModel(
+      userId: entity.userId,
+      email: entity.email,
+      name: entity.name,
+      role: entity.role,
+      createdAt: entity.createdAt,
+      bio: entity.bio,
+      cvFilePath: entity.cvFilePath,
+      skillSummary: entity.skillSummary,
+      experienceSummary: entity.experienceSummary,
+      statusEmployment: entity.statusEmployment,
+      profileImage: entity.profileImage,
+      coursesScore: entity.coursesScore,
+      finishedModule: entity.finishedModule,
+      competitionsOnprogres: entity.competitionsOnprogres,
+      competitionsDone: entity.competitionsDone,
+      finishedSubchapter: entity.finishedSubchapter,
+      finishedChapter: entity.finishedChapter,
+      onprogresChapter: entity.onprogresChapter,
+      tokenNotification: entity.tokenNotification,
+      bookmarks: entity.bookmarks,
+      progres: entity.progres.map((e) => ProgresModel.fromEntity(e)).toList(),
+    );
   }
 
   @override
@@ -118,29 +160,9 @@ class JobSeekerModel extends UserModel {
       finishedSubchapter: finishedSubchapter,
       finishedChapter: finishedChapter,
       onprogresChapter: onprogresChapter,
-    );
-  }
-
-  factory JobSeekerModel.fromEntity(JobSeekerEntity entity) {
-    return JobSeekerModel(
-      userId: entity.userId,
-      email: entity.email,
-      name: entity.name,
-      role: entity.role,
-      createdAt: entity.createdAt,
-      bio: entity.bio,
-      cvFilePath: entity.cvFilePath,
-      skillSummary: entity.skillSummary,
-      experienceSummary: entity.experienceSummary,
-      statusEmployment: entity.statusEmployment,
-      profileImage: entity.profileImage,
-      coursesScore: entity.coursesScore,
-      finishedModule: entity.finishedModule,
-      competitionsOnprogres: entity.competitionsOnprogres,
-      competitionsDone: entity.competitionsDone,
-      finishedSubchapter: entity.finishedSubchapter,
-      finishedChapter: entity.finishedChapter,
-      onprogresChapter: entity.onprogresChapter,
+      tokenNotification: tokenNotification,
+      bookmarks: bookmarks,
+      progres: progres.map((e) => e.toEntity()).toList(),
     );
   }
 }

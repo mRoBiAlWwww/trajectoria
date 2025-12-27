@@ -107,7 +107,6 @@ class _FilterCompetitionSheetState extends State<FilterCompetitionSheet> {
                                             ? Colors.teal
                                             : Colors.grey,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -157,7 +156,6 @@ class _FilterCompetitionSheetState extends State<FilterCompetitionSheet> {
                                         ? Colors.teal
                                         : Colors.grey,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
                                   ),
                                 ),
                               ),
@@ -192,7 +190,6 @@ class _FilterCompetitionSheetState extends State<FilterCompetitionSheet> {
                                         ? Colors.teal
                                         : Colors.grey,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
                                   ),
                                 ),
                               ),

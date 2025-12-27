@@ -6,11 +6,6 @@ class UserCompeInitial extends GetUserCompeState {}
 
 class UserCompeLoading extends GetUserCompeState {}
 
-class UserCompeUserInfo extends GetUserCompeState {
-  final JobSeekerEntity jobseeker;
-  UserCompeUserInfo({required this.jobseeker});
-}
-
 class UserCompeAllUsersLoaded extends GetUserCompeState {
   final List<JobSeekerEntity> users;
   UserCompeAllUsersLoaded({required this.users});

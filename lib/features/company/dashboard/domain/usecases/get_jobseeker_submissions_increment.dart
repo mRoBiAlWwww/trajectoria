@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:trajectoria/features/company/dashboard/domain/repositories/create_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/repositories/competition_organizer.dart';
 
 class GetJobseekerSubmissionsIncrementUseCase {
-  final CreateCompetitionRepository repository;
+  final CompetitionOrganizerRepository repository;
   GetJobseekerSubmissionsIncrementUseCase({required this.repository});
 
   Future<Either> call(String competitionId) async {

@@ -6,7 +6,7 @@ import 'package:trajectoria/features/company/dashboard/presentation/cubit/create
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/file_items.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/rubrik.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
   DateTime? pickedDate;
@@ -20,6 +20,8 @@ class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
           competition: CompetitionEntity(
             competitionId: "",
             companyName: "",
+            companyEmail: "",
+            companyProfileImage: "",
             companyId: "",
             title: "",
             description: "",
@@ -27,7 +29,7 @@ class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
             deadline: Timestamp.now(),
             rewardDescription: "",
             submissionType: "",
-            status: "draft",
+            status: "Draft",
             categoryId: "DDrpyORpBqBi3kNE7kHt",
             createdAt: Timestamp.now(),
             competitionImage: "",
@@ -53,6 +55,22 @@ class CreateCompetitionCubit extends Cubit<CreateCompetitionState> {
     emit(
       state.copyWith(
         competition: state.competition.copyWith(companyName: value),
+      ),
+    );
+  }
+
+  void setCompanyEmail(String value) {
+    emit(
+      state.copyWith(
+        competition: state.competition.copyWith(companyEmail: value),
+      ),
+    );
+  }
+
+  void setCompanyProfileImage(String value) {
+    emit(
+      state.copyWith(
+        competition: state.competition.copyWith(companyProfileImage: value),
       ),
     );
   }

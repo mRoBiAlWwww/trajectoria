@@ -26,6 +26,22 @@ class LearnRepositoryImpl extends LearnRepository {
   }
 
   @override
+  Future<Either> getCourseChapterById(
+    String courseId,
+    String courseChapterId,
+  ) async {
+    try {
+      final result = await service.getCourseChapterById(
+        courseId,
+        courseChapterId,
+      );
+      return Right(CourseChapterModel.fromMap(result).toEntity());
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
   Future<Either> getAllCourseChapters(String courseId) async {
     try {
       final result = await service.getAllCourseChapters(courseId);
@@ -151,6 +167,16 @@ class LearnRepositoryImpl extends LearnRepository {
   Future<Either> addOnprogresChapter(String chapterId) async {
     try {
       final result = await service.addOnprogresChapter(chapterId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
+  Future<Either> addValueProgres(String courseId, int newValue) async {
+    try {
+      final result = await service.addValueProgres(courseId, newValue);
       return Right(result);
     } catch (e) {
       return Left(e.toString().replaceFirst("Exception: ", ""));

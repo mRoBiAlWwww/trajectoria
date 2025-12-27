@@ -60,21 +60,20 @@ class RankWidget extends StatelessWidget {
                                 return SizedBox.shrink();
                               }
                               final submission = incrementState.data[index];
-                              final DateTime submittedAtDate = submission
-                                  .submittedAt
-                                  .toDate();
-                              final DateTime deadlineDate = submission
-                                  .submittedAt
-                                  .toDate();
-                              final String formattedDate = DateFormat(
-                                'd MMM y',
-                                'id_ID',
-                              ).format(deadlineDate);
-                              final String countdown = timeAgo(submittedAtDate);
+
+                              //formatter date
+                              final formatter = DateFormat('d MMM y', 'id_ID');
+                              final formattedDate = formatter.format(
+                                submission.submittedAt.toDate(),
+                              );
+                              final String countdown = timeAgo(
+                                submission.submittedAt.toDate(),
+                              );
+
                               return Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 15,
-                                  vertical: 15,
+                                  vertical: 5,
                                 ),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
@@ -97,24 +96,24 @@ class RankWidget extends StatelessWidget {
                                     index == 0
                                         ? Image.asset(
                                             AppImages.satu,
-                                            width: 50,
-                                            height: 50,
+                                            width: 40,
+                                            height: 40,
                                           )
                                         : index == 1
                                         ? Image.asset(
                                             AppImages.dua,
-                                            width: 50,
-                                            height: 50,
+                                            width: 40,
+                                            height: 40,
                                           )
                                         : index == 2
                                         ? Image.asset(
                                             AppImages.tiga,
-                                            width: 50,
-                                            height: 50,
+                                            width: 40,
+                                            height: 40,
                                           )
                                         : SizedBox(
-                                            width: 50,
-                                            height: 50,
+                                            width: 40,
+                                            height: 40,
                                             child: Center(
                                               child: Text(
                                                 (index + 1).toString(),
@@ -132,8 +131,8 @@ class RankWidget extends StatelessWidget {
                                       child: Image.network(
                                         userState.users[index].profileImage,
                                         fit: BoxFit.cover,
-                                        width: 50,
-                                        height: 50,
+                                        width: 40,
+                                        height: 40,
                                         loadingBuilder:
                                             (context, child, loadingProgress) {
                                               if (loadingProgress == null) {
@@ -172,9 +171,9 @@ class RankWidget extends StatelessWidget {
                                               style: TextStyle(
                                                 fontFamily: 'Inter',
                                                 fontWeight: FontWeight.w700,
-                                                fontSize: 16,
                                               ),
                                             ),
+                                            SizedBox(height: 5),
                                             Text(
                                               "$countdown - $formattedDate",
                                               maxLines: 2,
@@ -184,7 +183,7 @@ class RankWidget extends StatelessWidget {
                                                 fontWeight: FontWeight.w400,
                                                 color:
                                                     AppColors.disableTextButton,
-                                                fontSize: 13,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ],
@@ -214,7 +213,7 @@ class RankWidget extends StatelessWidget {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                               fontFamily: 'JetBrainsMono',
-                                              fontSize: 20,
+                                              fontSize: 18,
                                             ),
                                           ),
                                         ],

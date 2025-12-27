@@ -1,5 +1,6 @@
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/category.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/submission.dart';
 
 abstract class SearchCompeteState {}
 
@@ -12,9 +13,15 @@ class SearchCompeteLoaded extends SearchCompeteState {
   SearchCompeteLoaded(this.competitions);
 }
 
-class SearchCompeteSingleLoaded extends SearchCompeteState {
+class SingleCompeteAndSubmissionLoaded extends SearchCompeteState {
   final CompetitionEntity competition;
-  SearchCompeteSingleLoaded(this.competition);
+  final SubmissionEntity? submission;
+  final int totalCompetitionParticipants;
+  SingleCompeteAndSubmissionLoaded(
+    this.competition,
+    this.submission,
+    this.totalCompetitionParticipants,
+  );
 }
 
 class SearchCategoriesLoaded extends SearchCompeteState {

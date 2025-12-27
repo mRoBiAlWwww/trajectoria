@@ -16,6 +16,7 @@ class SubmissionEntity {
   final double score;
   final int rank;
   final bool isChecked;
+  final bool isFinalist;
 
   SubmissionEntity({
     required this.submissionId,
@@ -30,6 +31,7 @@ class SubmissionEntity {
     required this.score,
     required this.rank,
     required this.isChecked,
+    required this.isFinalist,
   });
 
   SubmissionEntity copyWith({
@@ -45,6 +47,7 @@ class SubmissionEntity {
     double? score,
     int? rank,
     bool? isChecked,
+    bool? isFinalist,
   }) {
     return SubmissionEntity(
       submissionId: submissionId ?? this.submissionId,
@@ -60,6 +63,7 @@ class SubmissionEntity {
       score: score ?? this.score,
       rank: rank ?? this.rank,
       isChecked: isChecked ?? this.isChecked,
+      isFinalist: isFinalist ?? this.isFinalist,
     );
   }
 
@@ -76,7 +80,8 @@ class SubmissionEntity {
       'feedback': feedback,
       'score': score,
       'rank': rank,
-      'isChecked': isChecked,
+      'is_checked': isChecked,
+      'is_finalist': isFinalist,
     };
   }
 
@@ -103,7 +108,8 @@ class SubmissionEntity {
           ? (map['score'] as int).toDouble()
           : (map['score'] ?? 0.0),
       rank: map['rank'] ?? 0,
-      isChecked: map['isChecked'],
+      isChecked: map['is_checked'],
+      isFinalist: map['is_finalist'],
     );
   }
 
@@ -121,6 +127,7 @@ class SubmissionEntity {
       score: score,
       rank: rank,
       isChecked: isChecked,
+      isFinalist: isFinalist,
     );
   }
 }

@@ -31,4 +31,5 @@ class AppImages {
   static const String ligaEmas = '${basePath}ligaEmas$format';
   static const String ligaPerak = '${basePath}ligaPerak$format';
   static const String ligaTerkunci = '${basePath}ligaTerkunci$format';
+  static const String premiumResult = '${basePath}premiumResult$format';
 }

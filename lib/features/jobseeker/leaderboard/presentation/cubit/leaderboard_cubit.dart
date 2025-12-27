@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
 import 'package:trajectoria/features/jobseeker/leaderboard/domain/usecases/get_jobseeker_by_score.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 part 'leaderboard_state.dart';
 

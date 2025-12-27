@@ -6,6 +6,7 @@ import 'package:trajectoria/features/authentication/data/models/user_signin_req.
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/additional_info_company.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/additional_info_jobseeker.dart';
+import 'package:trajectoria/features/authentication/domain/usecases/delete_token_notification.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/forgot_password.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/get_current_user.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/resend_email.dart';
@@ -13,7 +14,7 @@ import 'package:trajectoria/features/authentication/domain/usecases/signin.dart'
 import 'package:trajectoria/features/authentication/domain/usecases/signin_google.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/signout.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/signup.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 import 'auth_state.dart';
 
 class AuthStateCubit extends Cubit<AuthState> {
@@ -128,7 +129,7 @@ class AuthStateCubit extends Cubit<AuthState> {
     return result;
   }
 
-  Future<void> signout() async {
+  Future<void> signoutCompany() async {
     emit(AuthLoading());
     final result = await sl<SignOutUseCase>().call();
     result.fold(
@@ -137,6 +138,27 @@ class AuthStateCubit extends Cubit<AuthState> {
       },
       (data) {
         emit(UnAuthenticated());
+      },
+    );
+  }
+
+  Future<void> signoutJobseeker() async {
+    emit(AuthLoading());
+    final result = await sl<DeleteTokenNotificationUseCase>().call();
+    result.fold(
+      (failure) {
+        emit(AuthFailure(failure));
+      },
+      (data) async {
+        final result = await sl<SignOutUseCase>().call();
+        result.fold(
+          (failure) {
+            emit(AuthFailure(failure));
+          },
+          (data) {
+            emit(UnAuthenticated());
+          },
+        );
       },
     );
   }

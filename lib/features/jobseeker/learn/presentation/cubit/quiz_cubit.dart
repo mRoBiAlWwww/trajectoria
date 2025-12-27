@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/subchapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_chapter.dart';
@@ -7,9 +6,10 @@ import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finishe
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_onprogres_chapter.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_user_score.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_finished_module.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/usecases/add_value_progres.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_quiz.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/quiz_state.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class QuizCubit extends Cubit<QuizState> {
   QuizCubit() : super(QuizInitial());
@@ -34,7 +34,6 @@ class QuizCubit extends Cubit<QuizState> {
         emit(QuizFailure());
       },
       (data) {
-        debugPrint(data.toString());
         emit(QuizzesLoaded(data));
       },
     );
@@ -59,6 +58,8 @@ class QuizCubit extends Cubit<QuizState> {
     ModuleEntity module,
     SubChapterEntity subchapter,
     double score,
+    int newValue,
+    bool isChapterZero,
   ) async {
     emit(QuizLoading());
 
@@ -80,7 +81,16 @@ class QuizCubit extends Cubit<QuizState> {
         return;
       }
 
-      if (subchapter.orderIndex == 3) {
+      var valueProgresResult = await sl<AddValueProgresUseCase>().call(
+        module.courseId,
+        newValue,
+      );
+
+      if (valueProgresResult.isLeft()) {
+        emit(QuizFailure());
+        return;
+      }
+      if (isChapterZero || subchapter.orderIndex == 5) {
         var chapterResult = await sl<AddFinishedChapterStatusUseCase>().call(
           subchapter.chapterId,
         );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
+import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -50,7 +50,7 @@ class FirstSingupSheetContent extends StatelessWidget {
                       SizedBox(height: 20),
                       Text.rich(
                         TextSpan(
-                          style: TextStyle(fontSize: 14, color: Colors.black),
+                          style: TextStyle(color: Colors.black),
                           children: <TextSpan>[
                             const TextSpan(
                               text: 'Dengan menekan Setuju, kamu menyetujui ',
@@ -110,21 +110,3 @@ class FirstSingupSheetContent extends StatelessWidget {
     );
   }
 }
-
-//  ElevatedButton(
-//                   onPressed: () {
-//                     _openSecondSheet(context);
-//                   },
-//                   style: ElevatedButton.styleFrom(
-//                     minimumSize: const Size(double.infinity, 50),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.zero,
-//                     ),
-//                     backgroundColor: Colors.black,
-//                     foregroundColor: Colors.white,
-//                   ),
-//                   child: const Text(
-//                     'Terima dan Lanjutkan',
-//                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-//                   ),
-//                 ),

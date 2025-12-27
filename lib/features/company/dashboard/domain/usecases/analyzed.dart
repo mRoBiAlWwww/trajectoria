@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:trajectoria/features/company/dashboard/domain/repositories/create_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/repositories/competition_organizer.dart';
 
 class AnalyzedUseCase {
-  final CreateCompetitionRepository repository;
+  final CompetitionOrganizerRepository repository;
 
   AnalyzedUseCase({required this.repository});
   Future<Either> call(

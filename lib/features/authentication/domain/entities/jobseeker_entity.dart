@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trajectoria/features/authentication/domain/entities/user.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/progres.dart';
 
 class JobSeekerEntity extends UserEntity {
   final String bio;
@@ -13,7 +14,10 @@ class JobSeekerEntity extends UserEntity {
   final List<String> competitionsDone;
   final List<String> finishedSubchapter;
   final List<String> finishedChapter;
-  final List<String> onprogresChapter;
+  final String onprogresChapter;
+  final String tokenNotification;
+  final List<String> bookmarks;
+  final List<ProgresEntity> progres;
 
   JobSeekerEntity({
     required super.userId,
@@ -34,6 +38,9 @@ class JobSeekerEntity extends UserEntity {
     required this.finishedSubchapter,
     required this.finishedChapter,
     required this.onprogresChapter,
+    required this.tokenNotification,
+    required this.bookmarks,
+    required this.progres,
   });
   JobSeekerEntity copyWith({
     String? userId,
@@ -53,7 +60,10 @@ class JobSeekerEntity extends UserEntity {
     List<String>? competitionsDone,
     List<String>? finishedSubchapter,
     List<String>? finishedChapter,
-    List<String>? onprogresChapter,
+    String? onprogresChapter,
+    String? tokenNotification,
+    List<String>? bookmarks,
+    List<ProgresEntity>? progres,
   }) {
     return JobSeekerEntity(
       userId: userId ?? this.userId,
@@ -75,6 +85,9 @@ class JobSeekerEntity extends UserEntity {
       finishedSubchapter: finishedSubchapter ?? this.finishedSubchapter,
       finishedChapter: finishedChapter ?? this.finishedChapter,
       onprogresChapter: onprogresChapter ?? this.onprogresChapter,
+      tokenNotification: tokenNotification ?? this.tokenNotification,
+      bookmarks: bookmarks ?? this.bookmarks,
+      progres: progres ?? this.progres,
     );
   }
 }

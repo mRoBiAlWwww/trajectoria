@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
+import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 
 class PremiumPage extends StatefulWidget {
@@ -73,146 +75,242 @@ class _PremiumPageState extends State<PremiumPage> {
             ),
           ),
         ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.thirdBackGroundButton,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              children: [
-                Text(
-                  "Nikmati insight AI penuh, analisis real-time, dan bimbingan karier.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'JetBrainsMono',
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20,
-                  ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(25.0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Colors.white, Color(0xFFEDEDED)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-                SizedBox(height: 20),
-                Text(
-                  "Tempat user Premium mengakses fitur AI cerdas untuk analisis, rekomendasi, dan personal mentor.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.disableTextButton,
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    "Premium",
+                    style: TextStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      foreground: Paint()
+                        ..shader =
+                            const LinearGradient(
+                              colors: [
+                                Color(0xFF4B3480),
+                                Color(0xFFC267FF),
+                                Color(0xFFE5FF9E),
+                              ],
+                            ).createShader(
+                              const Rect.fromLTWH(0.0, 0.0, 300.0, 70.0),
+                            ),
+                    ),
                   ),
-                ),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 180,
-                      child: PageView.builder(
-                        controller: _controller,
-                        onPageChanged: (i) {
-                          setState(() {
-                            currentIndex = i % myImages.length;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          final realIndex = index % myImages.length;
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              myImages[realIndex],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+                  SizedBox(height: 20),
+                  Text(
+                    "Nikmati insight AI penuh, analisis real-time, dan bimbingan karier.",
+                    textAlign: TextAlign.center,
+
+                    style: TextStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                      height: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Tempat user Premium mengakses fitur AI cerdas untuk analisis, rekomendasi, dan personal mentor.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.disableTextButton,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 225,
+                        child: PageView.builder(
+                          controller: _controller,
+                          onPageChanged: (i) {
+                            setState(() {
+                              currentIndex = i % myImages.length;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final realIndex = index % myImages.length;
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Center(
+                                child: Image.asset(
+                                  myImages[realIndex],
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      SizedBox(
+                        height: 150,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              titles[currentIndex],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              child: Text(
+                                subtitles[currentIndex],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.disableTextButton,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(myImages.length, (index) {
+                          bool isActive = currentIndex == index;
+
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: isActive ? 24 : 8,
+                            height: 8,
+
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? Colors.black
+                                  : Colors.grey.shade400,
+
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           );
-                        },
+                        }),
                       ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Tunggu apa lagi? Mulai sekarang.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
                     ),
-                    const SizedBox(height: 25),
-                    SizedBox(
-                      height: 150,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF4B3480),
+                          Color(0xFFC267FF),
+                          Color(0xFFE5FF9E),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            titles[currentIndex],
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: 'JetBrainsMono',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 20,
-                            ),
+                          SvgPicture.asset(
+                            AppVectors.upgrade,
+                            width: 15.0,
+                            height: 15.0,
                           ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              subtitles[currentIndex],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.disableTextButton,
-                              ),
+                          SizedBox(width: 4),
+                          const Text(
+                            "Upgrade Sekarang",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
+                  ),
+                  SizedBox(height: 10),
+                  GestureDetector(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        myImages.length,
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: currentIndex == index ? 12 : 8,
-                          height: currentIndex == index ? 12 : 8,
-                          decoration: BoxDecoration(
-                            color: currentIndex == index
-                                ? Colors.black
-                                : Colors.grey.shade400,
-                            shape: BoxShape.circle,
+                      children: [
+                        Text(
+                          "Lihat detail paket",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.secondaryText,
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Text(
-                  "Tunggu apa lagi? Mulai sekarang.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'JetBrainsMono',
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(height: 75),
-                GestureDetector(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Lihat detail paket",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
+                        SizedBox(width: 5),
+                        Icon(
+                          Icons.arrow_forward,
                           color: AppColors.secondaryText,
+                          size: 20,
                         ),
-                      ),
-                      SizedBox(width: 5),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: AppColors.secondaryText,
-                        size: 20,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

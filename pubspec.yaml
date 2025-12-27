@@ -64,10 +64,17 @@ dependencies:
   http:
   flutter_dotenv:
   flutter_downloader:
+  firebase_messaging:
+  flutter_local_notifications:
+  dart_jsonwebtoken: ^2.14.0
+  envied:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner:
+  envied_generator:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -93,6 +100,7 @@ flutter:
     - assets/vectors/
     - assets/gifs/
     - assets/videos/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

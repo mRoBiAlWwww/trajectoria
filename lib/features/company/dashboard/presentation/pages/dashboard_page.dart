@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/empty_competition/company_empty_competition.dart';
 import 'package:trajectoria/common/widgets/listItem/competition_listitem.dart';
-import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
@@ -31,8 +31,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
   void initState() {
     super.initState();
 
-    context.read<OrganizeCompetitionCubit>().getCompetitions();
-    context.read<JobseekerSubmissionCubit>().getJobseekerAcrossSubmissions();
+    _refetchCompetition();
   }
 
   @override
@@ -43,8 +42,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
 
   @override
   void didPopNext() {
-    context.read<OrganizeCompetitionCubit>().getCompetitions();
-    context.read<JobseekerSubmissionCubit>().getJobseekerAcrossSubmissions();
+    _refetchCompetition();
   }
 
   @override
@@ -53,53 +51,74 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
     super.dispose();
   }
 
+  Future<void> _refetchCompetition() async {
+    await context
+        .read<OrganizeCompetitionCubit>()
+        .getCompetitionsByCurrentCompany();
+    // ignore: use_build_context_synchronously
+    await context
+        .read<JobseekerSubmissionCubit>()
+        .getJobseekerAcrossSubmissions();
+  }
+
   @override
   Widget build(BuildContext context) {
     final userCompany =
         (context.watch<AuthStateCubit>().state as AuthSuccess).user.name;
-    return BlocProvider(
-      create: (context) => GetUserCompeCubit(),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            appBar: _buildAppBar(context, userCompany),
-            body:
-                BlocBuilder<OrganizeCompetitionCubit, OrganizeCompetitionState>(
-                  builder: (context, competitionState) {
-                    if (competitionState is OrganizeCompetitionsLoaded) {
-                      final List<CompetitionEntity> allCompetitions =
-                          competitionState.data;
+    return RefreshIndicator(
+      onRefresh: () => _refetchCompetition(),
+      child: BlocProvider(
+        create: (context) => GetUserCompeCubit(),
+        child: Builder(
+          builder: (context) {
+            return Scaffold(
+              appBar: _buildAppBar(context, userCompany),
+              body:
+                  BlocBuilder<
+                    OrganizeCompetitionCubit,
+                    OrganizeCompetitionState
+                  >(
+                    builder: (context, competitionState) {
+                      if (competitionState is OrganizeCompetitionsLoaded) {
+                        bool showSeeAllButton =
+                            competitionState.data.isNotEmpty;
+                        final List<CompetitionEntity> allCompetitions =
+                            competitionState.data;
 
-                      return SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 75),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildCompetitionHeader(context),
-                              const SizedBox(height: 10),
-                              _buildCompetitionListSection(),
-                              const SizedBox(height: 30),
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 75),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildCompetitionHeader(
+                                  context,
+                                  showSeeAllButton,
+                                ),
+                                const SizedBox(height: 10),
+                                _buildCompetitionListSection(),
+                                const SizedBox(height: 30),
 
-                              _buildSubmissionHeader(context),
-                              const SizedBox(height: 10),
+                                _buildSubmissionHeader(context),
+                                const SizedBox(height: 10),
 
-                              _buildSubmissionListSection(
-                                context,
-                                allCompetitions,
-                              ),
-                            ],
+                                _buildSubmissionListSection(
+                                  context,
+                                  allCompetitions,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                ),
-          );
-        },
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -111,6 +130,8 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
       toolbarHeight: 75,
       actions: [
         Container(
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             color: Colors.white,
@@ -120,7 +141,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(CupertinoIcons.bell_solid, color: Colors.grey),
+            icon: Icon(CupertinoIcons.bell_solid, color: Colors.grey, size: 20),
           ),
         ),
         SizedBox(width: 25),
@@ -133,10 +154,18 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
           fontSize: 18,
         ),
       ),
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(1),
+        child: Divider(
+          height: 1,
+          thickness: 1,
+          color: AppColors.thirdBackGroundButton,
+        ),
+      ),
     );
   }
 
-  Widget _buildCompetitionHeader(BuildContext context) {
+  Widget _buildCompetitionHeader(BuildContext context, bool isVisible) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -148,26 +177,27 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
             fontSize: 18,
           ),
         ),
-        TextButton(
-          onPressed: () {
-            AppNavigator.push(
-              context,
-              BlocProvider(
-                create: (context) => OrganizeCompetitionCubit(),
-                child: const AllCompetitionsPage(),
+        if (isVisible)
+          TextButton(
+            onPressed: () {
+              AppNavigator.push(
+                context,
+                BlocProvider(
+                  create: (context) => OrganizeCompetitionCubit(),
+                  child: const AllCompetitionsPage(),
+                ),
+              );
+            },
+            child: const Text(
+              "Lihat Semua",
+              style: TextStyle(
+                fontFamily: 'JetBrainsMono',
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                color: Colors.black,
               ),
-            );
-          },
-          child: const Text(
-            "Lihat Semua",
-            style: TextStyle(
-              fontFamily: 'JetBrainsMono',
-              fontWeight: FontWeight.w400,
-              fontSize: 15,
-              color: Colors.black,
             ),
           ),
-        ),
       ],
     );
   }
@@ -191,7 +221,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
               },
             );
           } else {
-            return _buildEmptyStateCompetition(context);
+            return CompanyEmptyCompetition();
           }
         }
         return const SizedBox.shrink();
@@ -223,11 +253,16 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
       builder: (context, submissionState) {
         if (submissionState is JobseekerSubmissionsCompetitionLoaded) {
           if (submissionState.data.isEmpty) {
-            return const Center(
-              child: Text(
-                "Belum ada pengumpulan tugas.",
-                style: TextStyle(color: Colors.grey),
-              ),
+            return Column(
+              children: [
+                SizedBox(height: 100),
+                const Center(
+                  child: Text(
+                    "Belum ada pengumpulan tugas.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
             );
           }
 
@@ -243,7 +278,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
               if (userState is UserCompeAllUsersLoaded) {
                 return ListView.separated(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(), // WAJIB MATI
+                  physics: const NeverScrollableScrollPhysics(),
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 15),
                   itemCount: submissionState.data.length,
@@ -264,12 +299,11 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                           ),
                         );
 
-                    final submittedAtDate = submission.submittedAt.toDate();
-                    final formattedDate = DateFormat(
-                      'd MMM y',
-                      'id_ID',
-                    ).format(submittedAtDate);
-                    final countdown = timeAgo(submittedAtDate);
+                    final formatter = DateFormat('d MMM y', 'id_ID');
+                    final formattedDate = formatter.format(
+                      submission.submittedAt.toDate(),
+                    );
+                    final countdown = timeAgo(submission.submittedAt.toDate());
 
                     return GestureDetector(
                       onTap: () {
@@ -299,14 +333,14 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                               child: Image.network(
                                 user.profileImage,
                                 fit: BoxFit.cover,
-                                width: 50,
-                                height: 50,
+                                width: 40,
+                                height: 40,
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;
                                       return Container(
-                                        width: 50,
-                                        height: 50,
+                                        width: 40,
+                                        height: 40,
                                         color: Colors.grey,
                                         child: const Center(
                                           child: CircularProgressIndicator(
@@ -334,6 +368,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                                       fontSize: 16,
                                     ),
                                   ),
+                                  SizedBox(height: 5),
                                   Text(
                                     "$countdown - $formattedDate",
                                     maxLines: 2,
@@ -342,7 +377,6 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,
                                       color: AppColors.disableTextButton,
-                                      fontSize: 13,
                                     ),
                                   ),
                                 ],
@@ -361,16 +395,6 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
         }
         return const Center(child: CircularProgressIndicator());
       },
-    );
-  }
-
-  Widget _buildEmptyStateCompetition(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Image.asset(AppImages.not, width: 100, height: 100)],
-      ),
     );
   }
 

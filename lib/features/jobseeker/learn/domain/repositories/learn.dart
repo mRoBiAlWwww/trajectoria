@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 abstract class LearnRepository {
   Future<Either> getCourses();
+  Future<Either> getCourseChapterById(String courseId, String courseChapterId);
   Future<Either> getAllCourseChapters(String courseId);
   Future<Either> getCourseChapter(String courseId, int chapterOrder);
   Future<Either> getSubchapters(String courseId, int chapterOrder);
@@ -21,4 +22,5 @@ abstract class LearnRepository {
   Future<Either> addUserScore(double score);
   Future<Either> addFinishedChapter(String chapterId);
   Future<Either> addOnprogresChapter(String chapterId);
+  Future<Either> addValueProgres(String courseId, int newValue);
 }

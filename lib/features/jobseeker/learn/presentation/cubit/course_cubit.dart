@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/course.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/usecases/get_courses_path.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/cubit/course_state.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class CourseCubit extends Cubit<CourseState> {
   CourseCubit() : super(CourseInitial());

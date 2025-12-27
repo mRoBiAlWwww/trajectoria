@@ -7,7 +7,7 @@ import 'package:trajectoria/features/jobseeker/compete/domain/usecases/download_
 import 'package:trajectoria/features/jobseeker/compete/domain/usecases/is_already_submit.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/usecases/upload_file.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/submission_state.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class SubmissionCubit extends Cubit<SubmissionState> {
   SubmissionCubit() : super(SubmissionInitial());
@@ -23,7 +23,7 @@ class SubmissionCubit extends Cubit<SubmissionState> {
         emit(SubmissionError(error));
       },
       (competitionParticipantId) {
-        emit(OnprogressSubmited(competitionParticipantId));
+        emit(OnprogresSubmited(competitionParticipantId));
       },
     );
   }
@@ -81,7 +81,7 @@ class SubmissionCubit extends Cubit<SubmissionState> {
             ? emit(SubmissionInitial())
             : data == "done"
             ? emit(DoneSubmited())
-            : emit(OnprogressSubmited(data));
+            : emit(OnprogresSubmited(data));
       },
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trajectoria/features/authentication/domain/usecases/image_upload.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 import 'image_upload_state.dart';
 
 class ImageUploadCubit extends Cubit<ImageUploadState> {

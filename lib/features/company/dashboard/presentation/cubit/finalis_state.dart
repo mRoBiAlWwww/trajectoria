@@ -1,4 +1,4 @@
-import 'package:trajectoria/features/jobseeker/compete/domain/entities/finalis.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/submission.dart';
 
 abstract class UserFinalisState {}
 
@@ -12,7 +12,7 @@ class UserFinalisSuccess extends UserFinalisState {
 }
 
 class UserFinalisLoaded extends UserFinalisState {
-  final List<FinalisEntity> finalis;
+  final List<SubmissionEntity> finalis;
   UserFinalisLoaded({required this.finalis});
 }
 

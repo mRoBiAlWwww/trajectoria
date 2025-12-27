@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/helper/overlay/overlay_ai.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/core/api/fcm_notification_api.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
+import 'package:trajectoria/features/company/dashboard/domain/entities/announcement.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/finalis_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/finalis_state.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competition_state.dart';
@@ -33,7 +35,8 @@ class DetailSubmissionPage extends StatefulWidget {
 
 class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   late final TextEditingController _catatanController;
-  List<double> sliderValue = [0, 0, 0];
+  late AnnouncementEntity announcement;
+  late List<double> sliderValue;
   List<int> bobotList = [];
   List<String> urls = [];
   List<String> common = [];
@@ -58,6 +61,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
           ? widget.submission.feedback
           : "",
     );
+    sliderValue = List.filled(widget.competition.rubrik.length, 0.0);
 
     for (var item in widget.competition.rubrik) {
       bobotList.add(item.bobot);
@@ -67,16 +71,14 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   @override
   Widget build(BuildContext context) {
     urls = widget.submission.answerFiles.map((file) => file.url).toList();
-    final DateTime deadlineDate = widget.userListed.createdAt.toDate();
-    final String formattedDate = DateFormat(
-      'd MMM y',
-      'id_ID',
-    ).format(deadlineDate);
-    final DateTime submitted = widget.submission.submittedAt.toDate();
-    final String submittedDate = DateFormat(
-      'd MMM y',
-      'id_ID',
-    ).format(submitted);
+    final formatter = DateFormat('d MMMM y', 'id_ID');
+
+    final formattedDate = formatter.format(
+      widget.userListed.createdAt.toDate(),
+    );
+    final submittedDate = formatter.format(
+      widget.submission.submittedAt.toDate(),
+    );
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => OrganizeCompetitionCubit()),
@@ -174,29 +176,47 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     color: AppColors.secondaryText,
                                   ),
                                 ),
+                                SizedBox(height: 5),
                                 Row(
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        "${widget.userListed.email} Bergabung $formattedDate",
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 3,
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.disableTextButton,
-                                          fontSize: 13,
-                                        ),
+                                    Text(
+                                      widget.userListed.email,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.disableTextButton,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 3,
-                                      ),
-                                      child: Icon(
-                                        Icons
-                                            .do_not_disturb_on_total_silence_rounded,
-                                        size: 3,
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 25),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Tanggal bergabung kompetisi",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    color: AppColors.secondaryText,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    Text(
+                                      formattedDate,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.disableTextButton,
                                       ),
                                     ),
                                   ],
@@ -216,12 +236,12 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     color: AppColors.secondaryText,
                                   ),
                                 ),
+                                SizedBox(height: 5),
                                 Text(
                                   submittedDate,
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 16,
                                     color: AppColors.disableTextButton,
                                   ),
                                 ),
@@ -240,6 +260,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     color: AppColors.secondaryText,
                                   ),
                                 ),
+                                SizedBox(height: 5),
                                 ListView.builder(
                                   physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
@@ -300,7 +321,6 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                                           fontWeight:
                                                               FontWeight.w400,
                                                           color: Colors.red,
-                                                          fontSize: 14,
                                                         ),
                                                       ),
                                                     ),
@@ -314,63 +334,9 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     );
                                   },
                                 ),
-                                InkWell(
-                                  onTap: () async {
-                                    // await sl<CreateCompetitionService>()
-                                    //     .requestPermission();
-                                    // for (var file
-                                    //     in widget
-                                    //         .submission
-                                    //         .answerFiles) {
-                                    //   await sl<CreateCompetitionService>()
-                                    //       .downloadFileWithNotification(
-                                    //         file.url,
-                                    //         file.fileName,
-                                    //       );
-                                    // }
-                                  },
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.symmetric(vertical: 15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0XFFB2B2B2),
-                                          Color(0xFF242424),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.download,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            "Unduh berkas",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 15),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -383,7 +349,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     color: AppColors.secondaryText,
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: 5),
                                 ...List.generate(
                                   widget.competition.rubrik.length,
                                   (index) => Padding(
@@ -449,8 +415,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                                   child: Text(
                                                     sliderValue[index]
                                                         .toStringAsFixed(0),
-                                                    textAlign: TextAlign
-                                                        .end, // Rata kanan
+                                                    textAlign: TextAlign.end,
                                                     style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
@@ -522,7 +487,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                     color: AppColors.secondaryText,
                                   ),
                                 ),
-                                SizedBox(height: 8),
+                                SizedBox(height: 5),
                                 DottedBorder(
                                   padding: EdgeInsets.symmetric(horizontal: 20),
                                   color: AppColors.thirdBackGroundButton,
@@ -604,70 +569,6 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                               ],
                             ),
                             SizedBox(height: 25),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: BasicAppButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        sliderValue = [0, 0, 0];
-                                      });
-                                      _catatanController.clear();
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                    },
-                                    borderRad: 22,
-                                    isBordered: true,
-                                    borderColor: Colors.black,
-                                    backgroundColor: Colors.white,
-                                    content: const Text(
-                                      "Batal",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 20),
-                                Expanded(
-                                  child: BasicAppButton(
-                                    onPressed: () {
-                                      context
-                                          .read<OrganizeCompetitionCubit>()
-                                          .scoring(
-                                            multiplyScore(
-                                              sliderValue,
-                                              bobotList,
-                                            ),
-                                            _catatanController.text,
-                                            widget.submission.submissionId,
-                                          );
-                                      _displaySuccessToast(
-                                        context,
-                                        "Berhasil disimpan",
-                                      );
-                                    },
-                                    backgroundColor:
-                                        AppColors.thirdPositiveColor,
-                                    borderRad: 22,
-                                    content: const Center(
-                                      child: Text(
-                                        "Simpan",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 25),
                             BlocListener<UserFinalisCubit, UserFinalisState>(
                               listener: (context, finalState) {
                                 if (finalState is UserFinalisSuccess) {
@@ -708,6 +609,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                                 widget.userListed.profileImage,
                                               );
                                         },
+                                        verticalPadding: 20,
                                         borderRad: 22,
                                         backgroundColor: Colors.black,
                                         content: Center(
@@ -735,6 +637,93 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                       );
                                     },
                                   ),
+                            ),
+                            SizedBox(height: 25),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: BasicAppButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        sliderValue = List.filled(
+                                          widget.competition.rubrik.length,
+                                          0.0,
+                                        );
+                                      });
+                                      _catatanController.clear();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                    },
+                                    verticalPadding: 15,
+                                    borderRad: 22,
+                                    isBordered: true,
+                                    borderColor: Colors.black,
+                                    backgroundColor: Colors.white,
+                                    content: const Text(
+                                      "Batal",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: BasicAppButton(
+                                    onPressed: () async {
+                                      final announcementId = await context
+                                          .read<OrganizeCompetitionCubit>()
+                                          .finalAssessment(
+                                            multiplyScore(
+                                              sliderValue,
+                                              bobotList,
+                                            ),
+                                            _catatanController.text,
+                                            widget.submission.submissionId,
+                                            widget.competition.companyName,
+                                            widget.competition.title,
+                                            widget.competition.competitionId,
+                                            widget.userListed.userId,
+                                          );
+                                      if (context.mounted) {
+                                        await sendDirectNotification(
+                                          context,
+                                          widget.userListed.tokenNotification,
+                                          widget.competition.title,
+                                          widget.competition.competitionId,
+                                          widget.submission.submissionId,
+                                          announcementId,
+                                        );
+                                      }
+
+                                      if (context.mounted) {
+                                        _displaySuccessToast(
+                                          context,
+                                          "Berhasil disimpan",
+                                        );
+                                        Navigator.pop(context);
+                                      }
+                                    },
+                                    verticalPadding: 15,
+                                    backgroundColor:
+                                        AppColors.thirdPositiveColor,
+                                    borderRad: 22,
+                                    content: const Center(
+                                      child: Text(
+                                        "Simpan",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -837,7 +826,6 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
-                        fontSize: 14,
                         color: Colors.white,
                       ),
                     ),
@@ -888,3 +876,58 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
     ).show(context);
   }
 }
+
+// InkWell(
+//   onTap: () async {
+//     await sl<CreateCompetitionService>()
+//         .requestPermission();
+//     for (var file
+//         in widget
+//             .submission
+//             .answerFiles) {
+//       await sl<CreateCompetitionService>()
+//           .downloadFileWithNotification(
+//             file.url,
+//             file.fileName,
+//           );
+//     }
+//   },
+//   child: Container(
+//     width: double.infinity,
+//     padding: EdgeInsets.symmetric(vertical: 15),
+//     decoration: BoxDecoration(
+//       borderRadius: BorderRadius.circular(20),
+//       gradient: LinearGradient(
+//         colors: [
+//           Color(0XFFB2B2B2),
+//           Color(0xFF242424),
+//         ],
+//         begin: Alignment.topCenter,
+//         end: Alignment.bottomCenter,
+//       ),
+//     ),
+//     child: Center(
+//       child: Row(
+//         mainAxisAlignment:
+//             MainAxisAlignment.center,
+//         children: [
+//           Icon(
+//             Icons.download,
+//             color: Colors.white,
+//             size: 20,
+//           ),
+//           SizedBox(width: 5),
+//           Text(
+//             "Unduh berkas",
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 16,
+//               fontFamily: 'Inter',
+//               fontWeight: FontWeight.w700,
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   ),
+// ),

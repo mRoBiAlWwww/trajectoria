@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/helper/parser/capitalize.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
-import 'package:trajectoria/common/widgets/textField/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/user_role_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/signup/photo_profile_page.dart';
@@ -149,8 +150,10 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
       child: BasicAppButton(
         onPressed: isFormValid
             ? () {
-                widget.signupReq.firstname = _firstnameCon.text;
-                widget.signupReq.lastname = _lastnameCon.text;
+                widget.signupReq.firstname = capitalizeWords(
+                  _firstnameCon.text,
+                );
+                widget.signupReq.lastname = capitalizeWords(_lastnameCon.text);
                 widget.signupReq.role = context.read<RoleCubit>().state;
                 AppNavigator.push(
                   context,
@@ -171,33 +174,3 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
     );
   }
 }
-
-  // Widget _continueButton(BuildContext context, bool isFormValid) {
-  //   return ElevatedButton(
-  //     onPressed: isFormValid
-  //         ? () {
-  //             widget.signinReq.firstname = _firstnameCon.text;
-  //             widget.signinReq.lastname = _lastnameCon.text;
-  //             widget.signinReq.role = context.read<RoleCubit>().state;
-  //             AppNavigator.push(
-  //               context,
-  //               PhotoProfilePage(signinReq: widget.signinReq),
-  //             );
-  //           }
-  //         : null,
-  //     style: ElevatedButton.styleFrom(
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-  //       backgroundColor: Colors.black,
-  //       foregroundColor: Colors.white,
-  //       disabledBackgroundColor: AppColors.disableBackgroundButton,
-  //       disabledForegroundColor: AppColors.disableTextButton,
-  //     ),
-  //     child: Padding(
-  //       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-  //       child: Text(
-  //         'Lanjut',
-  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-  //       ),
-  //     ),
-  //   );
-  // }

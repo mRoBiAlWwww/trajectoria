@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/create_comp_image.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_comp_image_state.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class CreateCompImageCubit extends Cubit<CreateCompImageState> {
   CreateCompImageCubit() : super(CreateCompImageInitial());

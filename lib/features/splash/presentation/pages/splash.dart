@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
-import 'package:trajectoria/common/widgets/navigation/main_wrapper.dart';
+import 'package:trajectoria/core/navigation/main_wrapper.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/signup/welcome_animation.dart';

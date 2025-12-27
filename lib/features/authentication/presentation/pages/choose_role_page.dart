@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
-import 'package:trajectoria/common/helper/handle_google_login_violation.dart';
+import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
-import 'package:trajectoria/common/widgets/navigation/main_wrapper.dart';
+import 'package:trajectoria/core/navigation/main_wrapper.dart';
+import 'package:trajectoria/features/authentication/domain/entities/unrole_entity.dart';
+import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/user_role_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/widgets/first_bottom_sheet.dart';
 
@@ -119,51 +120,62 @@ class ChooseRolePage extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
+        child: SizedBox(
           height: 250,
-          decoration: BoxDecoration(
-            gradient: isSelected
-                ? LinearGradient(
-                    colors: activeGradientColors,
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  )
-                : null,
-
-            borderRadius: BorderRadius.circular(15.0),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: activeGlowColor,
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: const Offset(0, 0),
-                    ),
-                  ]
-                : null,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(imagePath, width: 140, height: 140),
-                SizedBox(height: 15),
-                isSelected
-                    ? Text(
-                        text,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontFamily: 'Britanica',
-                          fontWeight: FontWeight.w900,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  opacity: isSelected ? 1.0 : 0.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      gradient: LinearGradient(
+                        colors: activeGradientColors,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: activeGlowColor,
+                          spreadRadius: 3,
+                          blurRadius: 5,
+                          offset: const Offset(0, 0),
                         ),
-                      )
-                    : const SizedBox.shrink(),
-              ],
-            ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(imagePath, width: 140, height: 140),
+                        const SizedBox(height: 15),
+                        Text(
+                          text,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontFamily: 'Britanica',
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -180,25 +192,12 @@ class ChooseRolePage extends StatelessWidget {
                   if (state.isNotEmpty) {
                     if (from == "authenticated") {
                       debugPrint("yopo lek");
-                      handleGoogleLoginViolation(context, state.toString());
-                      AppNavigator.pushReplacement(
-                        context,
-                        MainWrapper(),
-                        // BlocProvider.value(
-                        //   value: context.read<AuthStateCubit>(),
-                        //   child: MainWrapper(),
-                        // ),
-                      );
+                      _handleGoogleLoginViolation(context, state.toString());
+                      AppNavigator.pushReplacement(context, MainWrapper());
                     } else if (from == "notAuthenticated") {
                       AppBottomsheet.display(
                         context,
                         const FirstSingupSheetContent(methode: "daftar"),
-                        // BlocProvider.value(
-                        //   value: context.read<AuthStateCubit>(),
-                        //   child: const FirstSingupSheetContent(
-                        //     methode: "daftar",
-                        //   ),
-                        // ),
                       );
                     }
                   }
@@ -220,126 +219,20 @@ class ChooseRolePage extends StatelessWidget {
       },
     );
   }
-}
 
-// Widget _continueButton(BuildContext context) {
-//     return BlocBuilder<RoleCubit, String>(
-//       builder: (context, state) {
-//         return ElevatedButton(
-//           onPressed: state.isNotEmpty
-//               ? () {
-//                   AppBottomsheet.display(
-//                     context,
-//                     const FirstSingupSheetContent(),
-//                   );
-//                 }
-//               : null,
-//           style: ElevatedButton.styleFrom(
-//             padding: EdgeInsets.symmetric(horizontal: 50),
-//             backgroundColor: state.isNotEmpty ? Colors.black : Colors.grey,
-//             foregroundColor: state.isNotEmpty
-//                 ? Colors.white
-//                 : AppColors.disableTextButton,
-//             shape: const RoundedRectangleBorder(
-//               borderRadius: BorderRadius.zero,
-//             ),
-//           ),
-//           child: Text(
-//             'Lanjut',
-//             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-//           ),
-//         );
-//       },
-//     );
-//   }
-//  GestureDetector(
-//                               onTap: () {
-//                                 context.read<RoleCubit>().setRole("user");
-//                               },
-//                               child: Container(
-//                                 height: 250,
-//                                 decoration: BoxDecoration(
-//                                   gradient: state == "user"
-//                                       ? LinearGradient(
-//                                           colors: [
-//                                             Colors.red.shade400,
-//                                             Colors.red.shade800,
-//                                           ],
-//                                           begin: Alignment.topCenter,
-//                                           end: Alignment.bottomCenter,
-//                                         )
-//                                       : null,
-//                                   borderRadius: BorderRadius.circular(15.0),
-//                                   boxShadow: state == "user"
-//                                       ? [
-//                                           BoxShadow(
-//                                             color: Color.fromRGBO(
-//                                               255,
-//                                               255,
-//                                               255,
-//                                               0.3,
-//                                             ),
-//                                             spreadRadius: 3,
-//                                             blurRadius: 5,
-//                                             offset: const Offset(0, 0),
-//                                           ),
-//                                         ]
-//                                       : null,
-//                                 ),
-//                                 padding: EdgeInsets.symmetric(horizontal: 10),
-//                                 child: ClipRRect(
-//                                   borderRadius: BorderRadius.circular(15.0),
-//                                   child: Image.asset(
-//                                     AppImages.user,
-//                                     width: 140,
-//                                     height: 140,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                             SizedBox(width: 10),
-//                             GestureDetector(
-//                               onTap: () {
-//                                 context.read<RoleCubit>().setRole("company");
-//                               },
-//                               child: Container(
-//                                 height: 250,
-//                                 decoration: BoxDecoration(
-//                                   gradient: state == "company"
-//                                       ? LinearGradient(
-//                                           colors: [
-//                                             Colors.blue.shade400,
-//                                             Colors.blue.shade800,
-//                                           ],
-//                                           begin: Alignment.topCenter,
-//                                           end: Alignment.bottomCenter,
-//                                         )
-//                                       : null,
-//                                   borderRadius: BorderRadius.circular(15.0),
-//                                   boxShadow: state == "company"
-//                                       ? [
-//                                           BoxShadow(
-//                                             color: Color.fromRGBO(
-//                                               255,
-//                                               255,
-//                                               255,
-//                                               0.3,
-//                                             ),
-//                                             spreadRadius: 3,
-//                                             blurRadius: 5,
-//                                             offset: const Offset(0, 0),
-//                                           ),
-//                                         ]
-//                                       : null,
-//                                 ),
-//                                 padding: EdgeInsets.symmetric(horizontal: 10),
-//                                 child: ClipRRect(
-//                                   borderRadius: BorderRadius.circular(15.0),
-//                                   child: Image.asset(
-//                                     AppImages.user,
-//                                     width: 140,
-//                                     height: 140,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
+  Future<void> _handleGoogleLoginViolation(
+    BuildContext context,
+    String role,
+  ) async {
+    debugPrint(role);
+    final authCubit = context.read<AuthStateCubit>();
+
+    final eitherUser = await authCubit.getCurrentUser();
+    final UnroleEntity user = eitherUser.getOrElse(() => null);
+    if (role == "Jobseeker") {
+      await authCubit.additionalUserInfoJobSeeker(user.toJobseekerSignupReq());
+    } else {
+      await authCubit.additionalUserInfoCompany(user.toCompanySignupReq());
+    }
+  }
+}

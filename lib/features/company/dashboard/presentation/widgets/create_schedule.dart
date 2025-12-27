@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_state.dart';
-import 'package:trajectoria/features/company/dashboard/presentation/widgets/editable_teks.dart';
+import 'package:trajectoria/common/widgets/textfield/editable_teks.dart';
 
 class CreateScheduleWidget extends StatefulWidget {
   const CreateScheduleWidget({super.key});
@@ -32,7 +32,6 @@ class _CreateScheduleWidgetState extends State<CreateScheduleWidget> {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
                   color: AppColors.secondaryText,
                 ),
               ),
@@ -249,6 +248,7 @@ class _CreateScheduleWidgetState extends State<CreateScheduleWidget> {
                       children: [
                         Expanded(
                           child: EditableTextItem(
+                            isHaveBackground: true,
                             needWrapText: true,
                             text: context
                                 .watch<CreateCompetitionCubit>()

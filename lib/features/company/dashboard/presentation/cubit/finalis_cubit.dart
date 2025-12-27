@@ -4,7 +4,7 @@ import 'package:trajectoria/features/company/dashboard/domain/usecases/delete_fi
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_finalis.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/finalis_state.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/submission.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class UserFinalisCubit extends Cubit<UserFinalisState> {
   UserFinalisCubit() : super(UserFinalisInitial());
@@ -39,29 +39,21 @@ class UserFinalisCubit extends Cubit<UserFinalisState> {
     );
   }
 
-  Future<void> deleteFinalis(String finalisId) async {
-    final currentState = state;
+  Future<void> deleteFinalis(String submissionId, String competitionId) async {
+    if (state is UserFinalisLoaded) {
+      final currentList = (state as UserFinalisLoaded).finalis;
 
-    if (currentState is! UserFinalisLoaded) {
-      return;
+      final newList = currentList
+          .where((item) => item.submissionId != submissionId)
+          .toList();
+
+      emit(UserFinalisLoaded(finalis: newList));
+
+      final result = await sl<DeleteFinalisUseCase>().call(submissionId);
+
+      result.fold((error) {
+        getFinalis(competitionId);
+      }, (success) {});
     }
-
-    final originalList = currentState.finalis;
-
-    final result = await sl<DeleteFinalisUseCase>().call(finalisId);
-
-    result.fold(
-      (failure) {
-        emit(UserFinalisFailure(message: failure.toString()));
-        emit(currentState);
-      },
-      (data) {
-        final updatedList = originalList
-            .where((item) => item.finalisId != finalisId)
-            .toList();
-
-        emit(UserFinalisLoaded(finalis: updatedList));
-      },
-    );
   }
 }

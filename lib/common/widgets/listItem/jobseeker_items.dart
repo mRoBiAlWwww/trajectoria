@@ -15,11 +15,8 @@ class JobseekerItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime deadlineDate = competition.deadline.toDate();
-    final String formattedDate = DateFormat(
-      'd MMM y',
-      'id_ID',
-    ).format(deadlineDate);
+    final formatter = DateFormat('d MMM y', 'id_ID');
+    final formattedDate = formatter.format(competition.deadline.toDate());
 
     return InkWell(
       onTap: () {
@@ -64,7 +61,6 @@ class JobseekerItems extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.secondaryText,
                       fontWeight: FontWeight.w500,
-                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -95,7 +91,6 @@ class JobseekerItems extends StatelessWidget {
                       Text(
                         formattedDate,
                         style: const TextStyle(
-                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.secondaryText,
                         ),
@@ -113,7 +108,6 @@ class JobseekerItems extends StatelessWidget {
                         child: Text(
                           competition.rewardDescription,
                           style: const TextStyle(
-                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: AppColors.secondaryText,
                           ),

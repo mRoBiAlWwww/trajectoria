@@ -8,13 +8,13 @@ import 'package:flutter/foundation.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:trajectoria/common/helper/capitalize.dart';
+import 'package:trajectoria/common/helper/parser/capitalize.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/file_items.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/competition_participants.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission_req.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 import 'package:path/path.dart' as p;
 
 abstract class CompetitionService {
@@ -34,6 +34,16 @@ abstract class CompetitionService {
   );
   Future<List<Map<String, dynamic>>> getCategories();
   Future<String> isAlreadySubmitted(String competitionId);
+  Future<Map<String, dynamic>?> getCompetitionParticipants(
+    String competitionId,
+  );
+  Future<Map<String, dynamic>?> getSubmissionByCompetitionParticipantId(
+    String competitionParticipantId,
+  );
+  Future<int> getTotalCompetitionParticipants(String competitionId);
+  Future<String> addBookmark(String competitionId);
+  Future<String> deleteBookmark(String competitionId);
+  Future<Map<String, dynamic>> getUserprofileInfo();
 }
 
 class CompetitionServiceImpl extends CompetitionService {
@@ -98,7 +108,7 @@ class CompetitionServiceImpl extends CompetitionService {
           .collection('Jobseeker')
           .doc(currentUser.uid)
           .update({
-            'competitions_onprogress': FieldValue.arrayUnion([compId]),
+            'competitions_onprogres': FieldValue.arrayUnion([compId]),
           });
       return competitionParticipantId;
     } catch (e) {
@@ -216,10 +226,7 @@ class CompetitionServiceImpl extends CompetitionService {
       var currentUser = FirebaseAuth.instance.currentUser;
 
       //ambil id unik collection
-      final submissionId = firestoreInstance
-          .collection('Competition_participants')
-          .doc()
-          .id;
+      final submissionId = firestoreInstance.collection('Submission').doc().id;
 
       final SubmissionModel newSubmission = SubmissionModel(
         submissionId: submissionId,
@@ -234,6 +241,7 @@ class CompetitionServiceImpl extends CompetitionService {
         score: 0,
         rank: 0,
         isChecked: false,
+        isFinalist: false,
       );
       //simpan ke db
       await firestoreInstance
@@ -254,7 +262,7 @@ class CompetitionServiceImpl extends CompetitionService {
           .collection('Jobseeker')
           .doc(currentUser.uid)
           .update({
-            'competitions_onprogress': FieldValue.arrayRemove([
+            'competitions_onprogres': FieldValue.arrayRemove([
               submission.competitionId,
             ]),
           });
@@ -343,7 +351,6 @@ class CompetitionServiceImpl extends CompetitionService {
             descending: deadline == "Terdekat" ? false : true,
           )
           .get();
-      debugPrint(competitions.docs.length.toString());
       return competitions.docs.map((e) => e.data()).toList();
     } catch (e) {
       throw Exception(
@@ -374,13 +381,11 @@ class CompetitionServiceImpl extends CompetitionService {
           .doc(currentUser!.uid)
           .get();
 
-      if (!jobseeker.exists) return "notparticipation";
+      final List<dynamic> onprogresCompetitionIds =
+          jobseeker.data()?['competitions_onprogres'] ?? [];
 
-      final List<dynamic> onprogressCompetitionIds =
-          jobseeker.data()?['competitions_onprogress'] ?? [];
-
-      if (onprogressCompetitionIds.contains(competitionId)) {
-        return "onprogress";
+      if (onprogresCompetitionIds.contains(competitionId)) {
+        return "onprogres";
       }
 
       final List<dynamic> done = jobseeker.data()?['competitions_done'] ?? [];
@@ -391,8 +396,122 @@ class CompetitionServiceImpl extends CompetitionService {
 
       return "notparticipation";
     } catch (e) {
-      debugPrint(e.toString());
       throw Exception('Error mengecek status kompetisi $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getCompetitionParticipants(
+    String competitionId,
+  ) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+    try {
+      var getCompetitionParticipants = await firestoreInstance
+          .collection("Competition_participants")
+          .where("user_id", isEqualTo: currentUser!.uid)
+          .where("competition_id", isEqualTo: competitionId)
+          .get();
+
+      if (getCompetitionParticipants.docs.isEmpty) {
+        return null;
+      }
+      return getCompetitionParticipants.docs.first.data();
+    } catch (e) {
+      throw Exception("Error gagal mendapatkan list partisipan kompetisi $e");
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getSubmissionByCompetitionParticipantId(
+    String competitionParticipantId,
+  ) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+    try {
+      var getSubmissionParticipant = await firestoreInstance
+          .collection("Submissions")
+          .where(
+            "competition_participants_id",
+            isEqualTo: competitionParticipantId,
+          )
+          .get();
+      if (getSubmissionParticipant.docs.isEmpty) {
+        return null;
+      }
+      return getSubmissionParticipant.docs.first.data();
+    } catch (e) {
+      throw Exception("Error gagal mendapatkan list partisipan kompetisi $e");
+    }
+  }
+
+  @override
+  Future<int> getTotalCompetitionParticipants(String competitionId) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Competition_participants')
+          .where("competition_id", isEqualTo: competitionId)
+          .count()
+          .get();
+
+      return snapshot.count ?? 0;
+    } catch (e) {
+      throw Exception(
+        "Error gagal mendapatkan total jumlah peserta kompetisi $e",
+      );
+    }
+  }
+
+  @override
+  Future<String> addBookmark(String competitionId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser!.uid)
+          .update({
+            'bookmarks': FieldValue.arrayUnion([competitionId]),
+          });
+
+      return "Bookmark telah berhasil ditambahkan dari daftar finalis";
+    } catch (e) {
+      throw Exception("Error gagal menambahkan Bookmark $e");
+    }
+  }
+
+  @override
+  Future<String> deleteBookmark(String competitionId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser!.uid)
+          .update({
+            'bookmarks': FieldValue.arrayRemove([competitionId]),
+          });
+      return "Bookmark telah berhasil dihapus dari daftar finalis";
+    } catch (e) {
+      throw Exception("Error gagal menghapus Bookmark $e");
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserprofileInfo() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+    try {
+      var getCompetitionParticipants = await firestoreInstance
+          .collection("Jobseeker")
+          .where("user_id", isEqualTo: currentUser!.uid)
+          .get();
+
+      return getCompetitionParticipants.docs.first.data();
+    } catch (e) {
+      throw Exception("Error gagal mendapatkan list partisipan kompetisi $e");
     }
   }
 }

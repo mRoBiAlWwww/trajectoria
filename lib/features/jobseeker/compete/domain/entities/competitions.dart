@@ -6,6 +6,8 @@ class CompetitionEntity {
   final String competitionId;
   final String companyId;
   final String companyName;
+  final String companyEmail;
+  final String companyProfileImage;
   final String description;
   final Timestamp createdAt;
   final Timestamp deadline;
@@ -14,7 +16,7 @@ class CompetitionEntity {
   final String rewardDescription;
   final String submissionType;
   final String status;
-  final String categoryId; //belum ada field nya
+  final String categoryId;
   final String competitionImage;
   final List<FileItemEntity> guidebook;
   final List<RubrikItemEntity> rubrik;
@@ -23,6 +25,8 @@ class CompetitionEntity {
     required this.competitionId,
     required this.companyId,
     required this.companyName,
+    required this.companyEmail,
+    required this.companyProfileImage,
     required this.title,
     required this.description,
     required this.problemStatement,
@@ -42,6 +46,8 @@ class CompetitionEntity {
     String? competitionId,
     String? companyId,
     String? companyName,
+    String? companyEmail,
+    String? companyProfileImage,
     String? title,
     String? description,
     String? problemStatement,
@@ -61,6 +67,8 @@ class CompetitionEntity {
       competitionId: competitionId ?? this.competitionId,
       companyId: companyId ?? this.companyId,
       companyName: companyName ?? this.companyName,
+      companyEmail: companyEmail ?? this.companyEmail,
+      companyProfileImage: companyProfileImage ?? this.companyProfileImage,
       title: title ?? this.title,
       description: description ?? this.description,
       problemStatement: problemStatement ?? this.problemStatement,
@@ -82,6 +90,8 @@ class CompetitionEntity {
       'competition_id': competitionId,
       'company_id': companyId,
       'company_name': companyName,
+      'company_email': companyEmail,
+      'company_profile_image': companyProfileImage,
       'title': title,
       'description': description,
       'problem_statement': problemStatement,
@@ -105,6 +115,8 @@ class CompetitionEntity {
       competitionId: map['competition_id']?.toString() ?? '',
       companyId: map['company_id']?.toString() ?? '',
       companyName: map['company_name']?.toString() ?? '',
+      companyEmail: map['company_email']?.toString() ?? '',
+      companyProfileImage: map['company_profile_image']?.toString() ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       problemStatement: map['problem_statement'] ?? '',

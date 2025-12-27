@@ -18,6 +18,7 @@ class SubmissionModel {
   final double score;
   final int rank;
   final bool isChecked;
+  final bool isFinalist;
 
   SubmissionModel({
     required this.submissionId,
@@ -32,6 +33,7 @@ class SubmissionModel {
     required this.score,
     required this.rank,
     required this.isChecked,
+    required this.isFinalist,
   });
 
   Map<String, dynamic> toMap() {
@@ -47,14 +49,15 @@ class SubmissionModel {
       'feedback': feedback,
       'score': score,
       'rank': rank,
-      'isChecked': isChecked,
+      'is_checked': isChecked,
+      'is_finalist': isFinalist,
     };
   }
 
   factory SubmissionModel.fromMap(Map<String, dynamic> map) {
     return SubmissionModel(
       submissionId: map['submissions_id'] ?? '',
-      competitionParticipantId: map['competition_participant_id'] ?? '',
+      competitionParticipantId: map['competition_participants_id'] ?? '',
       competitionId: map['competition_id'] ?? '',
       problemStatement: map['problem_statement'] ?? '',
       submittedAt: map['submitted_at'] as Timestamp,
@@ -74,7 +77,8 @@ class SubmissionModel {
           ? (map['score'] as int).toDouble()
           : (map['score'] ?? 0.0),
       rank: map['rank'] ?? 0,
-      isChecked: map['isChecked'],
+      isChecked: map['is_checked'],
+      isFinalist: map['is_finalist'],
     );
   }
 
@@ -98,6 +102,7 @@ class SubmissionModel {
       score: score,
       rank: rank,
       isChecked: isChecked,
+      isFinalist: isFinalist,
     );
   }
 
@@ -118,6 +123,7 @@ class SubmissionModel {
       score: entity.score,
       rank: entity.rank,
       isChecked: entity.isChecked,
+      isFinalist: entity.isFinalist,
     );
   }
 }

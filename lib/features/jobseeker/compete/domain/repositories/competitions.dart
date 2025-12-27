@@ -16,4 +16,12 @@ abstract class CompetitionRepository {
     String deadline,
   );
   Future<Either> isAlreadySubmitted(String competitionId);
+  Future<Either> getCompetitionParticipants(String competitionId);
+  Future<Either> getSubmissionByCompetitionParticipantId(
+    String competitionParticipantId,
+  );
+  Future<Either> getTotalCompetitionParticipants(String competitionId);
+  Future<Either> addBookmark(String competitionId);
+  Future<Either> deleteBookmark(String competitionId);
+  Future<Either> getUserprofileInfo();
 }

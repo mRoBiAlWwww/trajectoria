@@ -1,16 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/analyzed.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/create_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/usecases/delete_comp_partc_by_comp_id.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/delete_competition_by_id.dart';
+import 'package:trajectoria/features/company/dashboard/domain/usecases/delete_submission_by_comp_id.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/draft_competition.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_competition_by_id.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_competitions.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_competitions_by_title.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_draft_competitions.dart';
-import 'package:trajectoria/features/company/dashboard/domain/usecases/scoring.dart';
+import 'package:trajectoria/features/company/dashboard/domain/usecases/final_assessment.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competition_state.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class OrganizeCompetitionCubit extends Cubit<OrganizeCompetitionState> {
   OrganizeCompetitionCubit() : super(OrganizeCompetitionInitial());
@@ -54,9 +56,9 @@ class OrganizeCompetitionCubit extends Cubit<OrganizeCompetitionState> {
     );
   }
 
-  Future<void> getCompetitions() async {
+  Future<void> getCompetitionsByCurrentCompany() async {
     emit(OrganizeCompetitionLoading());
-    final result = await sl<GetCompetitionsCompanyUseCase>().call();
+    final result = await sl<GetCompetitionsByCurrentCompanyUseCase>().call();
     result.fold(
       (failure) {
         emit(OrganizeCompetitionFailure(message: failure.toString()));
@@ -99,13 +101,36 @@ class OrganizeCompetitionCubit extends Cubit<OrganizeCompetitionState> {
 
   Future<void> deleteCompetitionById(String competitionId) async {
     emit(OrganizeCompetitionLoading());
+    //delete kompetisi
     final result = await sl<DeleteCompetitionByIdUseCase>().call(competitionId);
     result.fold(
       (failure) {
         emit(OrganizeCompetitionFailure(message: failure.toString()));
       },
-      (data) {
-        emit(OrganizeCompetitionSuccess(success: data));
+      (data) async {
+        //delete competition participants
+        final result = await sl<DeleteCompPartcByCompIdUseCase>().call(
+          competitionId,
+        );
+        result.fold(
+          (failure) {
+            emit(OrganizeCompetitionFailure(message: failure.toString()));
+          },
+          (data) async {
+            //delete submission
+            final result = await sl<DeleteSubmissionByCompIdUseCase>().call(
+              competitionId,
+            );
+            result.fold(
+              (failure) {
+                emit(OrganizeCompetitionFailure(message: failure.toString()));
+              },
+              (data) {
+                emit(OrganizeCompetitionSuccess(success: data));
+              },
+            );
+          },
+        );
       },
     );
   }
@@ -131,22 +156,32 @@ class OrganizeCompetitionCubit extends Cubit<OrganizeCompetitionState> {
     );
   }
 
-  Future<void> scoring(
+  Future<String> finalAssessment(
     int totalScore,
     String feedback,
     String submissionId,
+    String companyName,
+    String title,
+    String competitionId,
+    String userId,
   ) async {
-    final result = await sl<ScoringUseCase>().call(
+    final result = await sl<FinalAssessmentUseCase>().call(
       totalScore,
       feedback,
       submissionId,
+      companyName,
+      title,
+      competitionId,
+      userId,
     );
-    result.fold(
+    return result.fold(
       (failure) {
         emit(OrganizeCompetitionFailure(message: failure.toString()));
+        return "";
       },
       (data) {
         emit(OrganizeCompetitionSuccess(success: data));
+        return data;
       },
     );
   }

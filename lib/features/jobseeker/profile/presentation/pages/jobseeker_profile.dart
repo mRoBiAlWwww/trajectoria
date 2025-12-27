@@ -1,17 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
+import 'package:trajectoria/core/services/notification_service.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/user_role_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/signin_or_signup_page.dart';
-import 'package:trajectoria/features/company/dashboard/presentation/widgets/editable_teks.dart';
+import 'package:trajectoria/common/widgets/textfield/editable_teks.dart';
+import 'package:trajectoria/features/jobseeker/profile/presentation/cubit/profile_cubit.dart';
+import 'package:trajectoria/features/jobseeker/profile/presentation/pages/bookmark_page.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/pages/detail_progress.dart';
+import 'package:trajectoria/features/jobseeker/profile/presentation/pages/notification_page.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/pages/riwayat_kompetisi.dart';
+import 'package:trajectoria/main.dart';
 
 class JobSeekerProfilePage extends StatefulWidget {
   const JobSeekerProfilePage({super.key});
@@ -20,8 +26,9 @@ class JobSeekerProfilePage extends StatefulWidget {
   State<JobSeekerProfilePage> createState() => _JobSeekerProfilePageState();
 }
 
-class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
-  String bio = "+ Tambahkan bio";
+class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
+    with RouteAware {
+  String bio = "+ Tambahkan biodata diri";
   final List<String> myImages = [
     AppImages.fs,
     AppImages.mobile,
@@ -39,10 +46,30 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    debugPrint("debugPrint");
-    debugPrint(myImages[0]);
+  void initState() {
+    super.initState();
+    context.read<ProfileCubit>().getAnnouncements();
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPopNext() {
+    context.read<ProfileCubit>().getAnnouncements();
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocConsumer<AuthStateCubit, AuthState>(
       listener: (context, state) {
         if (state is UnAuthenticated) {
@@ -51,9 +78,7 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
       },
 
       builder: (context, state) {
-        debugPrint(state.toString());
         if (state is AuthSuccess) {
-          debugPrint(state.jobSeeker?.profileImage);
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => FocusScope.of(context).unfocus(),
@@ -120,14 +145,14 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
-                            fontSize: 20,
+                            fontSize: 18,
                           ),
                         ),
                         SizedBox(height: 20),
                         SizedBox(
                           width: 250,
-                          height: 75,
                           child: EditableTextItem(
+                            source: "profile",
                             needWrapText: true,
                             text: bio.isEmpty
                                 ? (state.jobSeeker?.bio ??
@@ -141,183 +166,269 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                             },
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white,
-                                Color(0xFFFBFBFB),
-                                Color(0xFFEDEDED),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppColors.thirdBackGroundButton,
-                              width: 2,
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            25,
-                                          ),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color:
-                                                AppColors.thirdBackGroundButton,
-                                          ),
-                                        ),
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(
-                                            CupertinoIcons.bell_solid,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Notifikasi",
-                                        style: TextStyle(
-                                          fontFamily: 'Iinter',
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8.0,
-                                        ),
-                                        child: Container(
-                                          width: 10.0,
-                                          height: 10.0,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Icon(Icons.arrow_forward_ios_rounded),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Padding(
+                        SizedBox(height: 30),
+                        // BlocBuilder<HydratedAnnouncement, List<String>>(
+                        BlocBuilder<ProfileCubit, ProfileState>(
+                          builder: (context, announcementState) {
+                            if (announcementState is AnnouncementsLoaded) {
+                              final readNotification = announcementState
+                                  .announcements
+                                  .where((e) => !e.isRead)
+                                  .toList();
+                              return Container(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
+                                  horizontal: 20,
+                                  vertical: 15,
                                 ),
-                                child: Divider(
-                                  color: AppColors.thirdBackGroundButton,
-                                  thickness: 1,
-                                  height: 16,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.white,
+                                      Color(0xFFFBFBFB),
+                                      Color(0xFFEDEDED),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppColors.thirdBackGroundButton,
+                                    width: 2,
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  AppNavigator.push(
-                                    context,
-                                    ProgressDetailPage(
-                                      imageUrl:
-                                          state.jobSeeker?.profileImage ?? "",
-                                    ),
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                child: Column(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              25,
-                                            ),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: AppColors
-                                                  .thirdBackGroundButton,
-                                            ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        AppNavigator.push(
+                                          context,
+                                          BlocProvider.value(
+                                            value: context.read<ProfileCubit>(),
+                                            child: NotificationPage(),
                                           ),
-                                          child: IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(
-                                              Icons.trending_up_sharp,
-                                              color: Colors.grey,
-                                            ),
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color: AppColors
+                                                        .thirdBackGroundButton,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    AppNavigator.push(
+                                                      context,
+                                                      BlocProvider.value(
+                                                        value: context
+                                                            .read<
+                                                              ProfileCubit
+                                                            >(),
+                                                        child:
+                                                            NotificationPage(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    CupertinoIcons.bell_solid,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "Notifikasi",
+                                                style: TextStyle(
+                                                  fontFamily: 'Iinter',
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Text(
-                                          "Progres",
-                                          style: TextStyle(
-                                            fontFamily: 'Iinter',
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 20,
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  color: AppColors
+                                                      .thirdPositiveColor,
+                                                ),
+                                                child: Text(
+                                                  readNotification.length
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 8.0,
-                                          ),
-                                          child: Container(
-                                            width: 10.0,
-                                            height: 10.0,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Icon(Icons.arrow_forward_ios_rounded),
-                                      ],
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: Divider(
+                                        color: AppColors.thirdBackGroundButton,
+                                        thickness: 1,
+                                        height: 16,
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                ),
-                                child: Divider(
-                                  color: AppColors.thirdBackGroundButton,
-                                  thickness: 1,
-                                  height: 16,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        AppNavigator.push(
+                                          context,
+                                          ProgressDetailPage(
+                                            imageUrl:
+                                                state.jobSeeker?.profileImage ??
+                                                "",
+                                          ),
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color: AppColors
+                                                        .thirdBackGroundButton,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    AppNavigator.push(
+                                                      context,
+                                                      ProgressDetailPage(
+                                                        imageUrl:
+                                                            state
+                                                                .jobSeeker
+                                                                ?.profileImage ??
+                                                            "",
+                                                      ),
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.trending_up_sharp,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "Progres",
+                                                style: TextStyle(
+                                                  fontFamily: 'Iinter',
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Icon(Icons.arrow_forward_ios_rounded),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: Divider(
+                                        color: AppColors.thirdBackGroundButton,
+                                        thickness: 1,
+                                        height: 16,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        AppNavigator.push(
+                                          context,
+                                          BookmarkPage(),
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color: AppColors
+                                                        .thirdBackGroundButton,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    AppNavigator.push(
+                                                      context,
+                                                      BookmarkPage(),
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.bookmark,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "Bookmark",
+                                                style: TextStyle(
+                                                  fontFamily: 'Iinter',
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Icon(Icons.arrow_forward_ios_rounded),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: Divider(
+                                        color: AppColors.thirdBackGroundButton,
+                                        thickness: 1,
+                                        height: 16,
+                                      ),
+                                    ),
                                     GestureDetector(
                                       onTap: () {
                                         AppNavigator.push(
@@ -326,63 +437,55 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                                         );
                                       },
                                       child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                color: AppColors
-                                                    .thirdBackGroundButton,
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color: AppColors
+                                                        .thirdBackGroundButton,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    AppNavigator.push(
+                                                      context,
+                                                      RiwayatKompetisiPage(),
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.history,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            child: IconButton(
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                Icons.history,
-                                                color: Colors.grey,
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "Riwayat Kompetisi",
+                                                style: TextStyle(
+                                                  fontFamily: 'Iinter',
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Riwayat Kompetisi",
-                                            style: TextStyle(
-                                              fontFamily: 'Iinter',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 20,
-                                            ),
-                                          ),
+                                          Icon(Icons.arrow_forward_ios_rounded),
                                         ],
                                       ),
                                     ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 8.0,
-                                          ),
-                                          child: Container(
-                                            width: 10.0,
-                                            height: 10.0,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Icon(Icons.arrow_forward_ios_rounded),
-                                      ],
-                                    ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
+                              );
+                            }
+                            return SizedBox.shrink();
+                          },
                         ),
                         SizedBox(height: 25),
                         Image.asset(AppImages.promo, width: 550, height: 100),
@@ -400,14 +503,14 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                             ),
                             SizedBox(height: 20),
                             ListView.separated(
-                              shrinkWrap: true, // <— WAJIB
+                              shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: myImages.length,
                               itemBuilder: (context, index) {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 15,
+                                    horizontal: 10,
+                                    vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -443,17 +546,18 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                                           style: TextStyle(
                                             fontFamily: 'JetBrainsMono',
                                             fontWeight: FontWeight.w800,
-                                            fontSize: 18,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
+                                      SizedBox(width: 15),
                                       Expanded(
                                         child: Container(
-                                          padding: EdgeInsets.all(15),
+                                          padding: EdgeInsets.all(18),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius: BorderRadius.circular(
-                                              100,
+                                              80,
                                             ),
                                             border: Border.all(
                                               width: 3,
@@ -467,7 +571,6 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                                               style: TextStyle(
                                                 fontFamily: 'JetBrainsMono',
                                                 fontWeight: FontWeight.w700,
-                                                fontSize: 18,
                                               ),
                                             ),
                                           ),
@@ -485,12 +588,15 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                         SizedBox(height: 25),
                         BasicAppButton(
                           borderRad: 15,
-                          onPressed: () {
+                          onPressed: () async {
                             context.read<AuthStateCubit>().reset();
                             context.read<RoleCubit>().clearRole();
-                            context.read<AuthStateCubit>().signout();
+                            context.read<AuthStateCubit>().signoutJobseeker();
+                            context.read<BottomNavCubit>().reset();
+                            await NotificationService.instance.hardLogout();
                           },
                           backgroundColor: AppColors.doveRedColor,
+                          verticalPadding: 10,
                           content: Text(
                             "Keluar",
                             style: const TextStyle(
@@ -500,6 +606,7 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 25),
                       ],
                     ),
                   ),

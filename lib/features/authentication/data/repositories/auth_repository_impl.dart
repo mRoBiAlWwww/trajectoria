@@ -121,4 +121,24 @@ class AuthRepositoryImpl extends AuthRepository {
       return Left(e.toString().replaceFirst("Exception: ", ""));
     }
   }
+
+  @override
+  Future<Either> addTokenNotification(String tokenId) async {
+    try {
+      final result = await service.addTokenNotification(tokenId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
+  Future<Either> deleteTokenNotification() async {
+    try {
+      final result = await service.deleteTokenNotification();
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
 }

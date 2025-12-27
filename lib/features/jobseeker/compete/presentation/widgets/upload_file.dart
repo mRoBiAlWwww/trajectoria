@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
+import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -14,13 +14,13 @@ import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/submis
 import 'package:trajectoria/features/jobseeker/compete/presentation/widgets/submit.dart';
 
 class UploadSheetContent extends StatefulWidget {
-  final String competitionParicipantId;
+  final String competitionParticipantId;
   final String competitiondId;
   final String problemStatement;
 
   const UploadSheetContent({
     super.key,
-    required this.competitionParicipantId,
+    required this.competitionParticipantId,
     required this.competitiondId,
     required this.problemStatement,
   });
@@ -69,7 +69,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
         value: context.read<SubmissionCubit>(),
         child: SubmitSheetContent(
           problemStatement: widget.problemStatement,
-          competitionParticipantId: widget.competitionParicipantId,
+          competitionParticipantId: widget.competitionParticipantId,
           competitionId: widget.competitiondId,
           textField: _uploadText.text,
           filesUrl: filesUrl,
@@ -214,7 +214,6 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                                                 fontFamily: 'Inter',
                                                 fontWeight: FontWeight.w400,
                                                 color: Colors.teal,
-                                                fontSize: 14,
                                               ),
                                             ),
                                           ],
@@ -295,9 +294,9 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
               "Kamu bisa unggah file submission yang berupa link disini...",
           hintStyle: TextStyle(
             fontFamily: 'Inter',
-            fontSize: 13, // ✅ ukuran font hint text
-            color: Colors.grey, // opsional
-            fontWeight: FontWeight.w400, // opsional
+            fontSize: 13,
+            color: Colors.grey,
+            fontWeight: FontWeight.w400,
           ),
           hintMaxLines: 3,
 
@@ -350,7 +349,6 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w500,
-                        fontSize: 14,
                         color: Colors.black54,
                       ),
                     ),
@@ -370,6 +368,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
       shrinkWrap: true,
       itemCount: filesUrl.length,
       itemBuilder: (context, index) {
+        final colorExtension = getFileColor(filesUrl[index].extension);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
           child: InkWell(
@@ -382,7 +381,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.red, width: 1),
+                border: Border.all(color: colorExtension, width: 1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -391,7 +390,10 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                   Expanded(
                     child: Row(
                       children: [
-                        Icon(Icons.picture_as_pdf_rounded, color: Colors.red),
+                        Icon(
+                          Icons.picture_as_pdf_rounded,
+                          color: colorExtension,
+                        ),
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -401,8 +403,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
-                              color: Colors.red,
-                              fontSize: 14,
+                              color: colorExtension,
                             ),
                           ),
                         ),
@@ -413,7 +414,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                     onTap: () {
                       _removeFileUrlAtIndex(index);
                     },
-                    child: Icon(Icons.close, size: 20, color: Colors.red),
+                    child: Icon(Icons.close, size: 20, color: colorExtension),
                   ),
                 ],
               ),
@@ -422,6 +423,26 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
         );
       },
     );
+  }
+
+  Color getFileColor(String extension) {
+    final String cleanInput = extension.trim().toLowerCase();
+
+    switch (cleanInput) {
+      case 'pdf':
+        return Colors.red;
+
+      case 'docs':
+      case 'doc':
+      case 'docx':
+        return Colors.blue;
+
+      case 'zip':
+        return Colors.grey;
+
+      default:
+        return Colors.black;
+    }
   }
 
   void _displayErrorToast(context, String message) {

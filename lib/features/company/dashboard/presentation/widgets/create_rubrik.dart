@@ -5,7 +5,7 @@ import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/button_next_create_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_cubit.dart';
-import 'package:trajectoria/features/company/dashboard/presentation/widgets/editable_teks.dart';
+import 'package:trajectoria/common/widgets/textfield/editable_teks.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/rubrik.dart';
 
 class CreateRubrikWidget extends StatefulWidget {
@@ -36,7 +36,6 @@ class _CreateRubrikWidgetState extends State<CreateRubrikWidget> {
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w500,
-              fontSize: 14,
               color: AppColors.secondaryText,
             ),
           ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trajectoria/common/bloc/navigation/bottom_navigation_cubit.dart';
+import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
@@ -17,10 +17,12 @@ import 'package:trajectoria/main.dart';
 class SubchapterPage extends StatefulWidget {
   final String courseId;
   final int chapterOrder;
+  final bool isChapterZero;
   const SubchapterPage({
     super.key,
     required this.courseId,
     required this.chapterOrder,
+    required this.isChapterZero,
   });
 
   @override
@@ -125,7 +127,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
-                      fontSize: 14,
                       color: AppColors.secondaryText,
                     ),
                   ),
@@ -146,7 +147,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 14,
                                   color: AppColors.secondaryText,
                                 ),
                               ),
@@ -282,7 +282,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                                                 ? Colors.white
                                                                 : AppColors
                                                                       .secondaryText,
-                                                            fontSize: 14,
                                                             fontFamily: 'Inter',
                                                             fontWeight:
                                                                 FontWeight.w500,
@@ -370,6 +369,7 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                               nextMaximumScore: index + 1 < state.modules.length
                                   ? state.modules[index + 1].maximumScore
                                   : 0,
+                              isChapterZero: widget.isChapterZero,
                             ),
                           );
                           _toggleExpand(
@@ -419,7 +419,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                     color: isCompletedSubchapter
                                         ? Colors.white
                                         : AppColors.secondaryText,
-                                    fontSize: 14,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 3,
@@ -437,7 +436,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                             color: isCompletedSubchapter
                                 ? Colors.white
                                 : Colors.teal,
-                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -486,7 +484,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.secondaryText,
-                                fontSize: 14,
                               ),
                             ),
                           ],

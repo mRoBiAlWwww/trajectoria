@@ -17,6 +17,8 @@ abstract class AuthFirebaseService {
   Future<(Map<String, dynamic>, String)> signInWithGoogle(String role);
   Future<(Map<String, dynamic>, String)> getCurrentUser();
   Future<String> signOut();
+  Future<String> addTokenNotification(String tokenId);
+  Future<String> deleteTokenNotification();
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
@@ -235,12 +237,14 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
             'experience_sumarry': '',
             'status_employment': '',
             'courses_score': 0,
-            'competitions_onprogress': <String>[],
+            'competitions_onprogres': <String>[],
             'competitions_done': <String>[],
             'finished_module': <String>[],
             'finished_subchapter': <String>[],
             'finished_chapter': <String>[],
-            'onprogres_chapter': <String>[],
+            'onprogres_chapter': '',
+            'bookmarks': <String>[],
+            'progres': [],
           };
           await FirebaseFirestore.instance
               .collection(role)
@@ -309,6 +313,50 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return "Logout Success";
     } catch (e) {
       throw Exception("Kesalahan saat logout: $e");
+    }
+  }
+
+  @override
+  Future<String> addTokenNotification(String tokenId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      throw Exception("User belum login/registrasi, tidak bisa simpan token.");
+    }
+
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser.uid)
+          .update({
+            'token_notification': tokenId,
+            'lastTokenUpdate': FieldValue.serverTimestamp(),
+          });
+
+      return "Token notifikasi telah berhasil ditambahkan";
+    } catch (e) {
+      throw Exception("Error token gagal ditambahkan $e");
+    }
+  }
+
+  @override
+  Future<String> deleteTokenNotification() async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    var currentUser = FirebaseAuth.instance.currentUser;
+
+    try {
+      await firestoreInstance
+          .collection("Jobseeker")
+          .doc(currentUser!.uid)
+          .update({
+            'token_notification': "",
+            'lastTokenUpdate': FieldValue.serverTimestamp(),
+          });
+
+      return "Token notifikasi telah berhasil dihapus dari daftar";
+    } catch (e) {
+      throw Exception("Error modul gagal dihapus $e");
     }
   }
 

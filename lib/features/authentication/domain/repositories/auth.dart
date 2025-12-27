@@ -14,4 +14,6 @@ abstract class AuthRepository {
   Future<Either> signInWithGoogle(String role);
   Future<Either> getCurrentUser();
   Future<Either> signOut();
+  Future<Either> addTokenNotification(String tokenId);
+  Future<Either> deleteTokenNotification();
 }

@@ -46,177 +46,182 @@ class _ScorePageState extends State<ScorePage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => QuizCubit(),
-      child: Scaffold(
-        body: showFirst
-            ? ScoreGift()
-            : Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 25,
-                ),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          SvgPicture.asset(
-                            AppVectors.finalScore,
-                            width: 200.0,
-                            height: 200.0,
-                          ),
-                          Text(
-                            "${widget.finalScore!.truncate()} / ${widget.maximumScore} XP",
-                            style: TextStyle(
-                              fontFamily: 'JetBrainsMono',
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Scaffold(
+          body: showFirst
+              ? ScoreGift()
+              : Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 25,
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          children: [
+                            SvgPicture.asset(
+                              AppVectors.finalScore,
+                              width: 200.0,
+                              height: 200.0,
+                            ),
+                            Text(
+                              "${widget.finalScore!.truncate()} / ${widget.maximumScore} XP",
+                              style: TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              "Pelajaran Selesai!",
+                              style: TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontSize: 25,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Selesaikan pelajaran berikutnya untuk mendapatkan",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.disableTextButton,
+                              ),
+                            ),
+                            Text(
+                              "badge “${widget.badge}”",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.disableTextButton,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 100),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.thirdBackGroundButton,
+                              width: 2,
                             ),
                           ),
-                          SizedBox(height: 20),
-                          Text(
-                            "Pelajaran Selesai!",
-                            style: TextStyle(
-                              fontFamily: 'JetBrainsMono',
-                              fontSize: 25,
-                              fontWeight: FontWeight.w700,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 25,
                             ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "Selesaikan pelajaran berikutnya untuk mendapatkan",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.disableTextButton,
-                            ),
-                          ),
-                          Text(
-                            "badge “${widget.badge}”",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.disableTextButton,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 100),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.thirdBackGroundButton,
-                            width: 2,
+                            child: widget.nextModule == ""
+                                ? Text(
+                                    "Selamat anda telah menyelesaikan sub chapter ini",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'JetBrainsMono',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
+                                : IntrinsicHeight(
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Materi Selanjutnya:",
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                widget.nextModule,
+                                                style: TextStyle(
+                                                  fontFamily: 'JetBrainsMono',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          child: VerticalDivider(
+                                            width: 1,
+                                            thickness: 1,
+                                            color: AppColors
+                                                .disableBackgroundButton,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "KAMU DAPAT",
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.teal,
+                                                ),
+                                              ),
+                                              Text(
+                                                "${widget.nextMaximumScore} XP",
+                                                style: TextStyle(
+                                                  fontFamily: 'JetBrainsMono',
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 25,
-                          ),
-                          child: widget.nextModule == ""
-                              ? Text(
-                                  "Selamat anda telah menyelesaikan sub chapter ini",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: 'JetBrainsMono',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )
-                              : IntrinsicHeight(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 3,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Materi Selanjutnya:",
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            Text(
-                                              widget.nextModule,
-                                              style: TextStyle(
-                                                fontFamily: 'JetBrainsMono',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        child: VerticalDivider(
-                                          width: 1,
-                                          thickness: 1,
-                                          color:
-                                              AppColors.disableBackgroundButton,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "KAMU DAPAT",
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w900,
-                                                color: Colors.teal,
-                                              ),
-                                            ),
-                                            Text(
-                                              "${widget.nextMaximumScore} XP",
-                                              style: TextStyle(
-                                                fontFamily: 'JetBrainsMono',
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w900,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-        bottomNavigationBar: showFirst
-            ? null
-            : SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: BasicAppButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    content: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
+          bottomNavigationBar: showFirst
+              ? null
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: BasicAppButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      content: Text(
                         "Lanjut",
                         style: TextStyle(
                           color: Colors.white,
@@ -225,11 +230,11 @@ class _ScorePageState extends State<ScorePage> {
                           fontSize: 20,
                         ),
                       ),
+                      backgroundColor: Colors.black,
                     ),
-                    backgroundColor: Colors.black,
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }

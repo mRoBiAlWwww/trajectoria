@@ -65,6 +65,14 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     ],
                   ),
                 ),
+                bottom: const PreferredSize(
+                  preferredSize: Size.fromHeight(1),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.thirdBackGroundButton,
+                  ),
+                ),
               ),
               body: SingleChildScrollView(
                 child: Padding(
@@ -137,36 +145,36 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       index == 0
                                           ? Image.asset(
                                               AppImages.satu,
-                                              width: 50,
-                                              height: 50,
+                                              width: 40,
+                                              height: 40,
                                             )
                                           : index == 1
                                           ? Image.asset(
                                               AppImages.dua,
-                                              width: 50,
-                                              height: 50,
+                                              width: 40,
+                                              height: 40,
                                             )
                                           : index == 2
                                           ? Image.asset(
                                               AppImages.tiga,
-                                              width: 50,
-                                              height: 50,
+                                              width: 40,
+                                              height: 40,
                                             )
                                           : SizedBox(
-                                              width: 50,
-                                              height: 50,
+                                              width: 40,
+                                              height: 40,
                                               child: Center(
                                                 child: Text(
                                                   (index + 1).toString(),
                                                   style: TextStyle(
                                                     fontFamily: "JetBrainsMono",
                                                     fontWeight: FontWeight.w700,
-                                                    fontSize: 18,
+                                                    fontSize: 16,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                      SizedBox(width: 8),
+                                      SizedBox(width: 10),
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(
                                           100,
@@ -176,29 +184,33 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                           fit: BoxFit.cover,
                                           width: 40,
                                           height: 40,
-                                          // loadingBuilder:
-                                          //     (context, child, loadingProgress) {
-                                          //       if (loadingProgress == null) {
-                                          //         return child;
-                                          //       }
-                                          //       return Container(
-                                          //         width: 40,
-                                          //         height: 40,
-                                          //         color: Colors.grey,
-                                          //         child: const Center(
-                                          //           child:
-                                          //               CircularProgressIndicator(
-                                          //                 color: Colors.white,
-                                          //               ),
-                                          //         ),
-                                          //       );
-                                          //     },
-                                          // errorBuilder:
-                                          //     (context, error, stackTrace) {
-                                          //       return const Center(
-                                          //         child: Text('Gagal memuat.'),
-                                          //       );
-                                          //     },
+                                          loadingBuilder:
+                                              (
+                                                context,
+                                                child,
+                                                loadingProgress,
+                                              ) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  color: Colors.grey,
+                                                  child: const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          color: Colors.white,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return const Center(
+                                                  child: Text('Gagal memuat.'),
+                                                );
+                                              },
                                         ),
                                       ),
                                       SizedBox(width: 10),
@@ -210,19 +222,18 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                           style: TextStyle(
                                             fontFamily: 'Inter',
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
+                                SizedBox(width: 25),
                                 Text(
                                   "${leaderbord.coursesScore.toString()} XP",
                                   style: TextStyle(
                                     fontFamily: 'JetBrainsMono',
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 16,
                                   ),
                                 ),
                               ],

@@ -25,7 +25,7 @@ class DoneSubmited extends SubmissionState {
   DoneSubmited();
 }
 
-class OnprogressSubmited extends SubmissionState {
+class OnprogresSubmited extends SubmissionState {
   String competitionParticipantId;
-  OnprogressSubmited(this.competitionParticipantId);
+  OnprogresSubmited(this.competitionParticipantId);
 }

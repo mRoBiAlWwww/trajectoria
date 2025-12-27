@@ -3,6 +3,8 @@ import 'package:trajectoria/features/authentication/data/models/company_signup_r
 import 'package:trajectoria/features/authentication/data/models/jobseeker_signup_req.dart';
 import 'package:trajectoria/features/authentication/domain/entities/company_entity.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
+import 'package:trajectoria/features/jobseeker/learn/data/models/progres.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/progres.dart';
 
 class UserSignupReq {
   String email;
@@ -48,7 +50,10 @@ class UserSignupReq {
       competitionsOnprogres: <String>[],
       competitionsDone: <String>[],
       finishedSubchapter: <String>[],
-      onprogresChapter: <String>[],
+      onprogresChapter: '',
+      tokenNotification: '',
+      bookmarks: <String>[],
+      progres: <ProgresModel>[],
     );
   }
 
@@ -91,7 +96,10 @@ extension UserSignupReqX on UserSignupReq {
       competitionsDone: <String>[],
       finishedSubchapter: <String>[],
       finishedChapter: <String>[],
-      onprogresChapter: <String>[],
+      onprogresChapter: '',
+      tokenNotification: '',
+      bookmarks: <String>[],
+      progres: <ProgresEntity>[],
     );
   }
 

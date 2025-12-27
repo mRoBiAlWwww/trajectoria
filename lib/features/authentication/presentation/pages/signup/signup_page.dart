@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
-import 'package:trajectoria/common/widgets/textField/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';

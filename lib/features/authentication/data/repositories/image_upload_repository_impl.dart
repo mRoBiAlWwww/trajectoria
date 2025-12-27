@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trajectoria/features/authentication/data/datasources/image_upload.dart';
 import 'package:trajectoria/features/authentication/domain/repositories/image_upload.dart';
-import 'package:trajectoria/service_locator.dart';
+import 'package:trajectoria/core/dependency_injection/service_locator.dart';
 
 class ImageUploadRepositoryImpl implements ImageUploadRepository {
   @override

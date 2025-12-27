@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trajectoria/features/authentication/data/models/jobseeker.dart';
 import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
+import 'package:trajectoria/features/jobseeker/learn/data/models/progres.dart';
+import 'package:trajectoria/features/jobseeker/learn/domain/entities/progres.dart';
 
 class JobseekerSignupReq {
   final String email;
@@ -20,7 +22,10 @@ class JobseekerSignupReq {
   final List<String>? competitionsDone;
   final List<String>? finishedSubchapter;
   final List<String>? finishedChapter;
-  final List<String>? onprogresChapter;
+  final String? onprogresChapter;
+  final String? tokenNotification;
+  final List<String>? bookmarks;
+  final List<ProgresModel>? progres;
 
   JobseekerSignupReq({
     required this.email,
@@ -41,6 +46,9 @@ class JobseekerSignupReq {
     this.finishedSubchapter,
     this.finishedChapter,
     this.onprogresChapter,
+    this.tokenNotification,
+    this.bookmarks,
+    this.progres,
   });
 
   JobSeekerModel toJobseekerModel() {
@@ -62,7 +70,10 @@ class JobseekerSignupReq {
       competitionsDone: competitionsDone ?? <String>[],
       finishedSubchapter: finishedSubchapter ?? <String>[],
       finishedChapter: finishedChapter ?? <String>[],
-      onprogresChapter: onprogresChapter ?? <String>[],
+      onprogresChapter: '',
+      tokenNotification: '',
+      bookmarks: bookmarks ?? <String>[],
+      progres: progres ?? <ProgresModel>[],
     );
   }
 
@@ -85,7 +96,12 @@ class JobseekerSignupReq {
       competitionsDone: competitionsDone ?? <String>[],
       finishedSubchapter: finishedSubchapter ?? <String>[],
       finishedChapter: finishedChapter ?? <String>[],
-      onprogresChapter: onprogresChapter ?? <String>[],
+      onprogresChapter: '',
+      tokenNotification: '',
+      bookmarks: bookmarks ?? <String>[],
+      progres: progres != null
+          ? progres!.map((e) => e.toEntity()).toList()
+          : <ProgresEntity>[],
     );
   }
 }

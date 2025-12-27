@@ -2,9 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trajectoria/common/helper/bottomsheets/app_bottom_sheets.dart';
+import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/listitem/competition_listitem.dart';
+import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/hydrated_history_cubit.dart';
@@ -108,10 +109,7 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                     decoration: InputDecoration(
                       filled: false,
                       hintText: "Cari Kompetisi",
-                      hintStyle: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14.0,
-                      ),
+                      hintStyle: TextStyle(color: Colors.grey[400]),
                       border: InputBorder.none,
                     ),
                   ),
@@ -223,7 +221,6 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                                       style: TextStyle(
                                         color: Colors.teal,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ),
@@ -236,7 +233,16 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                     }
                   }
                   return Center(
-                    child: Text("anda masih belum punya history pencarian"),
+                    child: Text(
+                      "anda masih belum punya history pencarian",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'JetBrainsMono',
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.secondaryBackgroundButton,
+                        fontSize: 20,
+                      ),
+                    ),
                   );
                 } else {
                   if (state is SearchCompeteLoading) {
@@ -244,7 +250,6 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                   }
 
                   if (state is SearchCompeteLoaded) {
-                    // isDone = false;
                     if (state.competitions.isNotEmpty) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,10 +265,7 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                               children: [
                                 TextSpan(
                                   text: "${state.competitions.length} hasil",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                               ],
                             ),
@@ -279,7 +281,34 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
                         ],
                       );
                     } else {
-                      return const Center(child: Text('Tidak ada hasil'));
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(AppImages.not, width: 100, height: 100),
+                          SizedBox(height: 10),
+                          Text(
+                            'Tidak ada hasil',
+                            style: TextStyle(
+                              fontFamily: 'JetBrainsMono',
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.secondaryBackgroundButton,
+                              fontSize: 20,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            "Anda mungkin salah memasukkan nama kompetisi atau kompetisi yang anda cari tidak tersedia",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.disableTextButton,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      );
                     }
                   }
                 }

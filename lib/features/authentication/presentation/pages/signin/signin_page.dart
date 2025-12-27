@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
-import 'package:trajectoria/common/widgets/textField/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
-import 'package:trajectoria/common/widgets/navigation/main_wrapper.dart';
+import 'package:trajectoria/core/navigation/main_wrapper.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signin_req.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
@@ -75,14 +75,7 @@ class _SigninPageState extends State<SigninPage> {
       body: BlocListener<AuthStateCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            AppNavigator.push(
-              context,
-              MainWrapper(),
-              // BlocProvider.value(
-              //   value: context.read<AuthStateCubit>(),
-              //   child: MainWrapper(),
-              // ),
-            );
+            AppNavigator.push(context, MainWrapper());
           }
         },
         child: SingleChildScrollView(
@@ -191,9 +184,6 @@ class _SigninPageState extends State<SigninPage> {
       builder: (context, state) {
         Widget? buttonContent;
 
-        // if (state is AuthSuccess) {
-        //   AppNavigator.pushAndRemove(context, MainWrapper());
-        // }
         if (state is AuthInitial) {
           buttonContent = const Text(
             "Lanjut",
