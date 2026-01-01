@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
@@ -107,10 +107,7 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
   @override
   Widget build(BuildContext context) {
     //formatter date
-    final formatter = DateFormat('d MMM y', 'id_ID');
-    final formattedDate = formatter.format(
-      widget.competition.deadline.toDate(),
-    );
+    final formattedDate = widget.competition.deadline.toShortDate();
 
     final screenSize = MediaQuery.of(context).size;
     final double bottomSafeAreaPadding = MediaQuery.of(context).padding.bottom;

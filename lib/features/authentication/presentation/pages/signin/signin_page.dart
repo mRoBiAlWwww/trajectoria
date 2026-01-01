@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -50,11 +51,7 @@ class _SigninPageState extends State<SigninPage> {
         : 200.0;
 
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      appBar: CustomAppBar(
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10),

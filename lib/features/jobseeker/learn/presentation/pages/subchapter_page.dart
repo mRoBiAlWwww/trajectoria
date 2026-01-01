@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -81,12 +82,9 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-        elevation: 0,
+      appBar: CustomAppBar(
         centerTitle: true,
+        showLeading: true,
         title: const Text(
           "Kursus",
           style: TextStyle(
@@ -95,13 +93,6 @@ class _SubchapterPageState extends State<SubchapterPage> with RouteAware {
             fontSize: 15,
             color: Colors.black,
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: BlocBuilder<ChapterCubit, ChapterState>(

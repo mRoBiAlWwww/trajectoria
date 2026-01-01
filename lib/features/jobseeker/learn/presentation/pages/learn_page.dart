@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
@@ -414,15 +414,13 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                                 ),
                               );
                             } else {
-                              _displayErrorToast(
-                                context,
+                              context.showErrorToast(
                                 "Anda belum memilih chapter sama sekali",
                               );
                             }
                           }
                         } else {
-                          _displayErrorToast(
-                            context,
+                          context.showErrorToast(
                             "Silahkan pilih course terlebih dahulu",
                           );
                         }
@@ -469,15 +467,5 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
     } else {
       return 0;
     }
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

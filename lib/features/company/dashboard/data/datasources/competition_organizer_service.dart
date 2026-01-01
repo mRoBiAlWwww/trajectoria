@@ -287,7 +287,6 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
       }
 
       final submissions = await query.get();
-      debugPrint(submissions.docs.length.toString());
       return submissions.docs
           .map((e) => e.data() as Map<String, dynamic>)
           .toList();
@@ -571,7 +570,6 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
           .collection("Jobseeker")
           .doc(userId)
           .get();
-
       return getUserInformation.data()!;
     } catch (e) {
       throw Exception(

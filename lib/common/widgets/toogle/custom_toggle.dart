@@ -8,7 +8,6 @@ class CustomToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("ini bener $value");
     return GestureDetector(
       onTap: () {
         onChanged(!value);

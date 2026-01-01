@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
@@ -63,7 +64,7 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
                   .state
                   .competition;
               context.read<OrganizeCompetitionCubit>().draftCompetition(data);
-              _displaySuccessToast(context, "Berhasil disimpan sebagai draft");
+              context.showSuccessToast("Berhasil disimpan sebagai draft");
             }
 
             setState(() {
@@ -78,16 +79,9 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
           }
         },
         child: Scaffold(
-          appBar: AppBar(
-            scrolledUnderElevation: 0.0,
-            backgroundColor: AppColors.splashBackground,
-            leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.black,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+          appBar: CustomAppBar(
+            showLeading: true,
+            titleSpacing: 0,
             title: Text(
               "Buat Kompetisi - ${customTextAppbar[page - 1]} ",
               overflow: TextOverflow.ellipsis,
@@ -98,7 +92,6 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
                 fontSize: 18,
               ),
             ),
-            titleSpacing: 0,
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -198,8 +191,7 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
 
         context.read<OrganizeCompetitionCubit>().draftCompetition(data);
 
-        _displaySuccessToast(
-          context,
+        context.showSuccessToast(
           "Rencana kompetisi berhasil disimpan sebagai draft",
         );
         Navigator.pop(context);
@@ -223,8 +215,7 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
     cubit.setCompanyName(authState.company!.name);
 
     if (cubit.isDeadlineBeforeCreatedAt()) {
-      _displayErrorToast(
-        context,
+      context.showErrorToast(
         "Tanggal deadline tidak boleh lebih awal dari tanggal pembuatan kompetisi",
       );
       return;
@@ -233,7 +224,7 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
     final data = cubit.state.competition;
     context.read<OrganizeCompetitionCubit>().submitCompetition(data);
 
-    _displaySuccessToast(context, "Kompetisi berhasil dibuat");
+    context.showSuccessToast("Kompetisi berhasil dibuat");
     Navigator.pop(context);
   }
 
@@ -279,25 +270,5 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
         ),
       ],
     );
-  }
-
-  void _displaySuccessToast(context, String message) {
-    MotionToast.success(
-      title: Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

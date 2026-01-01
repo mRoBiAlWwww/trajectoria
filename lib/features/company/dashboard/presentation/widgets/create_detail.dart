@@ -1,7 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/button_next_create_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_comp_image_cubit.dart';
@@ -484,10 +484,7 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
                                           _addNewfilesUrl(state.files);
                                         }
                                         if (state is SubmissionError) {
-                                          _displayErrorToast(
-                                            context,
-                                            state.message,
-                                          );
+                                          context.showErrorToast(state.message);
                                         }
                                       },
                                       child: const SizedBox.shrink(),
@@ -797,15 +794,5 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
       default:
         return Colors.black;
     }
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

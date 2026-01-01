@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/common/widgets/toogle/custom_toggle.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_cubit.dart';
@@ -55,26 +55,6 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     context.read<CreateCompetitionCubit>().setRubrik(list);
   }
 
-  void _displaySuccessToast(BuildContext context, String message) {
-    MotionToast.success(
-      title: const Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: const TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displayErrorToast(BuildContext context, String message) {
-    MotionToast.error(
-      title: const Text(
-        "Error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: const TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return KeyedSubtree(
@@ -111,10 +91,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               },
               builder: (context, state) {
                 //formatter date
-                final formatter = DateFormat('d MMM y', 'id_ID');
-                final formattedDate = formatter.format(
-                  state.competition.deadline.toDate(),
-                );
+                final formattedDate = state.competition.deadline.toShortDate();
 
                 final isClosed = state.competition.status == "Ditutup";
                 if (state.isLoading) {
@@ -423,8 +400,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                                         competitionData,
                                                       );
 
-                                                  _displaySuccessToast(
-                                                    context,
+                                                  context.showSuccessToast(
                                                     "Perubahan berhasil disimpan",
                                                   );
                                                   Navigator.pop(context);
@@ -539,8 +515,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   onTap: () {
                     final newTotal = totalBobot + 1;
                     if (newTotal > 100) {
-                      _displayErrorToast(
-                        context,
+                      context.showErrorToast(
                         "Total bobot tidak boleh lebih dari 100%",
                       );
                       return;
@@ -616,8 +591,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeOut,
               );
-              _displaySuccessToast(
-                context,
+              context.showSuccessToast(
                 isClosed
                     ? "Kompetisi telah berhasil dibuka kembali"
                     : "Kompetisi telah berhasil ditutup",

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trajectoria/common/widgets/listItem/competition_listitem.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
+import 'package:trajectoria/common/widgets/list_competition/list_competition_items.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/cubit/profile_cubit.dart';
 
@@ -12,19 +13,9 @@ class RiwayatKompetisiPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProfileCubit()..getHistoryCompetitions(),
       child: Scaffold(
-        appBar: AppBar(
-          scrolledUnderElevation: 0.0,
+        appBar: CustomAppBar(
           backgroundColor: AppColors.splashBackground,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-
+          showLeading: true,
           title: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(left: 45),

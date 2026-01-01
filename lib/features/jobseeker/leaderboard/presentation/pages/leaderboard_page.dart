@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/leaderboard/presentation/cubit/leaderboard_cubit.dart';
@@ -30,10 +31,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         builder: (context, state) {
           if (state is JobseekerLeaderboardLoaded) {
             return Scaffold(
-              appBar: AppBar(
-                scrolledUnderElevation: 0.0,
+              appBar: CustomAppBar(
                 backgroundColor: AppColors.splashBackground,
-                automaticallyImplyLeading: false,
                 leadingWidth: 0,
                 title: Padding(
                   padding: const EdgeInsets.only(left: 10),

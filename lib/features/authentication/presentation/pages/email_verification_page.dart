@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
@@ -66,10 +66,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
         child: BlocListener<AuthStateCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthFailure) {
-              _displayErrorToast(context, state.errorMessage);
+              context.showErrorToast(state.errorMessage);
             }
             if (state is AuthSuccess) {
-              _displaySuccessToast(context, state.user.name);
+              context.showSuccessToast(state.user.name);
             }
           },
           child: Builder(
@@ -210,25 +210,5 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
         ),
       ),
     );
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displaySuccessToast(context, String message) {
-    MotionToast.success(
-      title: Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

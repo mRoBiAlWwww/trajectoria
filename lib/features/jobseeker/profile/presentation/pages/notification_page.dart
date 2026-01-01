@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/domain/entities/announcement.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/competition_result.dart';
@@ -51,10 +52,9 @@ class _NotificationPageState extends State<NotificationPage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
         title: const Text("Notifikasi"),
         backgroundColor: AppColors.splashBackground,
-        elevation: 0,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -84,10 +84,7 @@ class _NotificationPageState extends State<NotificationPage> with RouteAware {
 
   Widget notificationCard(BuildContext context, AnnouncementEntity item) {
     //formatter date
-    final formatter = DateFormat('d MMM y', 'id_ID');
-    final formattedDateComplete = formatter.format(
-      item.createdAnnouncementAt!.toDate(),
-    );
+    final formattedDateComplete = item.createdAnnouncementAt!.toShortDate();
 
     return InkWell(
       onTap: () {

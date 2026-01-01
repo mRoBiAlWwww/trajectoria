@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/searchbar/searchbar.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
-import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/get_user_compe_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/get_user_compe_state.dart';
@@ -224,17 +223,12 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
                                           final user = users[index];
 
                                           //formatter date
-                                          final formatter = DateFormat(
-                                            'd MMM y',
-                                            'id_ID',
-                                          );
-                                          final formattedDate = formatter
-                                              .format(
-                                                submission.submittedAt.toDate(),
-                                              );
-                                          final String countdown = timeAgo(
-                                            submission.submittedAt.toDate(),
-                                          );
+                                          final formattedDate = submission
+                                              .submittedAt
+                                              .toShortDate();
+                                          final countdown = submission
+                                              .submittedAt
+                                              .toTimeAgo();
 
                                           return GestureDetector(
                                             onTap: () {
@@ -446,76 +440,10 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
                         ],
                       ),
                 SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white,
-                        Color(0xFFFBFBFB),
-                        Color(0xFFEDEDED),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 0, 5, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            focusNode: _focusNode,
-                            controller: searchCon,
-                            onChanged: onSearchChanged,
-                            decoration: InputDecoration(
-                              filled: false,
-                              hintText: "Cari Peserta",
-                              hintStyle: TextStyle(color: Colors.grey[400]),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: Colors.black,
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.grey.shade700, Color(0xFF242424)],
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  AppVectors.miniFilter,
-                                  width: 12.0,
-                                  height: 12.0,
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  "Cari",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                SearchBarWidget(
+                  controller: searchCon,
+                  onChanged: onSearchChanged,
+                  hint: "Cari Peserta",
                 ),
               ],
             ),
@@ -523,23 +451,5 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
         ],
       ),
     );
-  }
-
-  String timeAgo(DateTime past) {
-    final Duration difference = DateTime.now().difference(past);
-
-    if (difference.inSeconds < 60) {
-      return 'baru saja';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} menit yang lalu';
-    } else if (difference.inHours < 24) {
-      final int hours = difference.inHours;
-      final int minutes = difference.inMinutes % 60;
-      return '$hours jam $minutes menit yang lalu';
-    } else {
-      final int days = difference.inDays;
-      final int hours = difference.inHours % 24;
-      return '$days hari $hours jam yang lalu';
-    }
   }
 }

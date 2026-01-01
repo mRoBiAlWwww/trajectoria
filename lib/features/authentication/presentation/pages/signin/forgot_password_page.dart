@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
@@ -44,9 +45,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         : 350.0;
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
+      appBar: CustomAppBar(
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10),
@@ -68,7 +67,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         child: BlocListener<AuthStateCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthFailure) {
-              _displayErrorToast(context, state.errorMessage);
+              context.showErrorToast(state.errorMessage);
             }
             if (state is AuthSuccess) {
               AppNavigator.push(
@@ -101,16 +100,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
       ),
     );
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 
   Widget _emailField(bool isFormValid) {

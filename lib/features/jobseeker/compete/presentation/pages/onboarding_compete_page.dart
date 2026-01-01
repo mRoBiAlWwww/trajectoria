@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trajectoria/common/widgets/listitem/competition_listitem.dart';
+import 'package:trajectoria/common/widgets/list_competition/list_competition_items.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_state.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/search_category_competition_page.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/get_user_compe_cubit.dart';
@@ -62,13 +62,10 @@ class RankWidget extends StatelessWidget {
                               final submission = incrementState.data[index];
 
                               //formatter date
-                              final formatter = DateFormat('d MMM y', 'id_ID');
-                              final formattedDate = formatter.format(
-                                submission.submittedAt.toDate(),
-                              );
-                              final String countdown = timeAgo(
-                                submission.submittedAt.toDate(),
-                              );
+                              final formattedDate = submission.submittedAt
+                                  .toShortDate();
+                              final countdown = submission.submittedAt
+                                  .toTimeAgo();
 
                               return Container(
                                 padding: const EdgeInsets.symmetric(
@@ -274,23 +271,5 @@ class RankWidget extends StatelessWidget {
         },
       ),
     );
-  }
-
-  String timeAgo(DateTime past) {
-    final Duration difference = DateTime.now().difference(past);
-
-    if (difference.inSeconds < 60) {
-      return 'baru saja';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} menit yang lalu';
-    } else if (difference.inHours < 24) {
-      final int hours = difference.inHours;
-      final int minutes = difference.inMinutes % 60;
-      return '$hours jam $minutes menit yang lalu';
-    } else {
-      final int days = difference.inDays;
-      final int hours = difference.inHours % 24;
-      return '$days hari $hours jam yang lalu';
-    }
   }
 }

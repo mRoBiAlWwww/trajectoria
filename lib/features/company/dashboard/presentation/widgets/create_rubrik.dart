@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/button_next_create_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/create_competition_cubit.dart';
@@ -191,8 +191,7 @@ class _CreateRubrikWidgetState extends State<CreateRubrikWidget> {
                                     int newTotal = totalBobot + 1;
 
                                     if (newTotal > 100) {
-                                      _displayErrorToast(
-                                        context,
+                                      context.showErrorToast(
                                         "Total bobot tidak boleh lebih dari 100%",
                                       );
                                       return;
@@ -268,7 +267,7 @@ class _CreateRubrikWidgetState extends State<CreateRubrikWidget> {
                             true,
                           )
                         : null;
-                    _displaySuccessToast(context, "Rubrik berhasil disimpan");
+                    context.showSuccessToast("Rubrik berhasil disimpan");
                     _saveRubrik();
                   },
                   child: Container(
@@ -306,25 +305,5 @@ class _CreateRubrikWidgetState extends State<CreateRubrikWidget> {
     );
 
     context.read<CreateCompetitionCubit>().setRubrik(list);
-  }
-
-  void _displaySuccessToast(context, String message) {
-    MotionToast.success(
-      title: Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

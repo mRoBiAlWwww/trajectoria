@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
@@ -49,11 +50,7 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
         : 275.0;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        scrolledUnderElevation: 0.0,
-        automaticallyImplyLeading: false,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      appBar: CustomAppBar(
         title: Center(
           child: FractionallySizedBox(
             widthFactor: 0.66,
@@ -82,7 +79,6 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
             ),
           ),
         ),
-        actions: const [],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 80, 25, 25),

@@ -135,7 +135,7 @@ class CompetitionEntity {
       rubrik: map['rubrik'] != null
           ? (map['rubrik'] as List)
                 .map(
-                  (e) => RubrikItemEntity.fromMap(Map<String, String>.from(e)),
+                  (e) => RubrikItemEntity.fromMap(Map<String, dynamic>.from(e)),
                 )
                 .toList()
           : [],
@@ -144,11 +144,6 @@ class CompetitionEntity {
                 .map((e) => FileItemEntity.fromMap(Map<String, String>.from(e)))
                 .toList()
           : [],
-      // guidebook: map['guidebook'] != null
-      //     ? (map['guidebook'] as List)
-      //           .map((e) => GuidebookItem.fromMap(Map<String, dynamic>.from(e)))
-      //           .toList()
-      //     : [],
     );
   }
 }

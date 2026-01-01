@@ -2,9 +2,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
@@ -130,7 +130,7 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
                               _addNewfilesUrl(state.files);
                             }
                             if (state is SubmissionError) {
-                              _displayErrorToast(context, state.message);
+                              context.showErrorToast(state.message);
                             }
                           },
                           child: const SizedBox.shrink(),
@@ -443,15 +443,5 @@ class _UploadSheetContentState extends State<UploadSheetContent> {
       default:
         return Colors.black;
     }
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

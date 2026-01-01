@@ -1,25 +1,34 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
+import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/hydrated_history_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/detail_competition_page.dart';
 
 class JobseekerItems extends StatelessWidget {
   final CompetitionEntity competition;
+  final bool isFromSearchPage;
 
-  const JobseekerItems({super.key, required this.competition});
+  const JobseekerItems({
+    super.key,
+    required this.competition,
+    required this.isFromSearchPage,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final formatter = DateFormat('d MMM y', 'id_ID');
-    final formattedDate = formatter.format(competition.deadline.toDate());
+    //formatter date
+    final formattedDate = competition.deadline.toShortDate();
 
     return InkWell(
       onTap: () {
+        isFromSearchPage
+            ? context.read<HydratedHistoryCubit>().addCompetition(competition)
+            : null;
         AppNavigator.push(
           context,
           BlocProvider.value(

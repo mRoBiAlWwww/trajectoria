@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trajectoria/common/widgets/listitem/competition_listitem.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
+import 'package:trajectoria/common/widgets/list_competition/list_competition_items.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/category.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_cubit.dart';
@@ -47,9 +48,9 @@ class _SearchCategoryCompetitionPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        backgroundColor: AppColors.splashBackground,
         toolbarHeight: 80,
-        automaticallyImplyLeading: false,
         titleSpacing: 40,
         title: Container(
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 25),
@@ -81,7 +82,6 @@ class _SearchCategoryCompetitionPageState
             ],
           ),
         ),
-        backgroundColor: AppColors.splashBackground,
       ),
       body: BlocBuilder<SearchCompeteCubit, SearchCompeteState>(
         builder: (context, state) {

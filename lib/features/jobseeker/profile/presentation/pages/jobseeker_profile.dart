@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
@@ -83,10 +84,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
             behavior: HitTestBehavior.translucent,
             onTap: () => FocusScope.of(context).unfocus(),
             child: Scaffold(
-              appBar: AppBar(
-                scrolledUnderElevation: 0.0,
+              appBar: CustomAppBar(
                 backgroundColor: AppColors.splashBackground,
-                automaticallyImplyLeading: false,
                 leadingWidth: 0,
                 title: Padding(
                   padding: const EdgeInsets.only(left: 10),

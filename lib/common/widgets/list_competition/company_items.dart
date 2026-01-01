@@ -1,6 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/pages/detail_competition.dart';
@@ -13,8 +13,8 @@ class CompanyItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatter = DateFormat('d MMM y', 'id_ID');
-    final formattedDate = formatter.format(competition.deadline.toDate());
+    //formatter date
+    final formattedDate = competition.deadline.toShortDate();
 
     return InkWell(
       onTap: () {

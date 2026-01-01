@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/empty_competition/company_empty_competition.dart';
-import 'package:trajectoria/common/widgets/listItem/competition_listitem.dart';
+import 'package:trajectoria/common/widgets/list_competition/list_competition_items.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
@@ -72,7 +73,50 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
         child: Builder(
           builder: (context) {
             return Scaffold(
-              appBar: _buildAppBar(context, userCompany),
+              appBar: CustomAppBar(
+                backgroundColor: AppColors.splashBackground,
+                toolbarHeight: 75,
+                actions: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.white,
+                      border: Border.all(
+                        color: AppColors.thirdBackGroundButton,
+                      ),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        CupertinoIcons.bell_solid,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 25),
+                ],
+                title: Text(
+                  "Hai, $userCompany",
+                  style: TextStyle(
+                    fontFamily: 'JetBrainsMono',
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                  ),
+                ),
+                bottom: const PreferredSize(
+                  preferredSize: Size.fromHeight(1),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.thirdBackGroundButton,
+                  ),
+                ),
+              ),
               body:
                   BlocBuilder<
                     OrganizeCompetitionCubit,
@@ -118,48 +162,6 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                   ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context, String userCompany) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: AppColors.splashBackground,
-      toolbarHeight: 75,
-      actions: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            color: Colors.white,
-            border: Border.all(color: AppColors.thirdBackGroundButton),
-          ),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(CupertinoIcons.bell_solid, color: Colors.grey, size: 20),
-          ),
-        ),
-        SizedBox(width: 25),
-      ],
-      title: Text(
-        "Hai, $userCompany",
-        style: TextStyle(
-          fontFamily: 'JetBrainsMono',
-          fontWeight: FontWeight.w800,
-          fontSize: 18,
-        ),
-      ),
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Divider(
-          height: 1,
-          thickness: 1,
-          color: AppColors.thirdBackGroundButton,
         ),
       ),
     );
@@ -299,11 +301,9 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                           ),
                         );
 
-                    final formatter = DateFormat('d MMM y', 'id_ID');
-                    final formattedDate = formatter.format(
-                      submission.submittedAt.toDate(),
-                    );
-                    final countdown = timeAgo(submission.submittedAt.toDate());
+                    //formatter date
+                    final formattedDate = submission.submittedAt.toShortDate();
+                    final countdown = submission.submittedAt.toTimeAgo();
 
                     return GestureDetector(
                       onTap: () {
@@ -396,22 +396,5 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
-
-  String timeAgo(DateTime past) {
-    final Duration difference = DateTime.now().difference(past);
-    if (difference.inSeconds < 60) {
-      return 'baru saja';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} menit yang lalu';
-    } else if (difference.inHours < 24) {
-      final int hours = difference.inHours;
-      final int minutes = difference.inMinutes % 60;
-      return '$hours jam $minutes menit yang lalu';
-    } else {
-      final int days = difference.inDays;
-      final int hours = difference.inHours % 24;
-      return '$days hari $hours jam yang lalu';
-    }
   }
 }

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/empty_competition/company_empty_competition.dart';
-import 'package:trajectoria/common/widgets/listItem/competition_listitem.dart';
+import 'package:trajectoria/common/widgets/list_competition/list_competition_items.dart';
+import 'package:trajectoria/common/widgets/searchbar/searchbar.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
-import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/draft_or_competitions_cubit.dart';
 import 'package:trajectoria/features/company/dashboard/presentation/cubit/organize_competition_state.dart';
@@ -59,100 +59,25 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
       child: Builder(
         builder: (context) {
           return Scaffold(
-            appBar: AppBar(
-              scrolledUnderElevation: 0.0,
+            appBar: CustomAppBar(
               backgroundColor: AppColors.splashBackground,
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.black,
-                ),
-                onPressed: () {
-                  if (isDone) {
-                    Navigator.pop(context);
-                  } else {
-                    searchCon.clear();
-                    context
-                        .read<OrganizeCompetitionCubit>()
-                        .getCompetitionsByCurrentCompany();
-                    setState(() {
-                      isDone = true;
-                    });
-                  }
-                },
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 3),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white,
-                        Color(0xFFFBFBFB),
-                        Color(0xFFEDEDED),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 0, 5, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: searchCon,
-                            onChanged: onSearchChanged,
-                            decoration: InputDecoration(
-                              filled: false,
-                              hintText: "Cari Kompetisi",
-                              hintStyle: TextStyle(color: Colors.grey[400]),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: Colors.black,
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.grey.shade700, Color(0xFF242424)],
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  AppVectors.miniFilter,
-                                  width: 12.0,
-                                  height: 12.0,
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  "Cari",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              onLeadingPressed: () {
+                if (isDone) {
+                  Navigator.pop(context);
+                } else {
+                  searchCon.clear();
+                  context
+                      .read<OrganizeCompetitionCubit>()
+                      .getCompetitionsByCurrentCompany();
+                  setState(() {
+                    isDone = true;
+                  });
+                }
+              },
+              title: SearchBarWidget(
+                controller: searchCon,
+                onChanged: onSearchChanged,
+                hint: "Cari Kompetisi",
               ),
             ),
             body: BlocBuilder<DraftOrCompetitionsCubit, String>(

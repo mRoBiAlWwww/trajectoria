@@ -1,10 +1,11 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/overlay/overlay_ai.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/api/fcm_notification_api.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
@@ -71,14 +72,11 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   @override
   Widget build(BuildContext context) {
     urls = widget.submission.answerFiles.map((file) => file.url).toList();
-    final formatter = DateFormat('d MMMM y', 'id_ID');
 
-    final formattedDate = formatter.format(
-      widget.userListed.createdAt.toDate(),
-    );
-    final submittedDate = formatter.format(
-      widget.submission.submittedAt.toDate(),
-    );
+    //formatter date
+    final formattedDate = widget.userListed.createdAt.toFullDate();
+    final submittedDate = widget.submission.submittedAt.toFullDate();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => OrganizeCompetitionCubit()),
@@ -93,18 +91,9 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
               FocusScope.of(context).unfocus();
             },
             child: Scaffold(
-              appBar: AppBar(
-                scrolledUnderElevation: 0.0,
+              appBar: CustomAppBar(
                 backgroundColor: AppColors.splashBackground,
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
+                showLeading: true,
                 title: Text(
                   "Detail Unggahan",
                   style: TextStyle(
@@ -574,23 +563,18 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                 if (finalState is UserFinalisSuccess) {
                                   if (finalState.success ==
                                       "User sudah ada di final") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "User sudah ada di final",
                                     );
                                   } else {
-                                    _displaySuccessToast(
-                                      context,
+                                    context.showSuccessToast(
                                       "Berhasil ditambahkan",
                                     );
                                   }
                                 }
 
                                 if (finalState is UserFinalisFailure) {
-                                  _displayErrorToast(
-                                    context,
-                                    finalState.message,
-                                  );
+                                  context.showErrorToast(finalState.message);
                                 }
                               },
                               child:
@@ -699,8 +683,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                                       }
 
                                       if (context.mounted) {
-                                        _displaySuccessToast(
-                                          context,
+                                        context.showSuccessToast(
                                           "Berhasil disimpan",
                                         );
                                         Navigator.pop(context);
@@ -854,26 +837,6 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
         ],
       ),
     );
-  }
-
-  void _displaySuccessToast(context, String message) {
-    MotionToast.success(
-      title: Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }
 

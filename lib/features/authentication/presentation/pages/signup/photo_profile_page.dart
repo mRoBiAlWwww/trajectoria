@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motion_toast/motion_toast.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/helper/overlay/overlay.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signup_req.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
@@ -21,11 +21,7 @@ class PhotoProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      appBar: CustomAppBar(
         title: Center(
           child: FractionallySizedBox(
             widthFactor: 0.66,
@@ -38,7 +34,6 @@ class PhotoProfilePage extends StatelessWidget {
             ),
           ),
         ),
-        actions: const [],
       ),
       body: BlocListener<AuthStateCubit, AuthState>(
         listener: (context, state) {
@@ -49,7 +44,7 @@ class PhotoProfilePage extends StatelessWidget {
           }
 
           if (state is AuthFailure) {
-            _displayErrorToast(context, state.errorMessage);
+            context.showErrorToast(state.errorMessage);
           }
 
           if (state is AuthSuccess) {
@@ -249,67 +244,4 @@ class PhotoProfilePage extends StatelessWidget {
       ),
     );
   }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
 }
-
-
-
-  // Widget _buatAkun(BuildContext context, String imageUrl) {
-  //   return ElevatedButton(
-  //     onPressed: imageUrl.isNotEmpty
-  //         ? () async {
-  //             signupReq.imageUrl = imageUrl;
-  //             await context.read<AuthStateCubit>().additionalUserInfo(
-  //               signupReq,
-  //             );
-  //           }
-  //         : null,
-  //     style: ElevatedButton.styleFrom(
-  //       padding: EdgeInsets.symmetric(horizontal: 30),
-  //       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-  //       backgroundColor: Colors.black,
-  //       foregroundColor: Colors.white,
-  //     ),
-  //     child: const Text(
-  //       "Buat Akun",
-  //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-  //     ),
-  //   );
-  // }
-  // Widget _buildImageContent(ImageUploadState state) {
-  //   if (state is ImageUploadLoading) {
-  //     return Container(
-  //       width: 200,
-  //       height: 200,
-  //       color: Colors.blueGrey,
-  //       child: const Center(
-  //         child: CircularProgressIndicator(color: Colors.white),
-  //       ),
-  //     );
-  //   } else if (state is ImageUploadSuccess) {
-  //     return Image.network(
-  //       state.url,
-  //       fit: BoxFit.cover,
-  //       width: 200,
-  //       height: 200,
-  //       loadingBuilder: (context, child, loadingProgress) {
-  //         if (loadingProgress == null) return child;
-  //         return const Center(child: CircularProgressIndicator());
-  //       },
-  //       errorBuilder: (context, error, stackTrace) {
-  //         return const Center(child: Text('Gagal memuat.'));
-  //       },
-  //     );
-  //   } else {
-  //     return Container();
-  //   }
-  // }

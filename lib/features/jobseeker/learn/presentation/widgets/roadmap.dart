@@ -2,7 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -182,8 +182,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                           child: GestureDetector(
                             onTap: () {
                               if (widget.course == null) {
-                                _displayErrorToast(
-                                  context,
+                                context.showErrorToast(
                                   "Silahkan pilih course terlebih dahulu sebelum memulai",
                                 );
                                 return;
@@ -195,8 +194,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                 context.read<QuizCubit>().addOnprogresChapter(
                                   chapterId,
                                 );
-                                _displaySuccessToast(
-                                  context,
+                                context.showSuccessToast(
                                   "Course telah berhasil dibuka",
                                 );
                                 context.read<QuizCubit>().addOnprogresChapter(
@@ -275,8 +273,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -287,8 +284,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                 // 🔒 LOCK → tambah ke on progress
                                 if (chapterStatus[1] == "lock") {
                                   if (chapterStatus[0] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -296,8 +292,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -397,8 +392,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -408,8 +402,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
 
                                 if (chapterStatus[2] == "lock") {
                                   if (chapterStatus[1] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -417,8 +410,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -511,8 +503,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -522,8 +513,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
 
                                 if (chapterStatus[3] == "lock") {
                                   if (chapterStatus[2] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -531,8 +521,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -641,8 +630,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -652,8 +640,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
 
                                 if (chapterStatus[4] == "lock") {
                                   if (chapterStatus[3] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -661,8 +648,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -744,8 +730,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -755,8 +740,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
 
                                 if (chapterStatus[5] == "lock") {
                                   if (chapterStatus[4] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -764,8 +748,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -870,8 +853,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.course == null) {
-                                  _displayErrorToast(
-                                    context,
+                                  context.showErrorToast(
                                     "Silahkan pilih course terlebih dahulu sebelum memulai",
                                   );
                                   return;
@@ -881,8 +863,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
 
                                 if (chapterStatus[6] == "lock") {
                                   if (chapterStatus[5] != "done") {
-                                    _displayErrorToast(
-                                      context,
+                                    context.showErrorToast(
                                       "Selesaikan dahulu course sebelumnya",
                                     );
                                     return;
@@ -890,8 +871,7 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
                                   context.read<QuizCubit>().addOnprogresChapter(
                                     chapterId,
                                   );
-                                  _displaySuccessToast(
-                                    context,
+                                  context.showSuccessToast(
                                     "Course telah berhasil dibuka",
                                   );
                                   context.read<QuizCubit>().addOnprogresChapter(
@@ -1018,25 +998,5 @@ class _RoadmapWidgetState extends State<RoadmapWidget> {
         return "lock";
       }
     }).toList();
-  }
-
-  void _displayErrorToast(context, String message) {
-    MotionToast.error(
-      title: Text(
-        "error",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
-  }
-
-  void _displaySuccessToast(context, String message) {
-    MotionToast.success(
-      title: Text(
-        "Success",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      description: Text(message, style: TextStyle(color: Colors.white)),
-    ).show(context);
   }
 }

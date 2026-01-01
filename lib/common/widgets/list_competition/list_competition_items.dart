@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trajectoria/common/widgets/listItem/company_items.dart';
-import 'package:trajectoria/common/widgets/listItem/jobseeker_items.dart';
+import 'package:trajectoria/common/widgets/list_competition/company_items.dart';
+import 'package:trajectoria/common/widgets/list_competition/jobseeker_items.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/competitions.dart';
 
@@ -9,6 +9,7 @@ class CompetitionListView extends StatelessWidget {
   final bool isBottomRounded;
   final bool isNotScrollable;
   final bool isJobseeker;
+  final bool isFromSearchPage;
 
   const CompetitionListView({
     super.key,
@@ -16,6 +17,7 @@ class CompetitionListView extends StatelessWidget {
     this.isBottomRounded = false,
     this.isNotScrollable = false,
     this.isJobseeker = true,
+    this.isFromSearchPage = false,
   });
 
   @override
@@ -53,7 +55,10 @@ class CompetitionListView extends StatelessWidget {
           final competition = competitions[index];
 
           return isJobseeker
-              ? JobseekerItems(competition: competition)
+              ? JobseekerItems(
+                  competition: competition,
+                  isFromSearchPage: isFromSearchPage,
+                )
               : CompanyItems(competition: competition);
         },
       ),

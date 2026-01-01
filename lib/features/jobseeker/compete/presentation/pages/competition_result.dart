@@ -2,6 +2,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/bloc/bottom_navigation_cubit.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
@@ -60,18 +61,9 @@ class CompetitionResultPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
+      appBar: CustomAppBar(
         backgroundColor: AppColors.splashBackground,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        showLeading: true,
         title: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 45),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/learn/domain/entities/module.dart';
@@ -69,34 +70,10 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
       child: Builder(
         builder: (context) {
           return Scaffold(
-            appBar: AppBar(
-              scrolledUnderElevation: 0,
-              backgroundColor: Colors.transparent,
-              systemOverlayStyle: SystemUiOverlayStyle.dark,
+            appBar: CustomAppBar(
               centerTitle: true,
               toolbarHeight: 80,
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.black,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.home_filled,
-                      color: Colors.black,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    },
-                  ),
-                ),
-              ],
+              showLeading: true,
               title: BlocBuilder<ModulOrQuizToggleCubit, String>(
                 builder: (context, state) {
                   Widget buildToggleButton(String label) {
@@ -158,6 +135,21 @@ class _ModulQuizPageState extends State<ModulQuizPage> {
                   );
                 },
               ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.home_filled,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    },
+                  ),
+                ),
+              ],
             ),
             body: BlocBuilder<ModulOrQuizToggleCubit, String>(
               builder: (context, state) {

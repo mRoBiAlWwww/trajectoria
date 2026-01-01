@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
@@ -58,12 +59,9 @@ class _PremiumPageState extends State<PremiumPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
+      appBar: CustomAppBar(
         toolbarHeight: 80,
         backgroundColor: AppColors.splashBackground,
-        automaticallyImplyLeading: false,
-        centerTitle: false,
         title: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Text(
