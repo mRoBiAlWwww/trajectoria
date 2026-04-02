@@ -1,6 +1,53 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
+
+/// Parses a comprehensive InsightAI JSON object from Gemini response.
+/// Expected structure:
+/// {
+///   "summary": [{"deskripsi": "..."}],
+///   "common_pattern": [{"deskripsi": "..."}],
+///   "strengths": [{"deskripsi": "..."}],
+///   "weaknesses": [{"deskripsi": "..."}],
+///   "improvement_suggestion": "...",
+///   "career_match_recommendation": "..."
+/// }
+InsightAIModel parseInsightAI(String responseText) {
+  try {
+    final startIndex = responseText.indexOf('{');
+    final endIndex = responseText.lastIndexOf('}');
+    if (startIndex == -1 || endIndex == -1) {
+      return InsightAIModel(commonPattern: [], summary: []);
+    }
+    final jsonString = responseText.substring(startIndex, endIndex + 1);
+    final Map<String, dynamic> json = jsonDecode(jsonString);
+
+    List<String> _parseArray(dynamic val) {
+      if (val == null) return [];
+      if (val is List) {
+        return val.map((e) {
+          if (e is Map) return (e['deskripsi'] ?? e.values.first).toString();
+          return e.toString();
+        }).toList();
+      }
+      return [];
+    }
+
+    return InsightAIModel(
+      summary: _parseArray(json['summary']),
+      commonPattern: _parseArray(json['common_pattern']),
+      strengths: _parseArray(json['strengths']),
+      weaknesses: _parseArray(json['weaknesses']),
+      improvementSuggestion: json['improvement_suggestion']?.toString() ?? '',
+      careerMatchRecommendation:
+          json['career_match_recommendation']?.toString() ?? '',
+    );
+  } catch (e) {
+    debugPrint("Gagal parsing InsightAI JSON: $e");
+    return InsightAIModel(commonPattern: [], summary: []);
+  }
+}
 
 List<String> parseSummary(String responseText) {
   try {

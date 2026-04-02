@@ -43,4 +43,11 @@ abstract class CompetitionOrganizerRepository {
   Future<Either> getJobseekerByName(String jobsName);
   Future<Either> getCompetitionParticipantsByUserId(String userId);
   Future<Either> getJobseekerSubmissionsByPartisipantId(String partisipanId);
+  Future<Either> closeCompetition(
+    String competitionId,
+    String competitionName,
+    String companyName, {
+    int topN = 10,
+  });
+  Future<Either> exportSubmissionsToCsv(String competitionId);
 }

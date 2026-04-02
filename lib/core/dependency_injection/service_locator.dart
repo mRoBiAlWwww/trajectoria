@@ -43,6 +43,8 @@ import 'package:trajectoria/features/company/dashboard/domain/usecases/get_jobse
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_jobseeker_submissions_increment.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_submission_by_username.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/get_user_info.dart';
+import 'package:trajectoria/features/company/dashboard/domain/usecases/close_competition.dart';
+import 'package:trajectoria/features/company/dashboard/domain/usecases/export_submissions_csv.dart';
 import 'package:trajectoria/features/company/dashboard/domain/usecases/final_assessment.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/datasources/competition_services.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/repositories/competitions_repository_impl.dart';
@@ -91,6 +93,7 @@ import 'package:trajectoria/features/jobseeker/profile/domain/usecases/delete_an
 import 'package:trajectoria/features/jobseeker/profile/domain/usecases/get_announcements.dart';
 import 'package:trajectoria/features/jobseeker/profile/domain/usecases/get_bookmarks.dart';
 import 'package:trajectoria/features/jobseeker/profile/domain/usecases/get_history_competitions.dart';
+import 'package:trajectoria/features/jobseeker/profile/domain/usecases/get_my_certificates.dart';
 import 'package:trajectoria/features/jobseeker/profile/domain/usecases/marks_as_done.dart';
 
 final sl = GetIt.instance;
@@ -289,6 +292,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<MarksasDoneUseCase>(
     MarksasDoneUseCase(repository: sl<ProfileRepository>()),
   );
+  sl.registerSingleton<GetMyCertificatesUseCase>(
+    GetMyCertificatesUseCase(repository: sl<ProfileRepository>()),
+  );
 
   //company mode
   sl.registerSingleton<CreateCompImageUseCase>(
@@ -370,6 +376,14 @@ Future<void> initializeDependencies() async {
   );
   sl.registerSingleton<GetSubmissionByUsernameUseCase>(
     GetSubmissionByUsernameUseCase(
+      repository: sl<CompetitionOrganizerRepository>(),
+    ),
+  );
+  sl.registerSingleton<CloseCompetitionUseCase>(
+    CloseCompetitionUseCase(repository: sl<CompetitionOrganizerRepository>()),
+  );
+  sl.registerSingleton<ExportSubmissionsCsvUseCase>(
+    ExportSubmissionsCsvUseCase(
       repository: sl<CompetitionOrganizerRepository>(),
     ),
   );

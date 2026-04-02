@@ -1,16 +1,14 @@
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:http/http.dart' as http;
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
-import 'package:trajectoria/common/helper/parser/parse_sumary.dart';
-import 'package:trajectoria/core/config/env/env.dart';
 import 'package:trajectoria/features/company/dashboard/data/models/announcement.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/certificate.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/competitions.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/certificate.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/insightAI.dart';
 
 abstract class CompetitionOrganizerService {
@@ -64,6 +62,14 @@ abstract class CompetitionOrganizerService {
   Future<Map<String, dynamic>?> getJobseekerSubmissionsByPartisipantId(
     String partisipanId,
   );
+  Future<String> closeCompetition(
+    String competitionId,
+    String competitionName,
+    String companyName, {
+    int topN = 10,
+  });
+  Future<List<CertificateEntity>> getMyCertificates();
+  Future<String> exportSubmissionsToCsv(String competitionId);
 }
 
 class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
@@ -303,64 +309,19 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
     required String problemStatement,
     required List<String> fileUrls,
   }) async {
-    final GenerativeModel geminiModel = GenerativeModel(
-      apiKey: Env.privateKey,
-      model: "gemini-2.5-flash-lite",
-    );
-    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
-
-    List<String> combinedSummary = [];
-    List<String> combinedProblemSolution = [];
-
     try {
-      for (final fileUrl in fileUrls) {
-        final response = await http.get(Uri.parse(fileUrl));
-        if (response.statusCode != 200) {
-          throw Exception("Gagal download file: $fileUrl");
-        }
-        final Uint8List fileBytes = response.bodyBytes;
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('analyzeSubmission');
 
-        final mimeType = fileUrl.endsWith(".pdf")
-            ? "application/pdf"
-            : "image/jpeg";
+      final result = await callable.call(<String, dynamic>{
+        'submissionId': submissionId,
+        'problemStatement': problemStatement,
+        'fileUrls': fileUrls,
+      });
 
-        final analysisResultSummary = Content.multi([
-          TextPart(
-            "Analisa file kompetisi ini. $problemStatement . Berdasarkan hal tersebut berikan saya insight/summary dalam beberapa point dan simpan poin-poin tadi dalam bentuk array yg berisi map poin, dan deskripsi serta batasi 5 poin saja dan tiap point hanya satu kalimat saja",
-          ),
-          DataPart(mimeType, fileBytes),
-        ]);
-        final geminiResponseSummary = await geminiModel.generateContent([
-          analysisResultSummary,
-        ]);
-        final List<String> summaryList = parseSummary(
-          geminiResponseSummary.text ?? "",
-        );
-        combinedSummary.addAll(summaryList);
-
-        final analysisResultProblemSolution = Content.multi([
-          TextPart(
-            "Analisa file kompetisi ini. $problemStatement . Berdasarkan hal tersebut berikan saya Problem–Solution Fit Analysis atau Analisis tingkat kecocokan solusi terhadap masalah dalam beberapa point dan simpan poin-poin tadi dalam bentuk array yg berisi map poin, dan deskripsi serta batasi 5 poin saja dan tiap point hanya satu kalimat saja",
-          ),
-          DataPart(mimeType, fileBytes),
-        ]);
-        final geminiResponseProblemSolution = await geminiModel.generateContent(
-          [analysisResultProblemSolution],
-        );
-        final List<String> problemSolutionList = parseSummary(
-          geminiResponseProblemSolution.text ?? "",
-        );
-        combinedProblemSolution.addAll(problemSolutionList);
-      }
-      final data = {
-        "common_pattern": combinedProblemSolution.take(5).toList(),
-        "summary": combinedSummary.take(5).toList(),
-      };
-      await firestoreInstance.collection("Submissions").doc(submissionId).set({
-        "ai_analyzed": data,
-      }, SetOptions(merge: true));
-
-      return InsightAIModel.fromMap(data).toEntity();
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final model = InsightAIModel.fromMap(data);
+      return model.toEntity();
     } catch (e) {
       throw Exception("Error Analisa Gagal: $e");
     }
@@ -396,9 +357,56 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
         "is_checked": true,
       }, SetOptions(merge: true));
 
+      // Auto-recalculate ranks for all checked submissions in this competition
+      await _calculateAndUpdateRanks(
+        firestoreInstance,
+        announcement.competitionId,
+      );
+
       return announcementId;
     } catch (e) {
       throw Exception("Error score tidak berhasil ditambahkan $e");
+    }
+  }
+
+  /// Recalculates and writes rank for every checked submission in a competition.
+  /// Uses standard competition ranking: tied scores get the same rank,
+  /// and the next rank skips by the count of tied entries (1, 2, 2, 4).
+  Future<void> _calculateAndUpdateRanks(
+    FirebaseFirestore firestore,
+    String competitionId,
+  ) async {
+    try {
+      final snapshot = await firestore
+          .collection("Submissions")
+          .where("competition_id", isEqualTo: competitionId)
+          .where("is_checked", isEqualTo: true)
+          .orderBy("score", descending: true)
+          .get();
+
+      if (snapshot.docs.isEmpty) return;
+
+      final WriteBatch batch = firestore.batch();
+      int rank = 1;
+      double? prevScore;
+
+      for (int i = 0; i < snapshot.docs.length; i++) {
+        final doc = snapshot.docs[i];
+        final double score = (doc.data()['score'] is int)
+            ? (doc.data()['score'] as int).toDouble()
+            : (doc.data()['score'] ?? 0.0);
+
+        if (prevScore != null && score < prevScore) {
+          rank = i + 1;
+        }
+        prevScore = score;
+        batch.update(doc.reference, {'rank': rank});
+      }
+
+      await batch.commit();
+    } catch (e) {
+      // Non-critical: ranking failure should not block the scoring flow
+      debugPrint("Auto-ranking failed: $e");
     }
   }
 
@@ -660,5 +668,138 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
         "Error Gagal mengambil daftar submission berdasarkan partisipan id: $e",
       );
     }
+  }
+
+  /// Closes a competition and issues certificates to the top N participants.
+  /// Delegated to a Cloud Function so the write to Certificates is server-side.
+  @override
+  Future<String> closeCompetition(
+    String competitionId,
+    String competitionName,
+    String companyName, {
+    int topN = 10,
+  }) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('closeCompetition');
+
+      await callable.call(<String, dynamic>{
+        'competitionId': competitionId,
+        'competitionName': competitionName,
+        'companyName': companyName,
+        'topN': topN,
+      });
+
+      return competitionId;
+    } catch (e) {
+      throw Exception("Error gagal menutup kompetisi: $e");
+    }
+  }
+
+  /// Returns all certificates earned by the current user.
+  @override
+  Future<List<CertificateEntity>> getMyCertificates() async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      throw Exception("User belum login");
+    }
+
+    try {
+      final snapshot = await firestoreInstance
+          .collection("Certificates")
+          .where("user_id", isEqualTo: currentUser.uid)
+          .orderBy("issued_at", descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((e) => CertificateModel.fromMap(e.data()).toEntity())
+          .toList();
+    } catch (e) {
+      throw Exception("Error gagal mengambil sertifikat: $e");
+    }
+  }
+
+  /// Generates a CSV string of all submissions for a competition.
+  /// Returns the CSV content as a String (to be saved/shared by the caller).
+  /// Columns: Rank, Name (via Competition_participants), Score, Feedback, Is Finalist, Submitted At
+  @override
+  Future<String> exportSubmissionsToCsv(String competitionId) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+    try {
+      // 1. Get all submissions ordered by rank ASC
+      final subSnap = await firestoreInstance
+          .collection("Submissions")
+          .where("competition_id", isEqualTo: competitionId)
+          .orderBy("rank")
+          .get();
+
+      if (subSnap.docs.isEmpty) {
+        return "Rank,User ID,Score,Feedback,Is Finalist,Submitted At\n";
+      }
+
+      // 2. Collect unique user IDs for name lookup
+      final userIds = subSnap.docs
+          .map((d) => d.data()['user_id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toSet()
+          .toList();
+
+      // 3. Batch-fetch jobseeker names (chunks of 10 for Firestore whereIn limit)
+      final Map<String, String> userNames = {};
+      for (var i = 0; i < userIds.length; i += 10) {
+        final chunk = userIds.sublist(
+          i,
+          (i + 10 > userIds.length) ? userIds.length : i + 10,
+        );
+        final usersSnap = await firestoreInstance
+            .collection("Jobseeker")
+            .where("user_id", whereIn: chunk)
+            .get();
+        for (final doc in usersSnap.docs) {
+          final data = doc.data();
+          final uid = data['user_id']?.toString() ?? '';
+          final name = data['name']?.toString() ?? uid;
+          if (uid.isNotEmpty) userNames[uid] = name;
+        }
+      }
+
+      // 4. Build CSV
+      final buffer = StringBuffer();
+      buffer.writeln('Rank,Nama,User ID,Skor,Feedback,Finalis,Submitted At');
+
+      for (final doc in subSnap.docs) {
+        final data = doc.data();
+        final int rank = (data['rank'] as num?)?.toInt() ?? 0;
+        final String uid = data['user_id']?.toString() ?? '';
+        final String name = _escapeCsvField(userNames[uid] ?? uid);
+        final double score = (data['score'] is int)
+            ? (data['score'] as int).toDouble()
+            : (data['score'] ?? 0.0);
+        final String feedback =
+            _escapeCsvField(data['feedback']?.toString() ?? '');
+        final bool isFinalist = data['is_finalist'] == true;
+        final String submittedAt = data['submitted_at'] != null
+            ? (data['submitted_at'] as Timestamp).toDate().toIso8601String()
+            : '';
+
+        buffer.writeln(
+          '$rank,$name,$uid,${score.toStringAsFixed(0)},$feedback,${isFinalist ? "Ya" : "Tidak"},$submittedAt',
+        );
+      }
+
+      return buffer.toString();
+    } catch (e) {
+      throw Exception("Error gagal mengekspor data kandidat: $e");
+    }
+  }
+
+  String _escapeCsvField(String value) {
+    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+      return '"${value.replaceAll('"', '""')}"';
+    }
+    return value;
   }
 }

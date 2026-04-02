@@ -1,0 +1,214 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -----------------------------------------------------------------------
+    // Helper functions
+    // -----------------------------------------------------------------------
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isCurrentUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check role by reading the relevant collection
+    function isJobseeker() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/Jobseeker/$(request.auth.uid));
+    }
+
+    function isCompany() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/Company/$(request.auth.uid));
+    }
+
+    function isVerifiedCompany() {
+      return isCompany() &&
+        get(/databases/$(database)/documents/Company/$(request.auth.uid)).data.is_verified == true;
+    }
+
+    // Check if the company owns this competition
+    function ownsCompetition(competitionId) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/Competitions/$(competitionId)).data.company_id == request.auth.uid;
+    }
+
+    // -----------------------------------------------------------------------
+    // Jobseeker profiles
+    // -----------------------------------------------------------------------
+
+    match /Jobseeker/{userId} {
+      // Any authenticated user can read profiles (for submission lookups, etc.)
+      allow read: if isAuthenticated();
+      // Only the owner can create/update their own profile
+      allow create: if isCurrentUser(userId);
+      allow update: if isCurrentUser(userId);
+      allow delete: if false; // profiles are not deleted via client
+    }
+
+    // -----------------------------------------------------------------------
+    // Company profiles
+    // -----------------------------------------------------------------------
+
+    match /Company/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isCurrentUser(userId);
+      // Only the company itself may update; is_verified can only be set server-side
+      allow update: if isCurrentUser(userId) &&
+        // Prevent client from setting is_verified to true
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['is_verified']));
+      allow delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Unrole (temporary staging collection during registration)
+    // -----------------------------------------------------------------------
+
+    match /Unrole/{userId} {
+      allow read, write: if isCurrentUser(userId);
+    }
+
+    // -----------------------------------------------------------------------
+    // Competitions (published)
+    // -----------------------------------------------------------------------
+
+    match /Competitions/{competitionId} {
+      // Anyone authenticated can browse competitions
+      allow read: if isAuthenticated();
+      // Only verified companies can publish
+      allow create: if isVerifiedCompany() &&
+        request.resource.data.company_id == request.auth.uid;
+      // Only the owning company can update/delete
+      allow update: if isAuthenticated() &&
+        resource.data.company_id == request.auth.uid;
+      allow delete: if isAuthenticated() &&
+        resource.data.company_id == request.auth.uid;
+    }
+
+    // -----------------------------------------------------------------------
+    // Draft competitions
+    // -----------------------------------------------------------------------
+
+    match /Draft_competitions/{draftId} {
+      allow read, write: if isAuthenticated() &&
+        (resource == null || resource.data.company_id == request.auth.uid) &&
+        (request.resource == null || request.resource.data.company_id == request.auth.uid);
+    }
+
+    // -----------------------------------------------------------------------
+    // Categories (read-only for clients)
+    // -----------------------------------------------------------------------
+
+    match /Categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // managed server-side only
+    }
+
+    // -----------------------------------------------------------------------
+    // Competition participants
+    // -----------------------------------------------------------------------
+
+    match /Competition_participants/{participantId} {
+      // Companies can read to see their competition participants
+      // Jobseekers can read their own participation records
+      allow read: if isAuthenticated();
+      // Jobseekers join competitions (create their own record)
+      allow create: if isJobseeker() &&
+        request.resource.data.user_id == request.auth.uid;
+      // No client-side updates or deletes (managed via server logic)
+      allow update, delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Submissions
+    // -----------------------------------------------------------------------
+
+    match /Submissions/{submissionId} {
+      // The submitting jobseeker or the owning company can read
+      allow read: if isAuthenticated() && (
+        resource.data.user_id == request.auth.uid ||
+        ownsCompetition(resource.data.competition_id)
+      );
+      // Jobseekers create their own submissions
+      allow create: if isJobseeker() &&
+        request.resource.data.user_id == request.auth.uid;
+      // Companies can update (score, feedback, is_checked, is_finalist, rank, ai_analyzed)
+      // Jobseekers cannot update their own submissions after creation
+      allow update: if isAuthenticated() &&
+        ownsCompetition(resource.data.competition_id);
+      allow delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Announcements
+    // -----------------------------------------------------------------------
+
+    match /Announcement/{announcementId} {
+      // Jobseekers read only their own announcements
+      allow read: if isAuthenticated() &&
+        resource.data.user_id == request.auth.uid;
+      // Companies create announcements (from finalAssessment flow)
+      allow create: if isAuthenticated() &&
+        ownsCompetition(request.resource.data.competition_id);
+      // Jobseekers can mark as read (update is_read only)
+      allow update: if isAuthenticated() &&
+        resource.data.user_id == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_read']);
+      allow delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Certificates (issued by Cloud Functions / closeCompetition)
+    // -----------------------------------------------------------------------
+
+    match /Certificates/{certificateId} {
+      // Owners read their own certificates
+      allow read: if isAuthenticated() &&
+        resource.data.user_id == request.auth.uid;
+      // Write is server-side only (closeCompetition uses Admin SDK)
+      allow write: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Courses, Chapters, Subchapters, Modules, Quizzes (learning content)
+    // Read-only for authenticated users; write is admin/server-side only
+    // -----------------------------------------------------------------------
+
+    match /Courses/{courseId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+
+      match /Chapters/{chapterId} {
+        allow read: if isAuthenticated();
+        allow write: if false;
+
+        match /Subchapters/{subchapterId} {
+          allow read: if isAuthenticated();
+          allow write: if false;
+
+          match /Modules/{moduleId} {
+            allow read: if isAuthenticated();
+            allow write: if false;
+
+            match /Quizzes/{quizId} {
+              allow read: if isAuthenticated();
+              allow write: if false;
+            }
+          }
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Deny everything else by default
+    // -----------------------------------------------------------------------
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

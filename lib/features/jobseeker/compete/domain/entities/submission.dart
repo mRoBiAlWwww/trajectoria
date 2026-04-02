@@ -7,6 +7,7 @@ class SubmissionEntity {
   final String submissionId;
   final String competitionParticipantId;
   final String competitionId;
+  final String userId;
   final String problemStatement;
   final Timestamp submittedAt;
   final String answerText;
@@ -22,6 +23,7 @@ class SubmissionEntity {
     required this.submissionId,
     required this.competitionParticipantId,
     required this.competitionId,
+    this.userId = '',
     required this.submittedAt,
     required this.problemStatement,
     required this.answerText,
@@ -38,6 +40,7 @@ class SubmissionEntity {
     String? submissionId,
     String? competitionParticipantId,
     String? competitionId,
+    String? userId,
     String? problemStatement,
     Timestamp? submittedAt,
     String? answerText,
@@ -54,6 +57,7 @@ class SubmissionEntity {
       competitionParticipantId:
           competitionParticipantId ?? this.competitionParticipantId,
       competitionId: competitionId ?? this.competitionId,
+      userId: userId ?? this.userId,
       problemStatement: problemStatement ?? this.problemStatement,
       submittedAt: submittedAt ?? this.submittedAt,
       answerText: answerText ?? this.answerText,
@@ -72,6 +76,7 @@ class SubmissionEntity {
       'submissions_id': submissionId,
       'competition_participants_id': competitionParticipantId,
       'competition_id': competitionId,
+      'user_id': userId,
       'problem_statement': problemStatement,
       'submitted_at': submittedAt,
       'answer_text': answerText,
@@ -90,6 +95,7 @@ class SubmissionEntity {
       submissionId: map['submissions_id'] ?? '',
       competitionParticipantId: map['competition_participants_id'] ?? '',
       competitionId: map['competition_id'] ?? '',
+      userId: map['user_id'] ?? '',
       problemStatement: map['problem_statement'] ?? '',
       submittedAt: map['submitted_at'],
       answerText: map['answer_text'] ?? '',
@@ -118,6 +124,7 @@ class SubmissionEntity {
       submissionId: submissionId,
       competitionParticipantId: competitionParticipantId,
       competitionId: competitionId,
+      userId: userId,
       problemStatement: problemStatement,
       submittedAt: submittedAt,
       answerText: answerText,

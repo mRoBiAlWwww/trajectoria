@@ -9,6 +9,7 @@ class SubmissionModel {
   final String submissionId;
   final String competitionParticipantId;
   final String competitionId;
+  final String userId;
   final String problemStatement;
   final Timestamp submittedAt;
   final String answerText;
@@ -24,6 +25,7 @@ class SubmissionModel {
     required this.submissionId,
     required this.competitionParticipantId,
     required this.competitionId,
+    this.userId = '',
     required this.problemStatement,
     required this.submittedAt,
     required this.answerText,
@@ -41,6 +43,7 @@ class SubmissionModel {
       'submissions_id': submissionId,
       'competition_participants_id': competitionParticipantId,
       'competition_id': competitionId,
+      'user_id': userId,
       'problem_statement': problemStatement,
       'submitted_at': submittedAt,
       'answer_text': answerText,
@@ -59,6 +62,7 @@ class SubmissionModel {
       submissionId: map['submissions_id'] ?? '',
       competitionParticipantId: map['competition_participants_id'] ?? '',
       competitionId: map['competition_id'] ?? '',
+      userId: map['user_id'] ?? '',
       problemStatement: map['problem_statement'] ?? '',
       submittedAt: map['submitted_at'] as Timestamp,
       answerText: map['answer_text'] ?? '',
@@ -93,6 +97,7 @@ class SubmissionModel {
       submissionId: submissionId,
       competitionParticipantId: competitionParticipantId,
       competitionId: competitionId,
+      userId: userId,
       problemStatement: problemStatement,
       submittedAt: submittedAt,
       answerText: answerText,
@@ -112,6 +117,7 @@ class SubmissionModel {
       submissionId: entity.submissionId,
       competitionParticipantId: entity.competitionParticipantId,
       competitionId: entity.competitionId,
+      userId: entity.userId,
       problemStatement: entity.problemStatement,
       submittedAt: entity.submittedAt,
       answerText: entity.answerText,

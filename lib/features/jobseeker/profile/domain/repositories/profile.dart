@@ -7,4 +7,5 @@ abstract class ProfileRepository {
   Future<Either> deleteAnnouncement(String announcementId);
   Future<Either> getUserprofileInfo();
   Future<Either> marksasDone(String announcementId);
+  Future<Either> getMyCertificates();
 }

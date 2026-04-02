@@ -60,13 +60,11 @@ dependencies:
   permission_handler:
   path:
   dotted_border: ^2.1.0
-  google_generative_ai: ^0.4.7
-  http:
+  cloud_functions:
   flutter_dotenv:
   flutter_downloader:
   firebase_messaging:
   flutter_local_notifications:
-  dart_jsonwebtoken: ^2.14.0
   envied:
   shared_preferences:
 

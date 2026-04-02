@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/certificate.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/certificate.dart';
 
 abstract class ProfileService {
   Future<List<Map<String, dynamic>>> getCompetitionParticipants();
@@ -8,6 +10,7 @@ abstract class ProfileService {
   Future<String> deleteAnnouncement(String announcementId);
   Future<Map<String, dynamic>> getUserprofileInfo();
   Future<String> marksasDone(String announcementId);
+  Future<List<CertificateEntity>> getMyCertificates();
 }
 
 class ProfileServiceImpl extends ProfileService {
@@ -107,6 +110,30 @@ class ProfileServiceImpl extends ProfileService {
       return "Announcement/notifikasi telah berhasil ditandai telah dibaca";
     } catch (e) {
       throw Exception("Announcement/notifkasi gagal ditandai telah dibaca $e");
+    }
+  }
+
+  @override
+  Future<List<CertificateEntity>> getMyCertificates() async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      throw Exception("User belum login");
+    }
+
+    try {
+      final snapshot = await firestoreInstance
+          .collection("Certificates")
+          .where("user_id", isEqualTo: currentUser.uid)
+          .orderBy("issued_at", descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((e) => CertificateModel.fromMap(e.data()).toEntity())
+          .toList();
+    } catch (e) {
+      throw Exception("Error gagal mengambil sertifikat: $e");
     }
   }
 }

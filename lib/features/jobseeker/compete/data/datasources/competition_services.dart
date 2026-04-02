@@ -232,6 +232,7 @@ class CompetitionServiceImpl extends CompetitionService {
         submissionId: submissionId,
         competitionParticipantId: submission.competitionParticipantId,
         competitionId: submission.competitionId,
+        userId: currentUser!.uid,
         problemStatement: submission.problemStatement,
         submittedAt: Timestamp.now(),
         answerText: submission.answerText,

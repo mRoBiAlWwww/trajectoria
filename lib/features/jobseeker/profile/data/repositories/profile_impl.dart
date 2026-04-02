@@ -77,4 +77,14 @@ class ProfileRepositoryImpl extends ProfileRepository {
       return Left(e.toString().replaceFirst("Exception: ", ""));
     }
   }
+
+  @override
+  Future<Either> getMyCertificates() async {
+    try {
+      final result = await service.getMyCertificates();
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
 }

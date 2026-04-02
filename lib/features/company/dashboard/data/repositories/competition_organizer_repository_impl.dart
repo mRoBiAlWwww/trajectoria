@@ -342,4 +342,34 @@ class CompetitionOrganizerRepositoryImpl
       return Left(e.toString().replaceFirst("Exception: ", ""));
     }
   }
+
+  @override
+  Future<Either> closeCompetition(
+    String competitionId,
+    String competitionName,
+    String companyName, {
+    int topN = 10,
+  }) async {
+    try {
+      final result = await service.closeCompetition(
+        competitionId,
+        competitionName,
+        companyName,
+        topN: topN,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
+
+  @override
+  Future<Either> exportSubmissionsToCsv(String competitionId) async {
+    try {
+      final result = await service.exportSubmissionsToCsv(competitionId);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString().replaceFirst("Exception: ", ""));
+    }
+  }
 }
