@@ -23,7 +23,7 @@ InsightAIModel parseInsightAI(String responseText) {
     final jsonString = responseText.substring(startIndex, endIndex + 1);
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
-    List<String> _parseArray(dynamic val) {
+    List<String> parseArray(dynamic val) {
       if (val == null) return [];
       if (val is List) {
         return val.map((e) {
@@ -35,10 +35,10 @@ InsightAIModel parseInsightAI(String responseText) {
     }
 
     return InsightAIModel(
-      summary: _parseArray(json['summary']),
-      commonPattern: _parseArray(json['common_pattern']),
-      strengths: _parseArray(json['strengths']),
-      weaknesses: _parseArray(json['weaknesses']),
+      summary: parseArray(json['summary']),
+      commonPattern: parseArray(json['common_pattern']),
+      strengths: parseArray(json['strengths']),
+      weaknesses: parseArray(json['weaknesses']),
       improvementSuggestion: json['improvement_suggestion']?.toString() ?? '',
       careerMatchRecommendation:
           json['career_match_recommendation']?.toString() ?? '',

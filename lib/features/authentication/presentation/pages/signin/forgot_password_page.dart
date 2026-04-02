@@ -126,7 +126,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         if (state is AuthInitial) {
           buttonContent = const Text(
             "Lanjut",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           );
         }
         if (state is AuthLoading) {

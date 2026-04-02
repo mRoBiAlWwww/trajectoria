@@ -1,3 +1,9 @@
+# Node / Cloud Functions
+node_modules/
+functions/lib/
+functions/node_modules/
+functions/.env
+
 # Miscellaneous
 *.class
 *.log

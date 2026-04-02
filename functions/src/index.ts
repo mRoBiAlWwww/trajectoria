@@ -56,21 +56,18 @@ function extractList(value: unknown): string[] {
 }
 
 function parseInsightAI(responseText: string): InsightAIResult {
-  // Strip markdown code fences if present
   const cleaned = responseText
     .replace(/```json\s*/gi, "")
     .replace(/```\s*/gi, "")
     .trim();
 
-  // Find first { ... } block
   const start = cleaned.indexOf("{");
   const end = cleaned.lastIndexOf("}");
   if (start === -1 || end === -1) {
     throw new Error("No JSON object found in Gemini response");
   }
 
-  const jsonStr = cleaned.slice(start, end + 1);
-  const parsed = JSON.parse(jsonStr) as Record<string, unknown>;
+  const parsed = JSON.parse(cleaned.slice(start, end + 1)) as Record<string, unknown>;
 
   return {
     summary: extractList(parsed["summary"]),
@@ -119,21 +116,19 @@ async function calculateAndUpdateRanks(competitionId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// analyzeSubmission — HTTPS Callable
-// Proxies Gemini AI analysis so the API key stays server-side.
+// analyzeSubmission — HTTPS Callable (v1)
 // ---------------------------------------------------------------------------
 
 export const analyzeSubmission = functions.https.onCall(
-  async (request: functions.https.CallableRequest<AnalyzeSubmissionData>) => {
-    // Auth check: only authenticated users may call this
-    if (!request.auth) {
+  async (data: AnalyzeSubmissionData, context) => {
+    if (!context.auth) {
       throw new functions.https.HttpsError(
         "unauthenticated",
         "User must be authenticated"
       );
     }
 
-    const { submissionId, problemStatement, fileUrls } = request.data;
+    const { submissionId, problemStatement, fileUrls } = data;
 
     if (!submissionId || !problemStatement || !fileUrls?.length) {
       throw new functions.https.HttpsError(
@@ -163,7 +158,6 @@ export const analyzeSubmission = functions.https.onCall(
     };
 
     for (const fileUrl of fileUrls) {
-      // Download file bytes
       const fileResponse = await axios.get<ArrayBuffer>(fileUrl, {
         responseType: "arraybuffer",
       });
@@ -199,8 +193,7 @@ Aturan:
         { inlineData: { mimeType, data: fileBytes.toString("base64") } },
       ]);
 
-      const responseText = result.response.text();
-      const parsed = parseInsightAI(responseText);
+      const parsed = parseInsightAI(result.response.text());
 
       combined.summary.push(...parsed.summary);
       combined.common_pattern.push(...parsed.common_pattern);
@@ -209,12 +202,8 @@ Aturan:
       if (!combined.improvement_suggestion && parsed.improvement_suggestion) {
         combined.improvement_suggestion = parsed.improvement_suggestion;
       }
-      if (
-        !combined.career_match_recommendation &&
-        parsed.career_match_recommendation
-      ) {
-        combined.career_match_recommendation =
-          parsed.career_match_recommendation;
+      if (!combined.career_match_recommendation && parsed.career_match_recommendation) {
+        combined.career_match_recommendation = parsed.career_match_recommendation;
       }
     }
 
@@ -227,7 +216,6 @@ Aturan:
       career_match_recommendation: combined.career_match_recommendation,
     };
 
-    // Persist to Firestore
     await db
       .collection("Submissions")
       .doc(submissionId)
@@ -238,26 +226,19 @@ Aturan:
 );
 
 // ---------------------------------------------------------------------------
-// sendFcmNotification — HTTPS Callable
-// Uses Firebase Admin SDK for FCM — no SA private key needed on the client.
+// sendFcmNotification — HTTPS Callable (v1)
 // ---------------------------------------------------------------------------
 
 export const sendFcmNotification = functions.https.onCall(
-  async (request: functions.https.CallableRequest<SendFcmData>) => {
-    if (!request.auth) {
+  async (data: SendFcmData, context) => {
+    if (!context.auth) {
       throw new functions.https.HttpsError(
         "unauthenticated",
         "User must be authenticated"
       );
     }
 
-    const {
-      targetToken,
-      competitionName,
-      competitionId,
-      submissionId,
-      announcementId,
-    } = request.data;
+    const { targetToken, competitionName, competitionId, submissionId, announcementId } = data;
 
     if (!targetToken || !competitionName || !competitionId) {
       throw new functions.https.HttpsError(
@@ -270,10 +251,7 @@ export const sendFcmNotification = functions.https.onCall(
 
     const message: admin.messaging.Message = {
       token: targetToken,
-      notification: {
-        title: "Update Lamaran",
-        body: messageBody,
-      },
+      notification: { title: "Update Lamaran", body: messageBody },
       data: {
         type: "report_submission",
         competition_id: competitionId,
@@ -295,7 +273,7 @@ export const sendFcmNotification = functions.https.onCall(
       const response = await admin.messaging().send(message);
       return { messageId: response };
     } catch (error) {
-      const err = error as { code?: string; message?: string };
+      const err = error as { message?: string };
       throw new functions.https.HttpsError(
         "internal",
         `FCM send failed: ${err.message ?? String(error)}`
@@ -305,22 +283,19 @@ export const sendFcmNotification = functions.https.onCall(
 );
 
 // ---------------------------------------------------------------------------
-// closeCompetition — HTTPS Callable
-// Closes a competition, recalculates final ranks, and issues certificates
-// to the top-N participants. Uses Admin SDK so it bypasses Firestore rules.
+// closeCompetition — HTTPS Callable (v1)
 // ---------------------------------------------------------------------------
 
 export const closeCompetition = functions.https.onCall(
-  async (request: functions.https.CallableRequest<CloseCompetitionData>) => {
-    if (!request.auth) {
+  async (data: CloseCompetitionData, context) => {
+    if (!context.auth) {
       throw new functions.https.HttpsError(
         "unauthenticated",
         "User must be authenticated"
       );
     }
 
-    const { competitionId, competitionName, companyName, topN = 10 } =
-      request.data;
+    const { competitionId, competitionName, companyName, topN = 10 } = data;
 
     if (!competitionId || !competitionName || !companyName) {
       throw new functions.https.HttpsError(
@@ -334,18 +309,15 @@ export const closeCompetition = functions.https.onCall(
     if (!compDoc.exists) {
       throw new functions.https.HttpsError("not-found", "Competition not found");
     }
-    if (compDoc.data()?.["company_id"] !== request.auth.uid) {
+    if (compDoc.data()?.["company_id"] !== context.auth.uid) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "Only the owning company may close this competition"
       );
     }
 
-    // 1. Mark competition as Closed
-    await db
-      .collection("Competitions")
-      .doc(competitionId)
-      .update({ status: "Closed" });
+    // 1. Mark as Closed
+    await db.collection("Competitions").doc(competitionId).update({ status: "Closed" });
 
     // 2. Recalculate final ranks
     await calculateAndUpdateRanks(competitionId);
@@ -373,7 +345,6 @@ export const closeCompetition = functions.https.onCall(
 
       if (!userId) continue;
 
-      // Avoid duplicate certificates
       const existing = await db
         .collection("Certificates")
         .where("competition_id", "==", competitionId)

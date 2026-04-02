@@ -169,8 +169,10 @@ service cloud.firestore {
       // Owners read their own certificates
       allow read: if isAuthenticated() &&
         resource.data.user_id == request.auth.uid;
-      // Write is server-side only (closeCompetition uses Admin SDK)
-      allow write: if false;
+      // Verified companies may create certificates (closeCompetition flow)
+      allow create: if isVerifiedCompany();
+      // No updates or deletes from client
+      allow update, delete: if false;
     }
 
     // -----------------------------------------------------------------------

@@ -1,8 +1,12 @@
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
+import 'package:trajectoria/common/helper/parser/parse_sumary.dart' show parseInsightAI;
+import 'package:trajectoria/core/config/env/env.dart';
 import 'package:trajectoria/features/company/dashboard/data/models/announcement.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/certificate.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/competitions.dart';
@@ -309,19 +313,90 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
     required String problemStatement,
     required List<String> fileUrls,
   }) async {
+    final GenerativeModel geminiModel = GenerativeModel(
+      apiKey: Env.geminiApiKey,
+      model: "gemini-2.5-flash-lite",
+    );
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+    List<String> combinedSummary = [];
+    List<String> combinedCommonPattern = [];
+    List<String> combinedStrengths = [];
+    List<String> combinedWeaknesses = [];
+    String improvementSuggestion = '';
+    String careerMatchRecommendation = '';
+
     try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('analyzeSubmission');
+      for (final fileUrl in fileUrls) {
+        final response = await http.get(Uri.parse(fileUrl));
+        if (response.statusCode != 200) {
+          throw Exception("Gagal download file: $fileUrl");
+        }
+        final Uint8List fileBytes = response.bodyBytes;
+        final mimeType = fileUrl.endsWith(".pdf")
+            ? "application/pdf"
+            : "image/jpeg";
 
-      final result = await callable.call(<String, dynamic>{
-        'submissionId': submissionId,
-        'problemStatement': problemStatement,
-        'fileUrls': fileUrls,
-      });
+        final prompt = """
+Analisa file submission kompetisi ini berdasarkan problem statement berikut:
+"$problemStatement"
 
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final model = InsightAIModel.fromMap(data);
-      return model.toEntity();
+Berikan hasil analisis dalam format JSON murni (tanpa markdown, tanpa kode block) sebagai berikut:
+{
+  "summary": [{"deskripsi": "ringkasan poin 1"}, {"deskripsi": "ringkasan poin 2"}, ...],
+  "common_pattern": [{"deskripsi": "problem-solution fit poin 1"}, ...],
+  "strengths": [{"deskripsi": "kelebihan teknis 1"}, ...],
+  "weaknesses": [{"deskripsi": "kelemahan teknis 1"}, ...],
+  "improvement_suggestion": "saran perbaikan dalam satu paragraf",
+  "career_match_recommendation": "rekomendasi karir yang sesuai dalam satu paragraf"
+}
+
+Aturan:
+- summary: 5 poin ringkasan insight utama dari submission
+- common_pattern: 5 poin analisis kecocokan solusi terhadap problem statement
+- strengths: 3-5 kelebihan teknis yang menonjol dari submission
+- weaknesses: 3-5 kelemahan atau area yang perlu ditingkatkan
+- improvement_suggestion: saran konkret untuk meningkatkan kualitas submission (1 paragraf)
+- career_match_recommendation: rekomendasi role/jalur karir yang cocok berdasarkan skills yang terlihat (1 paragraf)
+- Setiap poin hanya satu kalimat singkat
+- Gunakan bahasa Indonesia
+- Berikan HANYA JSON, tanpa teks pembuka, penutup, atau markdown
+""";
+
+        final content = Content.multi([
+          TextPart(prompt),
+          DataPart(mimeType, fileBytes),
+        ]);
+
+        final geminiResponse = await geminiModel.generateContent([content]);
+        final InsightAIModel result = parseInsightAI(geminiResponse.text ?? "");
+
+        combinedSummary.addAll(result.summary);
+        combinedCommonPattern.addAll(result.commonPattern);
+        combinedStrengths.addAll(result.strengths);
+        combinedWeaknesses.addAll(result.weaknesses);
+        if (improvementSuggestion.isEmpty && result.improvementSuggestion.isNotEmpty) {
+          improvementSuggestion = result.improvementSuggestion;
+        }
+        if (careerMatchRecommendation.isEmpty && result.careerMatchRecommendation.isNotEmpty) {
+          careerMatchRecommendation = result.careerMatchRecommendation;
+        }
+      }
+
+      final finalModel = InsightAIModel(
+        summary: combinedSummary.take(5).toList(),
+        commonPattern: combinedCommonPattern.take(5).toList(),
+        strengths: combinedStrengths.take(5).toList(),
+        weaknesses: combinedWeaknesses.take(5).toList(),
+        improvementSuggestion: improvementSuggestion,
+        careerMatchRecommendation: careerMatchRecommendation,
+      );
+
+      await firestoreInstance.collection("Submissions").doc(submissionId).set({
+        "ai_analyzed": finalModel.toMap(),
+      }, SetOptions(merge: true));
+
+      return finalModel.toEntity();
     } catch (e) {
       throw Exception("Error Analisa Gagal: $e");
     }
@@ -671,7 +746,6 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
   }
 
   /// Closes a competition and issues certificates to the top N participants.
-  /// Delegated to a Cloud Function so the write to Certificates is server-side.
   @override
   Future<String> closeCompetition(
     String competitionId,
@@ -679,17 +753,65 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
     String companyName, {
     int topN = 10,
   }) async {
+    final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
     try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('closeCompetition');
+      // 1. Update competition status to "Closed"
+      await firestoreInstance
+          .collection("Competitions")
+          .doc(competitionId)
+          .update({"status": "Closed"});
 
-      await callable.call(<String, dynamic>{
-        'competitionId': competitionId,
-        'competitionName': competitionName,
-        'companyName': companyName,
-        'topN': topN,
-      });
+      // 2. Recalculate final ranks
+      await _calculateAndUpdateRanks(firestoreInstance, competitionId);
 
+      // 3. Get top N submissions (checked, sorted by score DESC)
+      final snapshot = await firestoreInstance
+          .collection("Submissions")
+          .where("competition_id", isEqualTo: competitionId)
+          .where("is_checked", isEqualTo: true)
+          .orderBy("score", descending: true)
+          .limit(topN)
+          .get();
+
+      if (snapshot.docs.isEmpty) return competitionId;
+
+      // 4. Issue certificates for each top-N submission
+      final WriteBatch batch = firestoreInstance.batch();
+
+      for (int i = 0; i < snapshot.docs.length; i++) {
+        final subData = snapshot.docs[i].data();
+        final int rank = (subData['rank'] as num?)?.toInt() ?? (i + 1);
+        final String userId = subData['user_id'] ?? '';
+        final String submissionId =
+            subData['submissions_id'] ?? snapshot.docs[i].id;
+
+        if (userId.isEmpty) continue;
+
+        final existingCert = await firestoreInstance
+            .collection("Certificates")
+            .where("competition_id", isEqualTo: competitionId)
+            .where("user_id", isEqualTo: userId)
+            .limit(1)
+            .get();
+
+        if (existingCert.docs.isNotEmpty) continue;
+
+        final certRef = firestoreInstance.collection("Certificates").doc();
+        final cert = CertificateModel(
+          certificateId: certRef.id,
+          competitionId: competitionId,
+          userId: userId,
+          competitionName: competitionName,
+          companyName: companyName,
+          rank: rank,
+          topN: topN,
+          issuedAt: Timestamp.now(),
+        );
+        batch.set(certRef, cert.toMap()..addAll({'submission_id': submissionId}));
+      }
+
+      await batch.commit();
       return competitionId;
     } catch (e) {
       throw Exception("Error gagal menutup kompetisi: $e");

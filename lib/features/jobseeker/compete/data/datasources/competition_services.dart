@@ -252,7 +252,7 @@ class CompetitionServiceImpl extends CompetitionService {
 
       await firestoreInstance
           .collection('Jobseeker')
-          .doc(currentUser!.uid)
+          .doc(currentUser.uid)
           .update({
             'competitions_done': FieldValue.arrayUnion([
               submission.competitionId,
