@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_videos.dart';
@@ -14,10 +15,12 @@ class WelcomeAnimationPage extends StatefulWidget {
 }
 
 class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
+  late AnimationController _pulseController;
   late Animation<Decoration> _insideButtonDecorationAnimation;
   late Animation<Decoration> _outerButtonDecorationAnimation;
+  late Animation<double> _pulseAnimation;
   late VideoPlayerController _videoPlayerController;
   bool _showVideo = false;
   Timer? _timer;
@@ -59,13 +62,25 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
       ),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
+    // Subtle breathing pulse for the button ring
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+    _pulseController.repeat(reverse: true);
+
     _initializePlayer();
   }
 
   void _startHold(BuildContext context) {
     _controller.forward();
+    _pulseController.stop();
     _timer = Timer(const Duration(seconds: 1), () {
       if (mounted) {
+        HapticFeedback.mediumImpact();
         setState(() {
           _showVideo = true;
         });
@@ -77,6 +92,7 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
   void _cancelHold() {
     _timer?.cancel();
     _controller.reverse();
+    _pulseController.repeat(reverse: true);
   }
 
   Future<void> _initializePlayer() async {
@@ -110,6 +126,7 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
   @override
   void dispose() {
     _controller.dispose();
+    _pulseController.dispose();
     _timer?.cancel();
     _videoPlayerController.removeListener(_onVideoEnd);
     _videoPlayerController.dispose();
@@ -179,7 +196,8 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
                                       ),
                                     ),
                                     Center(
-                                      child: Center(
+                                      child: ScaleTransition(
+                                        scale: _pulseAnimation,
                                         child: ClipOval(
                                           child: Container(
                                             width: 250,

@@ -15,18 +15,67 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
-  double _opacity = 0.0;
+class _SplashPageState extends State<SplashPage>
+    with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late AnimationController _textController;
+  late AnimationController _dotsController;
+
+  late Animation<double> _logoScale;
+  late Animation<double> _logoOpacity;
+  late Animation<double> _textOpacity;
+
   @override
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() {
-        _opacity = 1.0;
-      });
-    });
+    // Logo: scale + fade in (0–800ms)
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _logoScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
+    );
+    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOut),
+    );
+
+    // Text: fade in (400–1000ms)
+    _textController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
+    );
+
+    // Dots: loop
+    _dotsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _startAnimations();
+  }
+
+  void _startAnimations() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    _logoController.forward();
+    await Future.delayed(const Duration(milliseconds: 400));
+    _textController.forward();
+    await Future.delayed(const Duration(milliseconds: 600));
+    _dotsController.repeat();
+
     context.read<AuthStateCubit>().appStarted();
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    _textController.dispose();
+    _dotsController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,28 +83,41 @@ class _SplashPageState extends State<SplashPage> {
     return BlocListener<AuthStateCubit, AuthState>(
       listener: (context, state) {
         if (state is UnAuthenticated) {
-          AppNavigator.pushReplacement(context, WelcomeAnimationPage());
+          AppNavigator.pushReplacement(context, const WelcomeAnimationPage());
         }
         if (state is AuthSuccess) {
-          AppNavigator.pushReplacement(context, MainWrapper());
+          AppNavigator.pushReplacement(context, const MainWrapper());
         }
       },
       child: Scaffold(
         backgroundColor: AppColors.splashBackground,
         body: Center(
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 2000),
-            curve: Curves.easeInOut,
-            opacity: _opacity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Transform.translate(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated logo
+              AnimatedBuilder(
+                animation: _logoController,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _logoOpacity.value,
+                    child: Transform.scale(
+                      scale: _logoScale.value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Transform.translate(
                   offset: const Offset(-10.0, 0.0),
                   child: Image.asset(AppImages.logo, width: 75, height: 150),
                 ),
-                SizedBox(height: 10),
-                Text(
+              ),
+              const SizedBox(height: 10),
+
+              // Animated text
+              FadeTransition(
+                opacity: _textOpacity,
+                child: const Text(
                   "trajectoria",
                   style: TextStyle(
                     fontSize: 30,
@@ -63,8 +125,38 @@ class _SplashPageState extends State<SplashPage> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Loading dots
+              AnimatedBuilder(
+                animation: _dotsController,
+                builder: (context, _) {
+                  return FadeTransition(
+                    opacity: _textOpacity,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(3, (i) {
+                        // Each dot pulses at a different phase
+                        final delay = i * 0.33;
+                        final t = (_dotsController.value + delay) % 1.0;
+                        final opacity = (1.0 - (t * 2 - 1).abs()).clamp(0.3, 1.0);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black.withValues(alpha: opacity),
+                          ),
+                        );
+                      }),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

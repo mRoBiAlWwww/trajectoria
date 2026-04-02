@@ -24,8 +24,48 @@ class SecondSingupSheetContent extends StatefulWidget {
       _SecondSingupSheetContentState();
 }
 
-class _SecondSingupSheetContentState extends State<SecondSingupSheetContent> {
+class _SecondSingupSheetContentState extends State<SecondSingupSheetContent>
+    with SingleTickerProviderStateMixin {
   bool platform = false;
+  late AnimationController _entranceController;
+  late Animation<double> _btn1Opacity;
+  late Animation<Offset> _btn1Slide;
+  late Animation<double> _btn2Opacity;
+  late Animation<Offset> _btn2Slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _btn1Opacity = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _entranceController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+    ));
+    _btn1Slide = Tween(begin: const Offset(0, 15), end: Offset.zero)
+        .animate(CurvedAnimation(
+      parent: _entranceController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+    ));
+    _btn2Opacity = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _entranceController,
+      curve: const Interval(0.25, 0.85, curve: Curves.easeOutCubic),
+    ));
+    _btn2Slide = Tween(begin: const Offset(0, 15), end: Offset.zero)
+        .animate(CurvedAnimation(
+      parent: _entranceController,
+      curve: const Interval(0.25, 0.85, curve: Curves.easeOutCubic),
+    ));
+    _entranceController.forward();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +115,30 @@ class _SecondSingupSheetContentState extends State<SecondSingupSheetContent> {
                     ),
                   ),
                   SizedBox(height: 40),
-                  _emailButton(),
-                  SizedBox(height: 10),
-                  _googleButton(),
+                  AnimatedBuilder(
+                    animation: _entranceController,
+                    builder: (context, _) {
+                      return Column(
+                        children: [
+                          Transform.translate(
+                            offset: _btn1Slide.value,
+                            child: Opacity(
+                              opacity: _btn1Opacity.value,
+                              child: _emailButton(),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Transform.translate(
+                            offset: _btn2Slide.value,
+                            child: Opacity(
+                              opacity: _btn2Opacity.value,
+                              child: _googleButton(),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   SizedBox(height: 30),
                 ],
               ),

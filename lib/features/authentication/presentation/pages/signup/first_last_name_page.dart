@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
+import 'package:trajectoria/common/widgets/animation/staggered_column.dart';
 import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
@@ -61,16 +62,16 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
               ),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: 0.5,
-                  heightFactor: 1.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(4.0),
-                        bottomLeft: Radius.circular(4.0),
-                      ),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  width: MediaQuery.of(context).size.width * 0.66 * 0.5,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4.0),
+                      bottomLeft: Radius.circular(4.0),
                     ),
                   ),
                 ),
@@ -82,7 +83,7 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 80, 25, 25),
         child: SingleChildScrollView(
-          child: Column(
+          child: StaggeredColumn(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

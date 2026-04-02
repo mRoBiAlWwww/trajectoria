@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/widgets/bottomsheets/app_bottom_sheets.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
@@ -69,6 +70,7 @@ class ChooseRolePage extends StatelessWidget {
                               ),
                               isSelected: state == "Jobseeker",
                               onTap: () {
+                                HapticFeedback.selectionClick();
                                 context.read<RoleCubit>().setRole("Jobseeker");
                               },
                               text: 'Ikuti kompetisi, asah skill, raih peluang',
@@ -90,6 +92,7 @@ class ChooseRolePage extends StatelessWidget {
                               ),
                               isSelected: state == "Company",
                               onTap: () {
+                                HapticFeedback.selectionClick();
                                 context.read<RoleCubit>().setRole("Company");
                               },
                               text: 'Buat kompetisi, temukan talenta terbaik',
@@ -120,62 +123,67 @@ class ChooseRolePage extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: SizedBox(
-          height: 250,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                  opacity: isSelected ? 1.0 : 0.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.0),
-                      gradient: LinearGradient(
-                        colors: activeGradientColors,
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: activeGlowColor,
-                          spreadRadius: 3,
-                          blurRadius: 5,
-                          offset: const Offset(0, 0),
+        child: AnimatedScale(
+          scale: isSelected ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          child: SizedBox(
+            height: 250,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                    opacity: isSelected ? 1.0 : 0.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        gradient: LinearGradient(
+                          colors: activeGradientColors,
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(imagePath, width: 140, height: 140),
-                        const SizedBox(height: 15),
-                        Text(
-                          text,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontFamily: 'Britanica',
-                            fontWeight: FontWeight.w900,
+                        boxShadow: [
+                          BoxShadow(
+                            color: activeGlowColor,
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: const Offset(0, 0),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(imagePath, width: 140, height: 140),
+                          const SizedBox(height: 15),
+                          Text(
+                            text,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontFamily: 'Britanica',
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -185,36 +193,40 @@ class ChooseRolePage extends StatelessWidget {
   Widget _continueButton(BuildContext context) {
     return BlocBuilder<RoleCubit, String>(
       builder: (context, state) {
-        return BasicAppButton(
-          onPressed: (state.isEmpty && from == "notAuthenticated")
-              ? null
-              : () {
-                  if (state.isNotEmpty) {
-                    if (from == "authenticated") {
-                      debugPrint("yopo lek");
-                      _handleGoogleLoginViolation(context, state.toString());
-                      AppNavigator.pushReplacement(context, MainWrapper());
-                    } else if (from == "notAuthenticated") {
-                      AppBottomsheet.display(
-                        context,
-                        const FirstSingupSheetContent(methode: "daftar"),
-                      );
+        return AnimatedOpacity(
+          opacity: state.isNotEmpty ? 1.0 : 0.5,
+          duration: const Duration(milliseconds: 200),
+          child: BasicAppButton(
+            onPressed: (state.isEmpty && from == "notAuthenticated")
+                ? null
+                : () {
+                    if (state.isNotEmpty) {
+                      if (from == "authenticated") {
+                        debugPrint("yopo lek");
+                        _handleGoogleLoginViolation(context, state.toString());
+                        AppNavigator.pushReplacement(context, MainWrapper());
+                      } else if (from == "notAuthenticated") {
+                        AppBottomsheet.display(
+                          context,
+                          const FirstSingupSheetContent(methode: "daftar"),
+                        );
+                      }
                     }
-                  }
-                },
+                  },
 
-          backgroundColor: state.isNotEmpty
-              ? Colors.white
-              : AppColors.disableBackgroundButton,
-          content: Text(
-            "Lanjut",
-            style: const TextStyle(
-              fontSize: 18,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w700,
+            backgroundColor: state.isNotEmpty
+                ? Colors.white
+                : AppColors.disableBackgroundButton,
+            content: Text(
+              "Lanjut",
+              style: const TextStyle(
+                fontSize: 18,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            // foregroundColor: AppColors.disableTextButton,
           ),
-          // foregroundColor: AppColors.disableTextButton,
         );
       },
     );

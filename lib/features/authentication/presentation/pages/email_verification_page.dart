@@ -26,13 +26,39 @@ class EmailVerificationPage extends StatefulWidget {
   State<EmailVerificationPage> createState() => _EmailVerificationPageState();
 }
 
-class _EmailVerificationPageState extends State<EmailVerificationPage> {
+class _EmailVerificationPageState extends State<EmailVerificationPage>
+    with TickerProviderStateMixin {
   Timer? _timer;
   final user = FirebaseAuth.instance.currentUser;
+
+  late final AnimationController _bounceController;
+  late final Animation<Offset> _bounceAnimation;
+
+  late final AnimationController _dotsController;
 
   @override
   void initState() {
     super.initState();
+
+    // Bounce animation for the email icon
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _bounceAnimation = Tween<Offset>(
+      begin: const Offset(0, -5),
+      end: const Offset(0, 5),
+    ).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
+    );
+
+    // Animated dots controller
+    _dotsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+
     if (widget.purpose == "register") {
       _timer = Timer.periodic(const Duration(seconds: 3), (_) async {
         await FirebaseAuth.instance.currentUser!.reload();
@@ -55,6 +81,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _bounceController.dispose();
+    _dotsController.dispose();
     super.dispose();
   }
 
@@ -96,8 +124,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                             ),
                           ),
                           SizedBox(height: 70),
-                          Transform.translate(
-                            offset: const Offset(-30.0, 0.0),
+                          AnimatedBuilder(
+                            animation: _bounceAnimation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(
+                                  -30.0,
+                                  _bounceAnimation.value.dy,
+                                ),
+                                child: child,
+                              );
+                            },
                             child: Image.asset(
                               AppImages.gradientEmail,
                               width: 120,
@@ -158,6 +195,24 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                           ),
                         ],
                       ),
+                      if (widget.purpose == "register") ...[
+                        const SizedBox(height: 20),
+                        AnimatedBuilder(
+                          animation: _dotsController,
+                          builder: (context, _) {
+                            final dotCount =
+                                (_dotsController.value * 3).floor() + 1;
+                            final dots = '.' * dotCount;
+                            return Text(
+                              'Memverifikasi$dots',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                       SizedBox(height: 100),
                       Text(
                         "Email tidak masuk?",

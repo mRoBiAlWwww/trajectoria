@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/helper/overlay/overlay.dart';
+import 'package:trajectoria/common/widgets/animation/staggered_column.dart';
 import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/toast/toast.dart';
@@ -28,8 +29,21 @@ class PhotoProfilePage extends StatelessWidget {
             child: Container(
               height: 10,
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: Colors.grey,
                 borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  width: MediaQuery.of(context).size.width * 0.66 * 1.0,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                ),
               ),
             ),
           ),
@@ -64,7 +78,7 @@ class PhotoProfilePage extends StatelessWidget {
                   if (state is ImageUploadSuccess) {
                     imageUrl = state.url;
                   }
-                  return Column(
+                  return StaggeredColumn(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -171,25 +185,33 @@ class PhotoProfilePage extends StatelessWidget {
         ),
       );
     } else if (state is ImageUploadSuccess) {
-      return Image.network(
-        state.url,
-        fit: BoxFit.cover,
-        width: 200,
-        height: 200,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: 200,
-            height: 200,
-            color: Colors.grey,
-            child: const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          );
+      return TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0.8, end: 1.0),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) {
+          return Transform.scale(scale: scale, child: child);
         },
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(child: Text('Gagal memuat.'));
-        },
+        child: Image.network(
+          state.url,
+          fit: BoxFit.cover,
+          width: 200,
+          height: 200,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 200,
+              height: 200,
+              color: Colors.grey,
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(child: Text('Gagal memuat.'));
+          },
+        ),
       );
     } else {
       return Container();

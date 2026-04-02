@@ -5,6 +5,7 @@ import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
 import 'package:trajectoria/common/widgets/textfield/auth_text_field.dart';
+import 'package:trajectoria/common/widgets/animation/staggered_column.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/navigation/main_wrapper.dart';
 import 'package:trajectoria/features/authentication/data/models/user_signin_req.dart';
@@ -71,13 +72,13 @@ class _SigninPageState extends State<SigninPage> {
       body: BlocListener<AuthStateCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            AppNavigator.push(context, MainWrapper());
+            AppNavigator.pushAndRemove(context, MainWrapper());
           }
         },
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Column(
+            child: StaggeredColumn(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -96,21 +97,24 @@ class _SigninPageState extends State<SigninPage> {
                 const SizedBox(height: 10),
                 BlocBuilder<AuthStateCubit, AuthState>(
                   builder: (context, state) {
-                    if (state is AuthFailure) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: Text(
-                          state.errorMessage,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 13,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: state is AuthFailure
+                          ? Padding(
+                              key: ValueKey(state.errorMessage),
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Text(
+                                state.errorMessage,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 13,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(key: ValueKey('empty')),
+                    );
                   },
                 ),
                 const SizedBox(height: 10),

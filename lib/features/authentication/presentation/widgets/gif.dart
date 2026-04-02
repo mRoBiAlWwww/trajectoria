@@ -64,100 +64,117 @@ class _GifSlideshowState extends State<GifSlideshow> {
     });
   }
 
+  void _goToIndex(int index) {
+    if (index == _currentIndex) return;
+    _timer?.cancel();
+    final String nextPath = widget.gifPaths[index];
+    AssetImage(nextPath).evict(cache: PaintingBinding.instance.imageCache);
+    setState(() {
+      _currentIndex = index;
+    });
+    _startTimer();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Transform.translate(
-            offset: const Offset(0, 30),
-            child: Image.asset(
-              AppImages.dot,
-              color: Colors.white,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity == null) return;
+        if (details.primaryVelocity! < -100) {
+          // Swipe left → next
+          _goToIndex((_currentIndex + 1) % widget.gifPaths.length);
+        } else if (details.primaryVelocity! > 100) {
+          // Swipe right → previous
+          _goToIndex(
+            (_currentIndex - 1 + widget.gifPaths.length) %
+                widget.gifPaths.length,
+          );
+        }
+      },
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Transform.translate(
+              offset: const Offset(0, 30),
+              child: Image.asset(
+                AppImages.dot,
+                color: Colors.white,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child: Text(
-                widget.subTitle[_currentIndex],
-                key: ValueKey('text_$_currentIndex'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.white,
-                  fontFamily: 'Averia',
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
-            Container(
-              key: ValueKey('gif_$_currentIndex'),
-              width: 250,
-              height: 250,
-              padding: widget.paddings[_currentIndex],
-              decoration: BoxDecoration(
-                color: AppColors.secondaryBackgroundButton,
-                shape: BoxShape.circle,
-              ),
-
-              child: AnimatedSwitcher(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
-                child: Center(
-                  child: Image.asset(widget.gifPaths[_currentIndex]),
+                child: Text(
+                  widget.subTitle[_currentIndex],
+                  key: ValueKey('text_$_currentIndex'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.white,
+                    fontFamily: 'Averia',
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child: SvgPicture.asset(
-                key: ValueKey('line_$_currentIndex'),
-                widget.linePaths[_currentIndex],
-                width: 40.0,
-                height: 40.0,
+              const SizedBox(height: 50),
+              Container(
+                key: ValueKey('gif_$_currentIndex'),
+                width: 250,
+                height: 250,
+                padding: widget.paddings[_currentIndex],
+                decoration: const BoxDecoration(
+                  color: AppColors.secondaryBackgroundButton,
+                  shape: BoxShape.circle,
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: Center(
+                    child: Image.asset(widget.gifPaths[_currentIndex]),
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(height: 20),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: SvgPicture.asset(
+                  key: ValueKey('line_$_currentIndex'),
+                  widget.linePaths[_currentIndex],
+                  width: 40.0,
+                  height: 40.0,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Dot indicator
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.gifPaths.length, (i) {
+                  final isActive = i == _currentIndex;
+                  return GestureDetector(
+                    onTap: () => _goToIndex(i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: isActive ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: isActive
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.35),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
-
-// final List<WidgetBuilder> myGifBuilders = [
-//   (context) => Image.asset(AppGifs.first, fit: BoxFit.cover),
-//   (context) => Padding(
-//     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-//     child: Image.asset(AppGifs.third, fit: BoxFit.contain),
-//   ),
-//   (context) => Image.asset(AppGifs.first, fit: BoxFit.cover),
-// ];
-// void _startTimer() {
-//   const Duration slideDuration = Duration(milliseconds: 3500);
-//   _timer = Timer.periodic(slideDuration, (timer) {
-//     final int nextIndex = (_currentIndex + 1) % widget.gifPaths.length;
-//     final String nextPath = widget.gifPaths[nextIndex];
-//     AssetImage(nextPath).evict(cache: PaintingBinding.instance.imageCache);
-//     setState(() {
-//       _currentIndex = nextIndex;
-//     });
-//   });
-// }
-// final List<Duration> durasi = [
-//   const Duration(milliseconds: 4000),
-//   const Duration(milliseconds: 2000),
-//   const Duration(milliseconds: 4000),
-// ];
-// final paddings = [
-//   // EdgeInsets.zero,
-//   const EdgeInsets.symmetric(horizontal: 40),
-//   const EdgeInsets.symmetric(horizontal: 40),
-//   const EdgeInsets.symmetric(horizontal: 40),
-// ];
-// final fits = [BoxFit.contain, BoxFit.cover, BoxFit.contain];
