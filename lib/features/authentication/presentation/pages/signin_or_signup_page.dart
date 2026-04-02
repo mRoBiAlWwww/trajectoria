@@ -114,7 +114,7 @@ class _SigninOrSignupPageState extends State<SigninOrSignupPage>
                         const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   ),
                 ),
-                const SizedBox(height: 500, width: 500, child: GifSlideshow()),
+                SizedBox(height: 500, width: 500, child: GifSlideshow()),
               ],
             ),
             AnimatedBuilder(
