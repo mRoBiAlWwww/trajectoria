@@ -6,6 +6,7 @@ import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/core/navigation/main_wrapper.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/cubit/auth_state.dart';
+import 'package:trajectoria/common/helper/navigator/page_transitions.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/signup/welcome_animation.dart';
 
 class SplashPage extends StatefulWidget {
@@ -83,7 +84,10 @@ class _SplashPageState extends State<SplashPage>
     return BlocListener<AuthStateCubit, AuthState>(
       listener: (context, state) {
         if (state is UnAuthenticated) {
-          AppNavigator.pushReplacement(context, const WelcomeAnimationPage());
+          Navigator.pushReplacement(
+            context,
+            HeroFadeRoute(page: const WelcomeAnimationPage()),
+          );
         }
         if (state is AuthSuccess) {
           AppNavigator.pushReplacement(context, const MainWrapper());
@@ -107,9 +111,12 @@ class _SplashPageState extends State<SplashPage>
                     ),
                   );
                 },
-                child: Transform.translate(
-                  offset: const Offset(-10.0, 0.0),
-                  child: Image.asset(AppImages.logo, width: 75, height: 150),
+                child: Hero(
+                  tag: 'app_logo',
+                  child: Transform.translate(
+                    offset: const Offset(-10.0, 0.0),
+                    child: Image.asset(AppImages.logo, width: 75, height: 150),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -117,12 +124,18 @@ class _SplashPageState extends State<SplashPage>
               // Animated text
               FadeTransition(
                 opacity: _textOpacity,
-                child: const Text(
-                  "trajectoria",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'JetBrainsMono',
-                    fontWeight: FontWeight.w700,
+                child: Hero(
+                  tag: 'app_title',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      "trajectoria",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontFamily: 'JetBrainsMono',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ),

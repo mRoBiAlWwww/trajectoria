@@ -29,3 +29,24 @@ class FadeSlideRoute<T> extends PageRouteBuilder<T> {
           },
         );
 }
+
+/// Fade-only route that supports Hero animations between pages.
+class HeroFadeRoute<T> extends PageRouteBuilder<T> {
+  final Widget page;
+
+  HeroFadeRoute({required this.page})
+      : super(
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionDuration: const Duration(milliseconds: 2000),
+          reverseTransitionDuration: const Duration(milliseconds: 1000),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOut,
+              ),
+              child: child,
+            );
+          },
+        );
+}

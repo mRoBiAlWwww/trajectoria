@@ -18,6 +18,8 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _pulseController;
+  late AnimationController _contentController;
+  late Animation<double> _contentOpacity;
   late Animation<Decoration> _insideButtonDecorationAnimation;
   late Animation<Decoration> _outerButtonDecorationAnimation;
   late Animation<double> _pulseAnimation;
@@ -71,6 +73,19 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _pulseController.repeat(reverse: true);
+
+    // Entrance animation for non-Hero content (delayed to let Hero land)
+    _contentController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _contentOpacity = CurvedAnimation(
+      parent: _contentController,
+      curve: Curves.easeOut,
+    );
+    Future.delayed(const Duration(milliseconds: 1300), () {
+      if (mounted) _contentController.forward();
+    });
 
     _initializePlayer();
   }
@@ -127,6 +142,7 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
   void dispose() {
     _controller.dispose();
     _pulseController.dispose();
+    _contentController.dispose();
     _timer?.cancel();
     _videoPlayerController.removeListener(_onVideoEnd);
     _videoPlayerController.dispose();
@@ -157,30 +173,44 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
                   alignment: AlignmentGeometry.center,
                   child: Column(
                     children: [
-                      Transform.translate(
-                        offset: const Offset(-5.0, 0.0),
-                        child: Image.asset(
-                          AppImages.logo,
-                          width: 40,
-                          height: 80,
+                      Hero(
+                        tag: 'app_logo',
+                        child: Transform.translate(
+                          offset: const Offset(-5.0, 0.0),
+                          child: Image.asset(
+                            AppImages.logo,
+                            width: 40,
+                            height: 80,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        "trajectoria",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'JetBrainsMono',
-                          fontWeight: FontWeight.w700,
+                      Hero(
+                        tag: 'app_title',
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Text(
+                            "trajectoria",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'JetBrainsMono',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _textUpper(context),
+                      FadeTransition(
+                        opacity: _contentOpacity,
+                        child: _textUpper(context),
+                      ),
                       Expanded(
-                        child: GestureDetector(
-                          onTapDown: (_) => _startHold(context),
-                          onTapUp: (_) => _cancelHold(),
-                          onTapCancel: _cancelHold,
+                        child: FadeTransition(
+                          opacity: _contentOpacity,
+                          child: GestureDetector(
+                            onTapDown: (_) => _startHold(context),
+                            onTapUp: (_) => _cancelHold(),
+                            onTapCancel: _cancelHold,
                           child: AnimatedBuilder(
                             animation: _controller,
                             builder: (context, child) {
@@ -241,15 +271,19 @@ class _WelcomeAnimationPageState extends State<WelcomeAnimationPage>
                               );
                             },
                           ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 70),
-                      Text(
-                        "KETUK DAN TAHAN UNTUK MULAI",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: 'JetBrainsMono',
-                          fontWeight: FontWeight.w700,
+                      FadeTransition(
+                        opacity: _contentOpacity,
+                        child: Text(
+                          "KETUK DAN TAHAN UNTUK MULAI",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'JetBrainsMono',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
