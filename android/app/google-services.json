@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "991376195963-gtgu7and0ovkbhuvc98jloroc761encc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trajectoria",
+            "certificate_hash": "5e6e6c2c094e6396f8da5be7be9419becf71d396"
+          }
+        },
+        {
           "client_id": "991376195963-71ge2d53admoulk0gejl8qba76146stt.apps.googleusercontent.com",
           "client_type": 3
         }
