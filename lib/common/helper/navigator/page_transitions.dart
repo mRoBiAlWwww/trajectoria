@@ -40,11 +40,13 @@ class HeroFadeRoute<T> extends PageRouteBuilder<T> {
           transitionDuration: const Duration(milliseconds: 2000),
           reverseTransitionDuration: const Duration(milliseconds: 1000),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Delay fade-in so Hero flies first, then content appears
+            final fadeCurve = CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+            );
             return FadeTransition(
-              opacity: CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeInOut,
-              ),
+              opacity: fadeCurve,
               child: child,
             );
           },

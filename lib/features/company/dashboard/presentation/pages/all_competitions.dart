@@ -19,18 +19,34 @@ class AllCompetitionsPage extends StatefulWidget {
   State<AllCompetitionsPage> createState() => _AllCompetitionsPageState();
 }
 
-class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
+class _AllCompetitionsPageState extends State<AllCompetitionsPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController searchCon = TextEditingController();
   Timer? debounce;
   bool isDone = true;
+  late AnimationController _entranceController;
+
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
           .read<OrganizeCompetitionCubit>()
           .getCompetitionsByCurrentCompany();
     });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
   }
 
   void onSearchChanged(String value) {
@@ -80,7 +96,20 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                 hint: "Cari Kompetisi",
               ),
             ),
-            body: BlocBuilder<DraftOrCompetitionsCubit, String>(
+            body: FadeTransition(
+              opacity: CurvedAnimation(
+                parent: _entranceController,
+                curve: Curves.easeOut,
+              ),
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.04),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOutCubic,
+                )),
+                child: BlocBuilder<DraftOrCompetitionsCubit, String>(
               builder: (context, widgetState) {
                 final isCompetitionsPage = widgetState == "Competitions";
                 return Column(
@@ -89,7 +118,7 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.all(7),
-                        width: 250,
+                        width: MediaQuery.of(context).size.width * 0.65,
                         decoration: BoxDecoration(
                           color: AppColors.disableBackgroundButton,
                           borderRadius: BorderRadius.circular(15),
@@ -108,7 +137,9 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                       .read<DraftOrCompetitionsCubit>()
                                       .select("Competitions");
                                 },
-                                child: Container(
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: Curves.easeOutCubic,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 5,
                                   ),
@@ -126,10 +157,12 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                             ],
                                           ),
                                         )
-                                      : null,
+                                      : BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
                                   child: Center(
-                                    child: Text(
-                                      "Semua",
+                                    child: AnimatedDefaultTextStyle(
+                                      duration: const Duration(milliseconds: 200),
                                       style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w700,
@@ -137,6 +170,7 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                             ? Colors.white
                                             : AppColors.secondaryText,
                                       ),
+                                      child: const Text("Semua"),
                                     ),
                                   ),
                                 ),
@@ -154,7 +188,9 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                       .read<DraftOrCompetitionsCubit>()
                                       .select("Drafts");
                                 },
-                                child: Container(
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: Curves.easeOutCubic,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 5,
                                   ),
@@ -172,10 +208,12 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                             ],
                                           ),
                                         )
-                                      : null,
+                                      : BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
                                   child: Center(
-                                    child: Text(
-                                      "Drafts",
+                                    child: AnimatedDefaultTextStyle(
+                                      duration: const Duration(milliseconds: 200),
                                       style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w700,
@@ -183,6 +221,7 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                                             ? Colors.white
                                             : AppColors.secondaryText,
                                       ),
+                                      child: const Text("Drafts"),
                                     ),
                                   ),
                                 ),
@@ -355,6 +394,8 @@ class _AllCompetitionsPageState extends State<AllCompetitionsPage> {
                 );
               },
             ),
+                ),
+              ),
           );
         },
       ),

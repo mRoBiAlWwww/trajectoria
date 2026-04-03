@@ -17,10 +17,20 @@ class NotificationPage extends StatefulWidget {
   State<NotificationPage> createState() => _NotificationPageState();
 }
 
-class _NotificationPageState extends State<NotificationPage> with RouteAware {
+class _NotificationPageState extends State<NotificationPage>
+    with RouteAware, SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
   }
 
   @override
@@ -36,6 +46,7 @@ class _NotificationPageState extends State<NotificationPage> with RouteAware {
 
   @override
   void dispose() {
+    _entranceController.dispose();
     routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -56,7 +67,20 @@ class _NotificationPageState extends State<NotificationPage> with RouteAware {
         title: const Text("Notifikasi"),
         backgroundColor: AppColors.splashBackground,
       ),
-      body: RefreshIndicator(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: RefreshIndicator(
         onRefresh: () async {
           context.read<ProfileCubit>().getAnnouncements();
         },
@@ -77,6 +101,8 @@ class _NotificationPageState extends State<NotificationPage> with RouteAware {
             }
             return SizedBox.shrink();
           },
+        ),
+          ),
         ),
       ),
     );

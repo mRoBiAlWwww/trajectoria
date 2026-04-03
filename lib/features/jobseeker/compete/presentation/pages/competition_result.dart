@@ -12,7 +12,7 @@ import 'package:trajectoria/features/jobseeker/compete/domain/entities/submissio
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_state.dart';
 
-class CompetitionResultPage extends StatelessWidget {
+class CompetitionResultPage extends StatefulWidget {
   final SubmissionEntity? submission;
   final CompetitionEntity? competition;
   final int? totalParticipant;
@@ -29,21 +29,47 @@ class CompetitionResultPage extends StatelessWidget {
   });
 
   @override
+  State<CompetitionResultPage> createState() => _CompetitionResultPageState();
+}
+
+class _CompetitionResultPageState extends State<CompetitionResultPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget bodyContent;
 
-    if (submission != null && competition != null) {
+    if (widget.submission != null && widget.competition != null) {
       bodyContent = _buildContent(
         context,
-        submission!,
-        competition!,
-        totalParticipant!,
+        widget.submission!,
+        widget.competition!,
+        widget.totalParticipant!,
       );
     } else {
       bodyContent = BlocProvider(
         create: (context) =>
             SearchCompeteCubit()
-              ..getSingleCompetitionAndSubmission(competitionId!),
+              ..getSingleCompetitionAndSubmission(widget.competitionId!),
         child: BlocBuilder<SearchCompeteCubit, SearchCompeteState>(
           builder: (context, searchState) {
             if (searchState is SingleCompeteAndSubmissionLoaded) {
@@ -82,7 +108,22 @@ class CompetitionResultPage extends StatelessWidget {
           ),
         ),
       ),
-      body: bodyContent,
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: bodyContent,
+        ),
+      ),
     );
   }
 

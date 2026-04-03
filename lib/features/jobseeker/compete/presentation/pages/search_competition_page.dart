@@ -24,10 +24,12 @@ class SearchCompetitionPage extends StatefulWidget {
   State<SearchCompetitionPage> createState() => _SearchCompetitionPageState();
 }
 
-class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
+class _SearchCompetitionPageState extends State<SearchCompetitionPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController searchCon = TextEditingController();
   Timer? debounce;
   bool isDone = true;
+  late AnimationController _entranceController;
 
   void onSearchChanged(String value) {
     value.isNotEmpty ? isDone = false : isDone = true;
@@ -39,7 +41,20 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
   void dispose() {
+    _entranceController.dispose();
     debounce?.cancel();
     super.dispose();
   }
@@ -106,7 +121,20 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
           }
         },
       ),
-      body: Container(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         width: double.infinity,
         color: AppColors.thirdBackGroundButton,
@@ -261,6 +289,8 @@ class _SearchCompetitionPageState extends State<SearchCompetitionPage> {
               },
             );
           },
+        ),
+          ),
         ),
       ),
     );

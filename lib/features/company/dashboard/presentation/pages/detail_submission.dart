@@ -34,7 +34,8 @@ class DetailSubmissionPage extends StatefulWidget {
   State<DetailSubmissionPage> createState() => _DetailSubmissionPageState();
 }
 
-class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
+class _DetailSubmissionPageState extends State<DetailSubmissionPage>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _catatanController;
   late AnnouncementEntity announcement;
   late List<double> sliderValue;
@@ -42,6 +43,7 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   List<String> urls = [];
   List<String> common = [];
   List<String> summary = [];
+  late AnimationController _entranceController;
 
   int multiplyScore(List<double> a, List<int> b) {
     if (a.length != b.length) {
@@ -57,6 +59,13 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     _catatanController = TextEditingController(
       text: (widget.submission.feedback.isNotEmpty)
           ? widget.submission.feedback
@@ -67,6 +76,13 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
     for (var item in widget.competition.rubrik) {
       bobotList.add(item.bobot);
     }
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    _catatanController.dispose();
+    super.dispose();
   }
 
   @override
@@ -103,7 +119,20 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                   ),
                 ),
               ),
-              body: SingleChildScrollView(
+              body: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOut,
+                ),
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.04),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: _entranceController,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
@@ -713,6 +742,8 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage> {
                       ),
                     ],
                   ),
+                ),
+              ),
                 ),
               ),
             ),

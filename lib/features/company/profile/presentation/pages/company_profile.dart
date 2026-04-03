@@ -19,8 +19,28 @@ class CompanyProfilePage extends StatefulWidget {
   State<CompanyProfilePage> createState() => _CompanyProfilePageState();
 }
 
-class _CompanyProfilePageState extends State<CompanyProfilePage> {
+class _CompanyProfilePageState extends State<CompanyProfilePage>
+    with SingleTickerProviderStateMixin {
   String bio = "+ Tambahkan Deskripsi";
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +77,20 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                   ),
                 ],
               ),
-              body: Padding(
+              body: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOut,
+                ),
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.04),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: _entranceController,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
                   child: Column(
@@ -214,6 +247,8 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                       ),
                     ],
                   ),
+                ),
+              ),
                 ),
               ),
             ),

@@ -18,17 +18,27 @@ class ForgotPasswordPage extends StatefulWidget {
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _emailCon = TextEditingController();
+  late AnimationController _entranceController;
 
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _entranceController.forward();
+    });
     _emailCon.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
+    _entranceController.dispose();
     _emailCon.dispose();
     super.dispose();
   }
@@ -62,7 +72,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ],
       ),
-      body: BlocProvider(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: BlocProvider(
         create: (context) => AuthStateCubit(),
         child: BlocListener<AuthStateCubit, AuthState>(
           listener: (context, state) {
@@ -97,6 +120,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ],
             ),
           ),
+        ),
+      ),
         ),
       ),
     );

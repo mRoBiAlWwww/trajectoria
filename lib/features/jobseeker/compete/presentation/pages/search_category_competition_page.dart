@@ -18,10 +18,12 @@ class SearchCategoryCompetitionPage extends StatefulWidget {
 }
 
 class _SearchCategoryCompetitionPageState
-    extends State<SearchCategoryCompetitionPage> {
+    extends State<SearchCategoryCompetitionPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController searchCon = TextEditingController();
   Timer? debounce;
   CategoryEntity? category;
+  late AnimationController _entranceController;
 
   void onSearchChanged(String value) {
     if (debounce?.isActive ?? false) debounce!.cancel();
@@ -34,6 +36,13 @@ class _SearchCategoryCompetitionPageState
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SearchCompeteCubit>().getCategories();
     });
@@ -41,6 +50,7 @@ class _SearchCategoryCompetitionPageState
 
   @override
   void dispose() {
+    _entranceController.dispose();
     debounce?.cancel();
     super.dispose();
   }
@@ -83,7 +93,20 @@ class _SearchCategoryCompetitionPageState
           ),
         ),
       ),
-      body: BlocBuilder<SearchCompeteCubit, SearchCompeteState>(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: BlocBuilder<SearchCompeteCubit, SearchCompeteState>(
         builder: (context, state) {
           if (state is SearchCompeteLoaded) {
             return Padding(
@@ -216,6 +239,8 @@ class _SearchCategoryCompetitionPageState
 
           return SizedBox.shrink();
         },
+          ),
+        ),
       ),
     );
   }

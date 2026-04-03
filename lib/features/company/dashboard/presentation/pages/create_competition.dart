@@ -21,10 +21,30 @@ class CreateCompetitionPage extends StatefulWidget {
   State<CreateCompetitionPage> createState() => _CreateCompetitionPageState();
 }
 
-class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
+class _CreateCompetitionPageState extends State<CreateCompetitionPage>
+    with SingleTickerProviderStateMixin {
   int page = 1;
   bool _canPop = false;
   final customTextAppbar = ["Detail", "Rubrik", "Jadwal & hadiah"];
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,15 +113,30 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage> {
               ),
             ),
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: IndexedStack(
-              index: page - 1,
-              children: [
-                SingleChildScrollView(child: CreateDetailWidget()),
-                SingleChildScrollView(child: CreateRubrikWidget()),
-                SingleChildScrollView(child: CreateScheduleWidget()),
-              ],
+          body: FadeTransition(
+            opacity: CurvedAnimation(
+              parent: _entranceController,
+              curve: Curves.easeOut,
+            ),
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.04),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: _entranceController,
+                curve: Curves.easeOutCubic,
+              )),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: IndexedStack(
+                  index: page - 1,
+                  children: [
+                    SingleChildScrollView(child: CreateDetailWidget()),
+                    SingleChildScrollView(child: CreateRubrikWidget()),
+                    SingleChildScrollView(child: CreateScheduleWidget()),
+                  ],
+                ),
+              ),
             ),
           ),
           bottomNavigationBar: _buildBottomBar(context),

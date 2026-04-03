@@ -26,7 +26,21 @@ class _BookmarkPageContent extends StatefulWidget {
 }
 
 class _BookmarkPageContentState extends State<_BookmarkPageContent>
-    with RouteAware {
+    with RouteAware, SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -35,6 +49,7 @@ class _BookmarkPageContentState extends State<_BookmarkPageContent>
 
   @override
   void dispose() {
+    _entranceController.dispose();
     routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -68,25 +83,40 @@ class _BookmarkPageContentState extends State<_BookmarkPageContent>
           ),
         ),
       ),
-      body: BlocBuilder<ProfileCubit, ProfileState>(
-        builder: (context, bookmarkState) {
-          if (bookmarkState is ProfileLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (bookmarkState is BookmarksLoaded) {
-            if (bookmarkState.bookmarks.isNotEmpty) {
-              return Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: CompetitionListView(
-                  competitions: bookmarkState.bookmarks,
-                ),
-              );
-            } else {
-              return const Center(child: Text("Belum ada bookmark"));
-            }
-          }
-          return const SizedBox.shrink();
-        },
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: BlocBuilder<ProfileCubit, ProfileState>(
+            builder: (context, bookmarkState) {
+              if (bookmarkState is ProfileLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (bookmarkState is BookmarksLoaded) {
+                if (bookmarkState.bookmarks.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: CompetitionListView(
+                      competitions: bookmarkState.bookmarks,
+                    ),
+                  );
+                } else {
+                  return const Center(child: Text("Belum ada bookmark"));
+                }
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
       ),
     );
   }

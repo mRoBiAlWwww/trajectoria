@@ -104,6 +104,7 @@ class CompanyWrapper extends StatelessWidget {
     required label,
     required filledIcon,
   }) {
+    final bool isActive = context.watch<BottomNavCubit>().state == page;
     return GestureDetector(
       onTap: () {
         context.read<BottomNavCubit>().changeSelectedIndexCompany(page);
@@ -114,24 +115,29 @@ class CompanyWrapper extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 10),
-            SvgPicture.asset(
-              context.watch<BottomNavCubit>().state == page
-                  ? filledIcon
-                  : defaultIcon,
-              width: 30.0,
-              height: 30.0,
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: context.watch<BottomNavCubit>().state == page
-                    ? Colors.amber
-                    : Colors.grey,
-                fontSize: 10,
-                fontWeight: context.watch<BottomNavCubit>().state == page
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+            AnimatedScale(
+              scale: isActive ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: SvgPicture.asset(
+                  isActive ? filledIcon : defaultIcon,
+                  width: 30.0,
+                  height: 30.0,
+                  key: ValueKey(isActive),
+                ),
               ),
+            ),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontFamily: 'JetBrainsMono',
+                color: isActive ? Colors.black : Colors.grey,
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+              ),
+              child: Text(label),
             ),
           ],
         ),

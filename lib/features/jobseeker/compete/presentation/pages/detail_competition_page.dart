@@ -52,9 +52,11 @@ class _DetailCompetitionContent extends StatefulWidget {
       _DetailCompetitionContentState();
 }
 
-class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
+class _DetailCompetitionContentState extends State<_DetailCompetitionContent>
+    with SingleTickerProviderStateMixin {
   final DraggableScrollableController _controller =
       DraggableScrollableController();
+  late AnimationController _entranceController;
   String buttonText = "Daftar Sekarang";
   bool isLoading = false;
   bool isAdded = false;
@@ -64,6 +66,13 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     _controller.addListener(() {
       final currentSize = _controller.size;
       if (currentSize >= 0.99 && !_isMaximized) {
@@ -77,6 +86,13 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
     });
 
     _checkInitialBookmarkStatus();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _checkInitialBookmarkStatus() async {
@@ -112,7 +128,20 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
     final screenSize = MediaQuery.of(context).size;
     final double bottomSafeAreaPadding = MediaQuery.of(context).padding.bottom;
 
-    return BlocBuilder<SubmissionCubit, SubmissionState>(
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: _entranceController,
+        curve: Curves.easeOut,
+      ),
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.04),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOutCubic,
+        )),
+        child: BlocBuilder<SubmissionCubit, SubmissionState>(
       builder: (context, submissionState) {
         if (submissionState is SubmissionLoading) {
           isLoading = true;
@@ -746,6 +775,8 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent> {
           ],
         );
       },
+        ),
+      ),
     );
   }
 

@@ -12,7 +12,9 @@ class PremiumPage extends StatefulWidget {
   State<PremiumPage> createState() => _PremiumPageState();
 }
 
-class _PremiumPageState extends State<PremiumPage> {
+class _PremiumPageState extends State<PremiumPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
   final PageController _controller = PageController();
   int currentIndex = 0;
 
@@ -37,7 +39,20 @@ class _PremiumPageState extends State<PremiumPage> {
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     _autoPlay();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
   }
 
   void _autoPlay() {
@@ -82,8 +97,13 @@ class _PremiumPageState extends State<PremiumPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(25.0),
@@ -148,7 +168,7 @@ class _PremiumPageState extends State<PremiumPage> {
                   Column(
                     children: [
                       SizedBox(
-                        height: 225,
+                        height: MediaQuery.of(context).size.height * 0.26,
                         child: PageView.builder(
                           controller: _controller,
                           onPageChanged: (i) {
@@ -173,7 +193,7 @@ class _PremiumPageState extends State<PremiumPage> {
                       ),
                       const SizedBox(height: 25),
                       SizedBox(
-                        height: 150,
+                        height: MediaQuery.of(context).size.height * 0.18,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -310,6 +330,7 @@ class _PremiumPageState extends State<PremiumPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

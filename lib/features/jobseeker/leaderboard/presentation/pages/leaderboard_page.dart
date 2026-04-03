@@ -12,7 +12,28 @@ class LeaderboardPage extends StatefulWidget {
   State<LeaderboardPage> createState() => _LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage> {
+class _LeaderboardPageState extends State<LeaderboardPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
+
   final List<String> myRank = [
     AppImages.ligaPerak,
     AppImages.ligaEmas,
@@ -73,23 +94,40 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   ),
                 ),
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
+              body: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOut,
+                ),
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.05),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: _entranceController,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
                     children: [
-                      SizedBox(
-                        height: 140,
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final itemSize = MediaQuery.of(context).size.height * 0.10;
+                          final bigItemSize = MediaQuery.of(context).size.height * 0.14;
+                          return SizedBox(
+                        height: bigItemSize + 20,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: myRank.length,
                           itemBuilder: (context, index) {
-                            double imageHeight = 80;
-                            double imageWidth = 80;
+                            double imageHeight = itemSize;
+                            double imageWidth = itemSize;
 
                             if (index == 1) {
-                              imageHeight = 120;
-                              imageWidth = 120;
+                              imageHeight = bigItemSize;
+                              imageWidth = bigItemSize;
                             }
 
                             return Padding(
@@ -107,6 +145,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             );
                           },
                         ),
+                      );
+                        },
                       ),
                       SizedBox(height: 50),
                       Container(
@@ -243,6 +283,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     ],
                   ),
                 ),
+              ),
+              ),
               ),
             );
           }

@@ -23,8 +23,29 @@ class DetailCompetitionPage extends StatefulWidget {
   State<DetailCompetitionPage> createState() => _DetailCompetitionPageState();
 }
 
-class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
+class _DetailCompetitionPageState extends State<DetailCompetitionPage>
+    with SingleTickerProviderStateMixin {
   int selectedIndex = 0;
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +62,20 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
         ),
         titleSpacing: 0,
       ),
-      body: MultiBlocProvider(
+      body: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _entranceController,
+          curve: Curves.easeOut,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOutCubic,
+          )),
+          child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => JobseekerSubmissionCubit()),
           BlocProvider(create: (context) => OrganizeCompetitionCubit()),
@@ -97,17 +131,21 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
           ),
         ),
       ),
+        ),
+      ),
     );
   }
 
   Widget buildButton(String label, int index) {
     final bool isSelected = selectedIndex == index;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
       width: 120,
       decoration: BoxDecoration(
         gradient: isSelected
-            ? LinearGradient(
+            ? const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [Color(0XFFB2B2B2), Color(0xFF242424)],
@@ -126,9 +164,14 @@ class _DetailCompetitionPageState extends State<DetailCompetitionPage> {
             selectedIndex = index;
           });
         },
-        child: Text(
-          label,
-          style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter'),
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 200),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Inter',
+            color: isSelected ? Colors.white : AppColors.disableTextButton,
+          ),
+          child: Text(label),
         ),
       ),
     );

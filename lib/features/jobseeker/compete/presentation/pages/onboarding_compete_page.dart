@@ -4,6 +4,7 @@ import 'package:trajectoria/common/widgets/list_competition/list_competition_ite
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_cubit.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/cubit/search_compete_state.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/search_category_competition_page.dart';
+import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/pages/search_competition_page.dart';
 import 'package:trajectoria/features/jobseeker/compete/presentation/widgets/slider_screen.dart';
 
@@ -63,17 +64,13 @@ class _OnboardingCompetePageState extends State<OnboardingCompetePage> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.push(
+                                      AppNavigator.push(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext newPageContext) {
-                                            return BlocProvider(
-                                              create: (context) =>
-                                                  SearchCompeteCubit(),
-                                              child:
-                                                  SearchCategoryCompetitionPage(),
-                                            );
-                                          },
+                                        BlocProvider(
+                                          create: (context) =>
+                                              SearchCompeteCubit(),
+                                          child:
+                                              SearchCategoryCompetitionPage(),
                                         ),
                                       );
                                     },
@@ -130,16 +127,12 @@ class _OnboardingCompetePageState extends State<OnboardingCompetePage> {
                               ),
                               child: InkWell(
                                 onTap: () {
-                                  Navigator.push(
+                                  AppNavigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext newPageContext) {
-                                        return BlocProvider(
-                                          create: (context) =>
-                                              SearchCompeteCubit(),
-                                          child: SearchCompetitionPage(),
-                                        );
-                                      },
+                                    BlocProvider(
+                                      create: (context) =>
+                                          SearchCompeteCubit(),
+                                      child: SearchCompetitionPage(),
                                     ),
                                   );
                                 },

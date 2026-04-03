@@ -5,8 +5,34 @@ import 'package:trajectoria/common/widgets/list_competition/list_competition_ite
 import 'package:trajectoria/core/config/theme/app_colors.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/cubit/profile_cubit.dart';
 
-class RiwayatKompetisiPage extends StatelessWidget {
+class RiwayatKompetisiPage extends StatefulWidget {
   const RiwayatKompetisiPage({super.key});
+
+  @override
+  State<RiwayatKompetisiPage> createState() => _RiwayatKompetisiPageState();
+}
+
+class _RiwayatKompetisiPageState extends State<RiwayatKompetisiPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,19 +60,36 @@ class RiwayatKompetisiPage extends StatelessWidget {
             ),
           ),
         ),
-        body: BlocBuilder<ProfileCubit, ProfileState>(
-          builder: (context, historyState) {
-            if (historyState is ProfileLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (historyState is HistoryCompetitionsLoaded) {
-              return Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: CompetitionListView(competitions: historyState.history),
-              );
-            }
-            return SizedBox.shrink();
-          },
+        body: FadeTransition(
+          opacity: CurvedAnimation(
+            parent: _entranceController,
+            curve: Curves.easeOut,
+          ),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.04),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: _entranceController,
+              curve: Curves.easeOutCubic,
+            )),
+            child: BlocBuilder<ProfileCubit, ProfileState>(
+              builder: (context, historyState) {
+                if (historyState is ProfileLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (historyState is HistoryCompetitionsLoaded) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: CompetitionListView(
+                      competitions: historyState.history,
+                    ),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ),
         ),
       ),
     );

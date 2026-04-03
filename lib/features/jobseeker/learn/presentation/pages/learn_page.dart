@@ -318,9 +318,17 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(2.0),
-                                    child: FractionallySizedBox(
-                                      alignment: Alignment.centerLeft,
-                                      widthFactor: progress / 100,
+                                    child: TweenAnimationBuilder<double>(
+                                      tween: Tween(end: progress / 100),
+                                      duration: const Duration(milliseconds: 500),
+                                      curve: Curves.easeOutCubic,
+                                      builder: (context, value, child) {
+                                        return FractionallySizedBox(
+                                          alignment: Alignment.centerLeft,
+                                          widthFactor: value.clamp(0.0, 1.0),
+                                          child: child,
+                                        );
+                                      },
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(

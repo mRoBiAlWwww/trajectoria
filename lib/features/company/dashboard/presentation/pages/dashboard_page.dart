@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:trajectoria/common/widgets/animation/animated_press_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/date/date_convert.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
@@ -27,11 +28,20 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> with RouteAware {
+class _DashboardPageState extends State<DashboardPage>
+    with RouteAware, SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+
   @override
   void initState() {
     super.initState();
-
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _entranceController.forward();
+    });
     _refetchCompetition();
   }
 
@@ -48,6 +58,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
 
   @override
   void dispose() {
+    _entranceController.dispose();
     routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -117,8 +128,20 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                   ),
                 ),
               ),
-              body:
-                  BlocBuilder<
+              body: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOut,
+                ),
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.04),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: _entranceController,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: BlocBuilder<
                     OrganizeCompetitionCubit,
                     OrganizeCompetitionState
                   >(
@@ -160,6 +183,8 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                       return const Center(child: CircularProgressIndicator());
                     },
                   ),
+                ),
+              ),
             );
           },
         ),
@@ -305,8 +330,8 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                     final formattedDate = submission.submittedAt.toShortDate();
                     final countdown = submission.submittedAt.toTimeAgo();
 
-                    return GestureDetector(
-                      onTap: () {
+                    return AnimatedPressButton(
+                      onPressed: () {
                         AppNavigator.push(
                           context,
                           DetailSubmissionPage(

@@ -28,7 +28,8 @@ class JobSeekerProfilePage extends StatefulWidget {
 }
 
 class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
-    with RouteAware {
+    with RouteAware, SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
   String bio = "+ Tambahkan biodata diri";
   final List<String> myImages = [
     AppImages.fs,
@@ -49,6 +50,13 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _entranceController.forward();
+    });
     context.read<ProfileCubit>().getAnnouncements();
   }
 
@@ -65,6 +73,7 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
 
   @override
   void dispose() {
+    _entranceController.dispose();
     routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -105,11 +114,16 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                   ),
                 ],
               ),
-              body: Center(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
+              body: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _entranceController,
+                  curve: Curves.easeOut,
+                ),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ClipRRect(
@@ -610,6 +624,7 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                     ),
                   ),
                 ),
+              ),
               ),
             ),
           );

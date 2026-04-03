@@ -116,6 +116,7 @@ class _JobseekerWrapperState extends State<JobseekerWrapper> {
     required label,
     required filledIcon,
   }) {
+    final bool isActive = context.watch<BottomNavCubit>().state == page;
     return GestureDetector(
       onTap: () {
         BlocProvider.of<BottomNavCubit>(
@@ -128,24 +129,29 @@ class _JobseekerWrapperState extends State<JobseekerWrapper> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 10),
-            SvgPicture.asset(
-              context.watch<BottomNavCubit>().state == page
-                  ? filledIcon
-                  : defaultIcon,
-              width: 30.0,
-              height: 30.0,
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: context.watch<BottomNavCubit>().state == page
-                    ? Colors.black
-                    : Colors.grey,
-                fontSize: 10,
-                fontWeight: context.watch<BottomNavCubit>().state == page
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+            AnimatedScale(
+              scale: isActive ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: SvgPicture.asset(
+                  isActive ? filledIcon : defaultIcon,
+                  key: ValueKey(isActive ? 'filled_$page' : 'default_$page'),
+                  width: 30.0,
+                  height: 30.0,
+                ),
               ),
+            ),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                color: isActive ? Colors.black : Colors.grey,
+                fontSize: 10,
+                fontFamily: 'CircularStd',
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              ),
+              child: Text(label),
             ),
           ],
         ),
