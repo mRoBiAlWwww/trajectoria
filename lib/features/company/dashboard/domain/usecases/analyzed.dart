@@ -6,8 +6,8 @@ class AnalyzedUseCase {
 
   AnalyzedUseCase({required this.repository});
   Future<Either> call(
-    String submissionId,
     String problemStatement,
+    String submissionId,
     List<String> fileUrls,
   ) async {
     return await repository.analyzeSubmission(

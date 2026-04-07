@@ -297,9 +297,11 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
       }
 
       final submissions = await query.get();
-      return submissions.docs
-          .map((e) => e.data() as Map<String, dynamic>)
-          .toList();
+      return submissions.docs.map((e) {
+        final data = e.data() as Map<String, dynamic>;
+        // Pastikan submissions_id selalu = Firestore document ID
+        return <String, dynamic>{...data, 'submissions_id': e.id};
+      }).toList();
     } catch (e) {
       throw Exception(
         "Error Gagal mengambil daftar submission dari jobseeker: $e",
@@ -523,7 +525,10 @@ Aturan:
           .where("competition_id", isEqualTo: competitionId)
           .where("is_finalist", isEqualTo: true)
           .get();
-      return finalis.docs.map((e) => e.data()).toList();
+      return finalis.docs.map((e) {
+        final data = e.data();
+        return <String, dynamic>{...data, 'submissions_id': e.id};
+      }).toList();
     } catch (e) {
       throw Exception(
         "Error gagal mendapatkan partisipan finalist kompetisi $e",
@@ -558,7 +563,10 @@ Aturan:
           .orderBy("score", descending: true)
           .get();
 
-      return submissions.docs.map((e) => e.data()).toList();
+      return submissions.docs.map((e) {
+        final data = e.data();
+        return <String, dynamic>{...data, 'submissions_id': e.id};
+      }).toList();
     } catch (e) {
       throw Exception(
         "Error gagal mendapatkan list peringkat dari submissions $e",
@@ -598,7 +606,10 @@ Aturan:
             .where("competition_id", whereIn: chunk)
             .get();
 
-        allSubs.addAll(subSnap.docs.map((e) => e.data()).toList());
+        allSubs.addAll(subSnap.docs.map((e) {
+          final data = e.data();
+          return <String, dynamic>{...data, 'submissions_id': e.id};
+        }).toList());
       }
 
       return allSubs;
@@ -617,7 +628,11 @@ Aturan:
           .doc(submissionId)
           .get();
 
-      return submissionDoc.data()!;
+      if (!submissionDoc.exists) {
+        throw Exception("Submission dengan ID '$submissionId' tidak ditemukan");
+      }
+      final data = submissionDoc.data()!;
+      return <String, dynamic>{...data, 'submissions_id': submissionDoc.id};
     } catch (e) {
       throw Exception(
         "Error gagal mendapatkan submission dengan ID yang ada $e",
