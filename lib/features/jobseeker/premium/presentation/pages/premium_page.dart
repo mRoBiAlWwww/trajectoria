@@ -55,6 +55,136 @@ class _PremiumPageState extends State<PremiumPage>
     super.dispose();
   }
 
+  void _showUpgradeSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.splashBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Trajectoria Premium",
+              style: TextStyle(
+                fontFamily: 'JetBrainsMono',
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Akses penuh ke semua fitur AI, course tanpa batas, dan analisis kompetisi.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _packageTile("Bulanan", "Rp 49.000 / bulan", "Akses penuh 30 hari"),
+            const SizedBox(height: 12),
+            _packageTile("Tahunan", "Rp 399.000 / tahun", "Hemat 32% · Akses 365 hari"),
+            const SizedBox(height: 24),
+            const Text(
+              "Fitur pembayaran sedang dalam pengembangan.\nHubungi tim kami untuk info lebih lanjut.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text(
+                  "Tutup",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _packageTile(String title, String price, String subtitle) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.thirdBackGroundButton, width: 1.5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'JetBrainsMono',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            price,
+            style: const TextStyle(
+              fontFamily: 'JetBrainsMono',
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _autoPlay() {
     Future.doWhile(() async {
       await Future.delayed(Duration(seconds: 3));
@@ -275,7 +405,7 @@ class _PremiumPageState extends State<PremiumPage>
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => _showUpgradeSheet(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -304,6 +434,7 @@ class _PremiumPageState extends State<PremiumPage>
                   ),
                   SizedBox(height: 10),
                   GestureDetector(
+                    onTap: () => _showUpgradeSheet(context),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

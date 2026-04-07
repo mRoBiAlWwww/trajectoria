@@ -86,8 +86,52 @@ class _NotificationPageState extends State<NotificationPage>
         },
         child: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, announcementState) {
+            if (announcementState is ProfileLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (announcementState is ProfileFailure) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Gagal memuat notifikasi",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () =>
+                          context.read<ProfileCubit>().getAnnouncements(),
+                      child: const Text("Coba lagi"),
+                    ),
+                  ],
+                ),
+              );
+            }
             if (announcementState is AnnouncementsLoaded) {
               final announcements = announcementState.announcements;
+              if (announcements.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Belum ada notifikasi",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
+                );
+              }
               return ListView.separated(
                 separatorBuilder: (context, index) {
                   return const SizedBox(height: 12);
@@ -99,7 +143,7 @@ class _NotificationPageState extends State<NotificationPage>
                 },
               );
             }
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           },
         ),
           ),

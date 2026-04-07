@@ -78,7 +78,49 @@ class _RiwayatKompetisiPageState extends State<RiwayatKompetisiPage>
                 if (historyState is ProfileLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                if (historyState is ProfileFailure) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Gagal memuat riwayat kompetisi",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () => context
+                              .read<ProfileCubit>()
+                              .getHistoryCompetitions(),
+                          child: const Text("Coba lagi"),
+                        ),
+                      ],
+                    ),
+                  );
+                }
                 if (historyState is HistoryCompetitionsLoaded) {
+                  if (historyState.history.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Belum ada riwayat kompetisi",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  }
                   return Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: CompetitionListView(
@@ -86,7 +128,7 @@ class _RiwayatKompetisiPageState extends State<RiwayatKompetisiPage>
                     ),
                   );
                 }
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               },
             ),
           ),

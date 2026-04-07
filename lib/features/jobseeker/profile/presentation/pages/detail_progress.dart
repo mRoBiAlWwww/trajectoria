@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:trajectoria/common/widgets/button/basic_app_buton.dart';
+import 'package:trajectoria/common/widgets/toast/toast.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
+import 'package:trajectoria/features/authentication/domain/entities/jobseeker_entity.dart';
 
 class ProgressDetailPage extends StatefulWidget {
-  final String imageUrl;
-  const ProgressDetailPage({super.key, required this.imageUrl});
+  final JobSeekerEntity jobseeker;
+  const ProgressDetailPage({super.key, required this.jobseeker});
 
   @override
   State<ProgressDetailPage> createState() => _ProgressDetailPageState();
@@ -34,8 +37,46 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
     super.dispose();
   }
 
+  String _getLeague(int score) {
+    if (score >= 1000) return 'Platinum';
+    if (score >= 500) return 'Emas';
+    if (score >= 100) return 'Perak';
+    return 'Perunggu';
+  }
+
+  void _onBagikan() {
+    final score = widget.jobseeker.coursesScore;
+    final name = widget.jobseeker.name;
+    final league = _getLeague(score);
+    final done = widget.jobseeker.competitionsDone.length;
+    final text =
+        'Cek progres belajarku di Trajectoria!\n'
+        '👤 $name\n'
+        '⭐ $score XP · 🏆 Liga $league · 🎯 $done kompetisi selesai\n'
+        '#Trajectoria #BelajarBareng';
+
+    Clipboard.setData(ClipboardData(text: text));
+    context.showSuccessToast("Teks progres berhasil disalin ke clipboard");
+  }
+
+  void _onUnduh() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Fitur unduh kartu progres segera hadir!",
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final score = widget.jobseeker.coursesScore;
+    final league = _getLeague(score);
+    final competitionsDone = widget.jobseeker.competitionsDone.length;
+
     return Scaffold(
       body: FadeTransition(
         opacity: CurvedAnimation(
@@ -58,9 +99,9 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(100),
                     child: Image.network(
-                      widget.imageUrl == ""
+                      widget.jobseeker.profileImage.isEmpty
                           ? "https://via.placeholder.com/150"
-                          : widget.imageUrl,
+                          : widget.jobseeker.profileImage,
                       fit: BoxFit.cover,
                       width: 100,
                       height: 100,
@@ -82,24 +123,24 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                       },
                     ),
                   ),
-                  SizedBox(height: 35),
+                  const SizedBox(height: 35),
                   Text(
-                    "Aku telah mempelajari tentang pemrogramman selama 100 hari berturut-turut",
+                    "${widget.jobseeker.name} sudah menyelesaikan $competitionsDone kompetisi dan mengumpulkan $score XP di Trajectoria!",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'JetBrainsMono',
                       fontWeight: FontWeight.w700,
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(height: 35),
+                  const SizedBox(height: 35),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 15,
                     ),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [
                           Colors.white,
                           Color(0xFFFBFBFB),
@@ -124,20 +165,20 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                               width: 40.0,
                               height: 40.0,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  "Streak aktif",
+                                const Text(
+                                  "Kompetisi selesai",
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 Text(
-                                  "100 hari",
-                                  style: TextStyle(
+                                  "$competitionsDone kompetisi",
+                                  style: const TextStyle(
                                     fontFamily: 'JetBrainsMono',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
@@ -163,11 +204,11 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                               width: 40.0,
                               height: 40.0,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
+                                const Text(
                                   "Total XP",
                                   style: TextStyle(
                                     fontFamily: 'Inter',
@@ -175,8 +216,8 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                                   ),
                                 ),
                                 Text(
-                                  "3200",
-                                  style: TextStyle(
+                                  "$score",
+                                  style: const TextStyle(
                                     fontFamily: 'JetBrainsMono',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
@@ -202,11 +243,11 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                               width: 40.0,
                               height: 40.0,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
+                                const Text(
                                   "Liga",
                                   style: TextStyle(
                                     fontFamily: 'Inter',
@@ -214,8 +255,8 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                                   ),
                                 ),
                                 Text(
-                                  "Emas",
-                                  style: TextStyle(
+                                  league,
+                                  style: const TextStyle(
                                     fontFamily: 'JetBrainsMono',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
@@ -228,13 +269,13 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                       ],
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   BasicAppButton(
-                    onPressed: () {},
+                    onPressed: _onBagikan,
                     backgroundColor: Colors.black,
                     borderRad: 15,
                     verticalPadding: 15,
-                    content: Text(
+                    content: const Text(
                       "Bagikan",
                       style: TextStyle(
                         fontFamily: 'Inter',
@@ -243,15 +284,15 @@ class _ProgressDetailPageState extends State<ProgressDetailPage>
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   BasicAppButton(
-                    onPressed: () {},
+                    onPressed: _onUnduh,
                     backgroundColor: Colors.white,
                     isBordered: true,
                     borderColor: Colors.black,
                     borderRad: 15,
                     verticalPadding: 15,
-                    content: Text(
+                    content: const Text(
                       "Unduh",
                       style: TextStyle(
                         fontFamily: 'Inter',

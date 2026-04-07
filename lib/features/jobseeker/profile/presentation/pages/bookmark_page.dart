@@ -101,6 +101,35 @@ class _BookmarkPageContentState extends State<_BookmarkPageContent>
               if (bookmarkState is ProfileLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
+              if (bookmarkState is ProfileFailure) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Gagal memuat bookmark",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () =>
+                            context.read<ProfileCubit>().getBookmarks(),
+                        child: const Text("Coba lagi"),
+                      ),
+                    ],
+                  ),
+                );
+              }
               if (bookmarkState is BookmarksLoaded) {
                 if (bookmarkState.bookmarks.isNotEmpty) {
                   return Padding(

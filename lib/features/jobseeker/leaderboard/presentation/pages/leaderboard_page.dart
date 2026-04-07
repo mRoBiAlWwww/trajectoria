@@ -50,6 +50,40 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       create: (context) => JobseekerLeaderboardCubit()..getJobseekerByScore(),
       child: BlocBuilder<JobseekerLeaderboardCubit, JobseekerLeaderboardState>(
         builder: (context, state) {
+          if (state is JobseekerLeaderboardLoading ||
+              state is JobseekerLeaderboardInitial) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (state is JobseekerLeaderboardFailure) {
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.grey),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Gagal memuat data leaderboard",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => context
+                          .read<JobseekerLeaderboardCubit>()
+                          .getJobseekerByScore(),
+                      child: const Text("Coba lagi"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (state is JobseekerLeaderboardLoaded) {
             return Scaffold(
               appBar: CustomAppBar(
@@ -288,7 +322,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
               ),
             );
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         },
       ),
     );

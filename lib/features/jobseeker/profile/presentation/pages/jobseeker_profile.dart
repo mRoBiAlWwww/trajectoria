@@ -109,8 +109,88 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.settings, color: Colors.black),
-                    onPressed: () {},
+                    icon: const Icon(Icons.settings, color: Colors.black),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: AppColors.splashBackground,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        builder: (ctx) => Padding(
+                          padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 40,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                "Pengaturan Akun",
+                                style: TextStyle(
+                                  fontFamily: 'JetBrainsMono',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const Icon(Icons.person_outline),
+                                title: const Text(
+                                  "Edit Profil",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () => Navigator.pop(ctx),
+                              ),
+                              const Divider(),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const Icon(Icons.notifications_outlined),
+                                title: const Text(
+                                  "Preferensi Notifikasi",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () => Navigator.pop(ctx),
+                              ),
+                              const Divider(),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const Icon(Icons.info_outline),
+                                title: const Text(
+                                  "Tentang Aplikasi",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () => Navigator.pop(ctx),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -315,9 +395,7 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                         AppNavigator.push(
                                           context,
                                           ProgressDetailPage(
-                                            imageUrl:
-                                                state.jobSeeker?.profileImage ??
-                                                "",
+                                            jobseeker: state.jobSeeker!,
                                           ),
                                         );
                                       },
@@ -342,11 +420,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                                     AppNavigator.push(
                                                       context,
                                                       ProgressDetailPage(
-                                                        imageUrl:
-                                                            state
-                                                                .jobSeeker
-                                                                ?.profileImage ??
-                                                            "",
+                                                        jobseeker:
+                                                            state.jobSeeker!,
                                                       ),
                                                     );
                                                   },
