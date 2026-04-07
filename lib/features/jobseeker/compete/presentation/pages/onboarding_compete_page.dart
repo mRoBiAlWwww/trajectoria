@@ -38,9 +38,15 @@ class _OnboardingCompetePageState extends State<OnboardingCompetePage> {
                     return Center(child: Text("Error: ${state.message}"));
                   }
                   if (state is SearchCompeteLoaded) {
-                    return Stack(
-                      children: [
-                        Column(
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOut,
+                      builder: (_, value, child) =>
+                          Opacity(opacity: value, child: child!),
+                      child: Stack(
+                        children: [
+                          Column(
                           children: [
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.3,
@@ -167,6 +173,7 @@ class _OnboardingCompetePageState extends State<OnboardingCompetePage> {
                           ),
                         ),
                       ],
+                      ),
                     );
                   }
                   return const Center(child: Text('No data available'));

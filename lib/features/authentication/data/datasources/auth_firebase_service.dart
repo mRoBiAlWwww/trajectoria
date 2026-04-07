@@ -224,30 +224,52 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
           return (companySnapshot.docs.first.data(), "Company");
         } else {
           //user baru
-          final newUserData = {
-            'user_id': currentUser.uid,
-            'email': currentUser.email?.toLowerCase() ?? googleUser.email,
-            'name': currentUser.displayName,
-            'role': role,
-            'created_at': Timestamp.now(),
-            'profileImage': currentUser.photoURL ?? '',
-            'bio': '',
-            'cv_file_path': '',
-            'skill_summary': '',
-            'experience_summary': '',
-            'status_employment': '',
-            'courses_score': 0,
-            'competitions_onprogres': <String>[],
-            'competitions_done': <String>[],
-            'finished_module': <String>[],
-            'finished_subchapter': <String>[],
-            'finished_chapter': <String>[],
-            'onprogres_chapter': '',
-            'bookmarks': <String>[],
-            'progres': [],
-          };
+          final Map<String, dynamic> newUserData;
+
+          if (role == "Company") {
+            // Buat profil perusahaan dengan field yang sesuai
+            newUserData = {
+              'user_id': currentUser.uid,
+              'email': currentUser.email?.toLowerCase() ?? googleUser.email,
+              'name': currentUser.displayName ?? '',
+              'role': 'Company',
+              'created_at': Timestamp.now(),
+              'profileImage': currentUser.photoURL ?? '',
+              'company_description': '',
+              'website_url': '',
+              'is_verified': false,
+            };
+          } else {
+            // Default: buat profil jobseeker (termasuk role Unrole atau Jobseeker)
+            newUserData = {
+              'user_id': currentUser.uid,
+              'email': currentUser.email?.toLowerCase() ?? googleUser.email,
+              'name': currentUser.displayName ?? '',
+              'role': role,
+              'created_at': Timestamp.now(),
+              'profileImage': currentUser.photoURL ?? '',
+              'bio': '',
+              'cv_file_path': '',
+              'skill_summary': '',
+              'experience_summary': '',
+              'status_employment': '',
+              'courses_score': 0,
+              'competitions_onprogres': <String>[],
+              'competitions_done': <String>[],
+              'finished_module': <String>[],
+              'finished_subchapter': <String>[],
+              'finished_chapter': <String>[],
+              'onprogres_chapter': '',
+              'bookmarks': <String>[],
+              'progres': [],
+            };
+          }
+
+          final String targetCollection =
+              (role == "Company") ? "Company" : (role == "Jobseeker") ? "Jobseeker" : "Unrole";
+
           await FirebaseFirestore.instance
-              .collection(role)
+              .collection(targetCollection)
               .doc(currentUser.uid)
               .set(newUserData);
           return (newUserData, role);

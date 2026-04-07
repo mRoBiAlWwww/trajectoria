@@ -197,14 +197,16 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage>
                                 SizedBox(height: 5),
                                 Row(
                                   children: [
-                                    Text(
-                                      widget.userListed.email,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 3,
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.disableTextButton,
+                                    Expanded(
+                                      child: Text(
+                                        widget.userListed.email,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.disableTextButton,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -812,8 +814,8 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage>
           GestureDetector(
             onTap: () {
               context.read<OrganizeCompetitionCubit>().analyzed(
-                widget.submission.submissionId,
                 widget.competition.problemStatement,
+                widget.submission.submissionId,
                 urls,
               );
             },

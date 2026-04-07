@@ -4,6 +4,7 @@ import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';
 import 'package:trajectoria/core/config/assets/app_images.dart';
 import 'package:trajectoria/core/config/assets/app_vectors.dart';
 import 'package:trajectoria/core/config/theme/app_colors.dart';
+import 'package:trajectoria/common/widgets/animation/animated_press_button.dart';
 
 class PremiumPage extends StatefulWidget {
   const PremiumPage({super.key});
@@ -390,7 +391,9 @@ class _PremiumPageState extends State<PremiumPage>
                     ),
                   ),
                   SizedBox(height: 10),
-                  Container(
+                  AnimatedPressButton(
+                    onPressed: () => _showUpgradeSheet(context),
+                    child: Container(
                     height: 40,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -431,6 +434,7 @@ class _PremiumPageState extends State<PremiumPage>
                         ],
                       ),
                     ),
+                  ),
                   ),
                   SizedBox(height: 10),
                   GestureDetector(

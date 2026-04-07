@@ -95,6 +95,11 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent>
     super.dispose();
   }
 
+  bool _isValidUrl(String url) {
+    if (url.isEmpty) return false;
+    return url.startsWith('http://') || url.startsWith('https://');
+  }
+
   Future<void> _checkInitialBookmarkStatus() async {
     final bool isBookmarked = await context
         .read<CompetitonFeatureCubit>()
@@ -158,27 +163,46 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent>
         return Stack(
           children: [
             Positioned.fill(
-              child: Image.network(
-                widget.competition.competitionImage,
-                alignment: Alignment.topCenter,
-                fit: BoxFit.contain,
-                width: screenSize.width,
-                height: screenSize.height * 0.5,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  } else {
-                    return Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          bottom: screenSize.height * 0.5,
-                        ),
-                        child: CircularProgressIndicator(color: Colors.white),
+              child: _isValidUrl(widget.competition.competitionImage)
+                  ? Image.network(
+                      widget.competition.competitionImage,
+                      alignment: Alignment.topCenter,
+                      fit: BoxFit.contain,
+                      width: screenSize.width,
+                      height: screenSize.height * 0.5,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        } else {
+                          return Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                bottom: screenSize.height * 0.5,
+                              ),
+                              child: CircularProgressIndicator(color: Colors.white),
+                            ),
+                          );
+                        }
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: AppColors.thirdBackGroundButton,
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                            size: 60,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: AppColors.thirdBackGroundButton,
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                        size: 60,
                       ),
-                    );
-                  }
-                },
-              ),
+                    ),
             ),
             Positioned(
               top: 20,
@@ -277,31 +301,50 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent>
                                             children: [
                                               Row(
                                                 children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
+                                                  _isValidUrl(widget.competition.companyProfileImage)
+                                                      ? ClipRRect(
+                                                          borderRadius: BorderRadius.circular(4),
+                                                          child: Image.network(
+                                                            widget.competition.companyProfileImage,
+                                                            width: 25,
+                                                            height: 25,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) =>
+                                                                Container(
+                                                              width: 25,
+                                                              height: 25,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade300,
+                                                                borderRadius: BorderRadius.circular(4),
+                                                              ),
+                                                              child: const Icon(Icons.business, size: 16, color: Colors.grey),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : Container(
+                                                          width: 25,
+                                                          height: 25,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.grey.shade300,
+                                                            borderRadius: BorderRadius.circular(4),
+                                                          ),
+                                                          child: const Icon(Icons.business, size: 16, color: Colors.grey),
                                                         ),
-                                                    child: Image.network(
+                                                  SizedBox(width: 5),
+                                                  Expanded(
+                                                    child: Text(
                                                       widget
                                                           .competition
-                                                          .companyProfileImage,
-                                                      width: 25,
-                                                      height: 25,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 5),
-                                                  Text(
-                                                    widget
-                                                        .competition
-                                                        .companyName,
-                                                    style: TextStyle(
-                                                      fontFamily: "Inter",
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors
-                                                          .secondaryText,
+                                                          .companyName,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontFamily: "Inter",
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors
+                                                            .secondaryText,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -532,16 +575,20 @@ class _DetailCompetitionContentState extends State<_DetailCompetitionContent>
                                                           size: 20,
                                                         ),
                                                         SizedBox(width: 10),
-                                                        Text(
-                                                          widget
-                                                              .competition
-                                                              .guidebook[index]
-                                                              .fileName,
-                                                          style: TextStyle(
-                                                            fontFamily: 'Inter',
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: Colors.red,
+                                                        Expanded(
+                                                          child: Text(
+                                                            widget
+                                                                .competition
+                                                                .guidebook[index]
+                                                                .fileName,
+                                                            maxLines: 1,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: TextStyle(
+                                                              fontFamily: 'Inter',
+                                                              fontWeight:
+                                                                  FontWeight.w400,
+                                                              color: Colors.red,
+                                                            ),
                                                           ),
                                                         ),
                                                       ],

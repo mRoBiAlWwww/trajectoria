@@ -85,8 +85,11 @@ class AuthRepositoryImpl extends AuthRepository {
 
       if (userRole == "Jobseeker") {
         return Right(JobSeekerModel.fromMap(raw).toEntity());
-      } else {
+      } else if (userRole == "Company") {
         return Right(CompanyModel.fromMap(raw).toEntity());
+      } else {
+        // Unrole atau role tidak dikenal
+        return Right(UnroleModel.fromMap(raw).toEntity());
       }
     } catch (e) {
       return Left(e.toString().replaceFirst("Exception: ", ""));

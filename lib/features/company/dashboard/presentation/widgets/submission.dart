@@ -199,6 +199,10 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
                                 final comp = competitionState.data;
                                 final users = userState.users;
                                 final submissions = submissionsState.data;
+                                // Guard: only render rows where both user and submission are available
+                                final itemCount = users.length < submissions.length
+                                    ? users.length
+                                    : submissions.length;
 
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,8 +221,11 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
                                       child: ListView.separated(
                                         separatorBuilder: (_, __) =>
                                             const SizedBox(height: 15),
-                                        itemCount: submissions.length,
+                                        itemCount: itemCount,
                                         itemBuilder: (context, index) {
+                                          if (index >= users.length || index >= submissions.length) {
+                                            return const SizedBox.shrink();
+                                          }
                                           final submission = submissions[index];
                                           final user = users[index];
 
@@ -310,43 +317,47 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
                                                     ),
                                                   ),
                                                   SizedBox(width: 5),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                          10,
-                                                        ),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          user.name,
-                                                          style:
-                                                              const TextStyle(
-                                                                fontFamily:
-                                                                    'Inter',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                              ),
-                                                        ),
-                                                        SizedBox(height: 5),
-                                                        Text(
-                                                          "$countdown • $formattedDate",
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: const TextStyle(
-                                                            fontFamily: 'Inter',
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: AppColors
-                                                                .disableTextButton,
-                                                            fontSize: 12,
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            10,
                                                           ),
-                                                        ),
-                                                      ],
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            user.name,
+                                                            maxLines: 1,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                ),
+                                                          ),
+                                                          SizedBox(height: 5),
+                                                          Text(
+                                                            "$countdown • $formattedDate",
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                            style: const TextStyle(
+                                                              fontFamily: 'Inter',
+                                                              fontWeight:
+                                                                  FontWeight.w400,
+                                                              color: AppColors
+                                                                  .disableTextButton,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ],

@@ -132,7 +132,11 @@ class _CreateCompetitionPageState extends State<CreateCompetitionPage>
                   index: page - 1,
                   children: [
                     SingleChildScrollView(child: CreateDetailWidget()),
-                    SingleChildScrollView(child: CreateRubrikWidget()),
+                    SingleChildScrollView(
+                      child: CreateRubrikWidget(
+                        onSaved: () => setState(() => page++),
+                      ),
+                    ),
                     SingleChildScrollView(child: CreateScheduleWidget()),
                   ],
                 ),

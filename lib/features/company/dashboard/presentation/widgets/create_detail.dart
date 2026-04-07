@@ -29,9 +29,12 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _problemStatementController =
       TextEditingController();
-  final TextEditingController _jenisPengumpulanController =
-      TextEditingController();
   CategoryEntity? dropdownValue;
+
+  final List<String> _allExtensions = [
+    'pdf', 'doc', 'docx', 'ppt', 'pptx', 'zip', 'xlsx', 'jpg', 'png', 'mp4',
+  ];
+  final Set<String> _selectedExtensions = {};
 
   @override
   void initState() {
@@ -39,7 +42,6 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
     _judulController.addListener(_onTextChanged);
     _descriptionController.addListener(_onTextChanged);
     _problemStatementController.addListener(_onTextChanged);
-    _jenisPengumpulanController.addListener(_onTextChanged);
   }
 
   @override
@@ -47,7 +49,6 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
     _judulController.dispose();
     _descriptionController.dispose();
     _problemStatementController.dispose();
-    _jenisPengumpulanController.dispose();
     super.dispose();
   }
 
@@ -79,7 +80,7 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
         _judulController.text.trim().isNotEmpty &&
         _descriptionController.text.trim().isNotEmpty &&
         _problemStatementController.text.trim().isNotEmpty &&
-        _jenisPengumpulanController.text.trim().isNotEmpty &&
+        _selectedExtensions.isNotEmpty &&
         filesUrl.isNotEmpty;
 
     context.read<ButtonNextCreateCubit>().updateValid(isValid);
@@ -384,44 +385,79 @@ class _CreateDetailWidgetState extends State<CreateDetailWidget> {
                               color: AppColors.secondaryText,
                             ),
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Pilih format file yang diizinkan",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: AppColors.disableTextButton,
+                            ),
+                          ),
                           SizedBox(height: 10),
-                          Container(
-                            height: 50,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  (AppColors.thirdBackGroundButton),
-                                  Color(0xFFD2D2D2),
-                                ],
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: TextField(
-                              controller: _jenisPengumpulanController,
-                              onChanged: (value) => {
-                                context
-                                    .read<CreateCompetitionCubit>()
-                                    .setSubmissionType(value),
-                              },
-                              decoration: InputDecoration(
-                                hintStyle: TextStyle(
-                                  color: AppColors.secondaryText,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w500,
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: _allExtensions.map((ext) {
+                              final bool isSelected = _selectedExtensions.contains(ext);
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      _selectedExtensions.remove(ext);
+                                    } else {
+                                      _selectedExtensions.add(ext);
+                                    }
+                                  });
+                                  context
+                                      .read<CreateCompetitionCubit>()
+                                      .setSubmissionType(
+                                        _selectedExtensions.join(', '),
+                                      );
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.black : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.black
+                                          : AppColors.thirdBackGroundButton,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isSelected)
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 4),
+                                          child: Icon(
+                                            Icons.check,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      Text(
+                                        ext.toUpperCase(),
+                                        style: TextStyle(
+                                          fontFamily: 'JetBrainsMono',
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                          color: isSelected ? Colors.white : Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 12,
-                                ),
-                              ),
-                            ),
+                              );
+                            }).toList(),
                           ),
                           SizedBox(height: 20),
                           Text(

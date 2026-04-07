@@ -14,6 +14,8 @@ class CreateScheduleWidget extends StatefulWidget {
 }
 
 class _CreateScheduleWidgetState extends State<CreateScheduleWidget> {
+  Key _rewardKey = UniqueKey();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -248,6 +250,7 @@ class _CreateScheduleWidgetState extends State<CreateScheduleWidget> {
                       children: [
                         Expanded(
                           child: EditableTextItem(
+                            key: _rewardKey,
                             isHaveBackground: true,
                             needWrapText: true,
                             text: context
@@ -268,6 +271,9 @@ class _CreateScheduleWidgetState extends State<CreateScheduleWidget> {
                             context
                                 .read<CreateCompetitionCubit>()
                                 .setRewardDescription('');
+                            setState(() {
+                              _rewardKey = UniqueKey();
+                            });
                           },
                           icon: Icon(CupertinoIcons.trash, color: Colors.red),
                         ),

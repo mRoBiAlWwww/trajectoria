@@ -20,6 +20,7 @@ import 'package:trajectoria/features/jobseeker/learn/presentation/pages/subchapt
 import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/roadmap.dart';
 import 'package:trajectoria/features/jobseeker/learn/presentation/widgets/select_course_path.dart';
 import 'package:trajectoria/main.dart';
+import 'package:trajectoria/common/widgets/animation/staggered_column.dart';
 
 class LearnPage extends StatefulWidget {
   const LearnPage({super.key});
@@ -104,7 +105,9 @@ class _LearnPageState extends State<LearnPage> with RouteAware {
                   padding: const EdgeInsets.fromLTRB(30, 60, 30, 0),
                   child: Column(
                     children: [
-                      Column(
+                      StaggeredColumn(
+                        interval: const Duration(milliseconds: 100),
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Row(
                             children: [

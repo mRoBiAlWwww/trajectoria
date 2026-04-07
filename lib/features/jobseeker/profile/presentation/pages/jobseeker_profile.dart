@@ -13,6 +13,7 @@ import 'package:trajectoria/features/authentication/presentation/cubit/auth_stat
 import 'package:trajectoria/features/authentication/presentation/cubit/user_role_cubit.dart';
 import 'package:trajectoria/features/authentication/presentation/pages/signin_or_signup_page.dart';
 import 'package:trajectoria/common/widgets/textfield/editable_teks.dart';
+import 'package:trajectoria/common/widgets/animation/animated_press_button.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/cubit/profile_cubit.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/pages/bookmark_page.dart';
 import 'package:trajectoria/features/jobseeker/profile/presentation/pages/detail_progress.dart';
@@ -291,8 +292,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                 ),
                                 child: Column(
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {
+                                    AnimatedPressButton(
+                                      onPressed: () {
                                         AppNavigator.push(
                                           context,
                                           BlocProvider.value(
@@ -390,8 +391,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                         height: 16,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
+                                    AnimatedPressButton(
+                                      onPressed: () {
                                         AppNavigator.push(
                                           context,
                                           ProgressDetailPage(
@@ -456,8 +457,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                         height: 16,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
+                                    AnimatedPressButton(
+                                      onPressed: () {
                                         AppNavigator.push(
                                           context,
                                           BookmarkPage(),
@@ -517,8 +518,8 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                                         height: 16,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
+                                    AnimatedPressButton(
+                                      onPressed: () {
                                         AppNavigator.push(
                                           context,
                                           RiwayatKompetisiPage(),
@@ -674,23 +675,26 @@ class _JobSeekerProfilePageState extends State<JobSeekerProfilePage>
                           ],
                         ),
                         SizedBox(height: 25),
-                        BasicAppButton(
-                          borderRad: 15,
-                          onPressed: () async {
-                            context.read<AuthStateCubit>().reset();
-                            context.read<RoleCubit>().clearRole();
-                            context.read<AuthStateCubit>().signoutJobseeker();
-                            context.read<BottomNavCubit>().reset();
-                            await NotificationService.instance.hardLogout();
-                          },
-                          backgroundColor: AppColors.doveRedColor,
-                          verticalPadding: 10,
-                          content: Text(
-                            "Keluar",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontFamily: "Inter",
-                              fontWeight: FontWeight.w700,
+                        AnimatedPressButton(
+                          onPressed: () {},
+                          child: BasicAppButton(
+                            borderRad: 15,
+                            onPressed: () async {
+                              context.read<AuthStateCubit>().reset();
+                              context.read<RoleCubit>().clearRole();
+                              context.read<AuthStateCubit>().signoutJobseeker();
+                              context.read<BottomNavCubit>().reset();
+                              await NotificationService.instance.hardLogout();
+                            },
+                            backgroundColor: AppColors.doveRedColor,
+                            verticalPadding: 10,
+                            content: Text(
+                              "Keluar",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontFamily: "Inter",
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
