@@ -328,16 +328,25 @@ class CompetitionOrganizerServiceImpl extends CompetitionOrganizerService {
     String improvementSuggestion = '';
     String careerMatchRecommendation = '';
 
+    if (fileUrls.isEmpty) {
+      throw Exception("Tidak ada file untuk dianalisis");
+    }
+
     try {
       for (final fileUrl in fileUrls) {
         final response = await http.get(Uri.parse(fileUrl));
         if (response.statusCode != 200) {
-          throw Exception("Gagal download file: $fileUrl");
+          throw Exception("Gagal download file (${response.statusCode}): $fileUrl");
         }
         final Uint8List fileBytes = response.bodyBytes;
-        final mimeType = fileUrl.endsWith(".pdf")
+        // Firebase Storage URLs contain ?alt=media&token=... so we must decode
+        // the path portion to find the actual file extension.
+        final decodedPath = Uri.decodeFull(Uri.parse(fileUrl).path).toLowerCase();
+        final mimeType = decodedPath.endsWith('.pdf')
             ? "application/pdf"
-            : "image/jpeg";
+            : decodedPath.endsWith('.png')
+                ? "image/png"
+                : "image/jpeg";
 
         final prompt = """
 Analisa file submission kompetisi ini berdasarkan problem statement berikut:
@@ -394,9 +403,17 @@ Aturan:
         careerMatchRecommendation: careerMatchRecommendation,
       );
 
-      await firestoreInstance.collection("Submissions").doc(submissionId).set({
-        "ai_analyzed": finalModel.toMap(),
-      }, SetOptions(merge: true));
+      // Save to Firestore is non-fatal: UI still gets the result even if save fails
+      if (submissionId.isNotEmpty) {
+        try {
+          await firestoreInstance
+              .collection("Submissions")
+              .doc(submissionId)
+              .set({"ai_analyzed": finalModel.toMap()}, SetOptions(merge: true));
+        } catch (_) {
+          // Ignore save error — analysis result is still returned to UI
+        }
+      }
 
       return finalModel.toEntity();
     } catch (e) {

@@ -542,6 +542,12 @@ class _DetailSubmissionPageState extends State<DetailSubmissionPage>
                                             } else {
                                               GlobalLoadingAi.hide();
                                             }
+                                            if (state
+                                                is OrganizeCompetitionFailure) {
+                                              context.showErrorToast(
+                                                state.message,
+                                              );
+                                            }
                                           },
                                           builder: (context, state) {
                                             //kondisi setelah klik analisis

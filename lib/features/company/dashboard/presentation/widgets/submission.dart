@@ -137,11 +137,12 @@ class _SubmissionWidgetState extends State<SubmissionWidget> with RouteAware {
               listener: (context, submissionsState) {
                 if (submissionsState is JobseekerSubmissionsCompetitionLoaded &&
                     submissionsState.data.isNotEmpty) {
-                  final submissionIds = submissionsState.data
-                      .map((e) => e.submissionId)
+                  final userIds = submissionsState.data
+                      .map((e) => e.userId)
+                      .where((uid) => uid.isNotEmpty)
                       .toList();
 
-                  context.read<GetUserCompeCubit>().loadAllUsers(submissionIds);
+                  context.read<GetUserCompeCubit>().loadAllUsers(userIds);
                 }
               },
               builder: (context, submissionsState) {

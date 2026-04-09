@@ -293,11 +293,12 @@ class _DashboardPageState extends State<DashboardPage>
             );
           }
 
-          final submissionIds = submissionState.data
-              .map((e) => e.submissionId)
+          final userIds = submissionState.data
+              .map((e) => e.userId)
+              .where((uid) => uid.isNotEmpty)
               .toList();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<GetUserCompeCubit>().loadAllUsers(submissionIds);
+            context.read<GetUserCompeCubit>().loadAllUsers(userIds);
           });
 
           return BlocBuilder<GetUserCompeCubit, GetUserCompeState>(

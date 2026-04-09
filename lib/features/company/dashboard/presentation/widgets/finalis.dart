@@ -26,10 +26,11 @@ class FinalisWidget extends StatelessWidget {
         builder: (context, finalisState) {
           if (finalisState is UserFinalisLoaded) {
             if (finalisState.finalis.isNotEmpty) {
-              final submissionIds = finalisState.finalis
-                  .map((e) => e.submissionId)
+              final userIds = finalisState.finalis
+                  .map((e) => e.userId)
+                  .where((uid) => uid.isNotEmpty)
                   .toList();
-              context.read<GetUserCompeCubit>().loadAllUsers(submissionIds);
+              context.read<GetUserCompeCubit>().loadAllUsers(userIds);
 
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),

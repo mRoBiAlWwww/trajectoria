@@ -91,89 +91,99 @@ class _GifSlideshowState extends State<GifSlideshow> {
           );
         }
       },
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Transform.translate(
-              offset: const Offset(0, 30),
-              child: Image.asset(
-                AppImages.dot,
-                color: Colors.white,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final h = constraints.maxHeight;
+          final circleSize = (h * 0.56).clamp(180.0, 250.0);
+          final gap1 = (h * 0.04).clamp(8.0, 36.0);
+          final gap2 = (h * 0.02).clamp(5.0, 14.0);
+
+          return Stack(
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: Text(
-                  widget.subTitle[_currentIndex],
-                  key: ValueKey('text_$_currentIndex'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 17,
+              Positioned.fill(
+                child: Transform.translate(
+                  offset: const Offset(0, 30),
+                  child: Image.asset(
+                    AppImages.dot,
                     color: Colors.white,
-                    fontFamily: 'Averia',
-                    fontWeight: FontWeight.w300,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const SizedBox(height: 50),
-              Container(
-                key: ValueKey('gif_$_currentIndex'),
-                width: 250,
-                height: 250,
-                padding: widget.paddings[_currentIndex],
-                decoration: const BoxDecoration(
-                  color: AppColors.secondaryBackgroundButton,
-                  shape: BoxShape.circle,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: Center(
-                    child: Image.asset(widget.gifPaths[_currentIndex]),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: SvgPicture.asset(
-                  key: ValueKey('line_$_currentIndex'),
-                  widget.linePaths[_currentIndex],
-                  width: 40.0,
-                  height: 40.0,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Dot indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(widget.gifPaths.length, (i) {
-                  final isActive = i == _currentIndex;
-                  return GestureDetector(
-                    onTap: () => _goToIndex(i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: isActive ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: isActive
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.35),
+              Positioned.fill(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      child: Text(
+                        widget.subTitle[_currentIndex],
+                        key: ValueKey('text_$_currentIndex'),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          color: Colors.white,
+                          fontFamily: 'Averia',
+                          fontWeight: FontWeight.w300,
+                        ),
                       ),
                     ),
-                  );
-                }),
+                    SizedBox(height: gap1),
+                    Container(
+                      key: ValueKey('gif_$_currentIndex'),
+                      width: circleSize,
+                      height: circleSize,
+                      padding: widget.paddings[_currentIndex],
+                      decoration: const BoxDecoration(
+                        color: AppColors.secondaryBackgroundButton,
+                        shape: BoxShape.circle,
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        child: Center(
+                          child: Image.asset(widget.gifPaths[_currentIndex]),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: gap2),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      child: SvgPicture.asset(
+                        key: ValueKey('line_$_currentIndex'),
+                        widget.linePaths[_currentIndex],
+                        width: 36.0,
+                        height: 36.0,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(widget.gifPaths.length, (i) {
+                        final isActive = i == _currentIndex;
+                        return GestureDetector(
+                          onTap: () => _goToIndex(i),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: isActive ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: isActive
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.35),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

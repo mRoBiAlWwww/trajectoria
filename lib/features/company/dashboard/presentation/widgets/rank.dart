@@ -27,11 +27,12 @@ class RankWidget extends StatelessWidget {
         builder: (context, incrementState) {
           if (incrementState is JobseekerSubmissionsCompetitionLoaded) {
             if (incrementState.data.isNotEmpty) {
-              final submissionIds = incrementState.data
-                  .map((e) => e.submissionId)
+              final userIds = incrementState.data
+                  .map((e) => e.userId)
+                  .where((uid) => uid.isNotEmpty)
                   .toList();
 
-              context.read<GetUserCompeCubit>().loadAllUsers(submissionIds);
+              context.read<GetUserCompeCubit>().loadAllUsers(userIds);
 
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
