@@ -1,4 +1,4 @@
-import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/insight_ai.dart';
 
 class InsightAIEntity {
   final List<String> commonPattern;
@@ -16,12 +16,12 @@ class InsightAIEntity {
     );
   }
 
-  /// 🔹 Convert ke Map (misal untuk Firestore / JSON)
+  /// Convert ke Map (misal untuk Firestore / JSON)
   Map<String, dynamic> toMap() {
     return {'common_pattern': commonPattern, 'summary': summary};
   }
 
-  /// 🔹 Convert dari Map (misal hasil dari Firestore / API)
+  /// Convert dari Map (misal hasil dari Firestore / API)
   factory InsightAIEntity.fromMap(Map<String, dynamic> map) {
     return InsightAIEntity(
       commonPattern: map['common_pattern'] != null

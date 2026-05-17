@@ -177,8 +177,15 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
   @override
   Future<(Map<String, dynamic>, String)> signInWithGoogle(String role) async {
     try {
-      //initialisasi
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      //initialisasi dengan proper configuration untuk Android
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId:
+            '631660559852-0a1sif8rrh0ridaju7i8pocr50uk8qdq.apps.googleusercontent.com',
+        scopes: [
+          'email',
+          'profile',
+        ],
+      );
       final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
       final FirebaseAuth authInstance = FirebaseAuth.instance;
 
@@ -269,10 +276,31 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         return (<String, dynamic>{}, "Unauthenticated");
       }
 
-      debugPrint(currentUser.uid);
+      debugPrint("Getting current user: ${currentUser.uid}");
+
+      // Set timeout 10 detik untuk mencegah hang
+      final result = await Future.any([
+        _fetchUserFromCollections(firestoreInstance, currentUser.uid),
+        Future.delayed(
+          const Duration(seconds: 10),
+          () => throw Exception(
+              "Timeout: Firestore query timeout setelah 10 detik"),
+        ),
+      ]);
+
+      return result;
+    } catch (e) {
+      debugPrint("Error getCurrentUser: $e");
+      throw Exception("Error kesalahan saat mengambil data pengguna $e");
+    }
+  }
+
+  Future<(Map<String, dynamic>, String)> _fetchUserFromCollections(
+      FirebaseFirestore firestoreInstance, String uid) async {
+    try {
       final jobseekerUserDoc = await firestoreInstance
           .collection("Jobseeker")
-          .doc(currentUser.uid)
+          .doc(uid)
           .get();
 
       if (jobseekerUserDoc.exists) {
@@ -281,7 +309,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       final companyUserDoc = await firestoreInstance
           .collection("Company")
-          .doc(currentUser.uid)
+          .doc(uid)
           .get();
 
       if (companyUserDoc.exists) {
@@ -290,7 +318,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       final unroleUserDoc = await firestoreInstance
           .collection("Unrole")
-          .doc(currentUser.uid)
+          .doc(uid)
           .get();
 
       if (unroleUserDoc.exists) {
@@ -298,14 +326,21 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       }
       throw Exception("Data pengguna tidak ditemukan");
     } catch (e) {
-      throw Exception("Error kesalahan saat mengambil data pengguna $e");
+      rethrow;
     }
   }
 
   @override
   Future<String> signOut() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId:
+          '631660559852-0a1sif8rrh0ridaju7i8pocr50uk8qdq.apps.googleusercontent.com',
+      scopes: [
+        'email',
+        'profile',
+      ],
+    );
     try {
       await googleSignIn.signOut();
       await auth.signOut();
@@ -326,13 +361,31 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
     }
 
     try {
-      await firestoreInstance
+      // Cek collection mana (Jobseeker atau Company) untuk user ini
+      final jobseekerDoc = await firestoreInstance
           .collection("Jobseeker")
           .doc(currentUser.uid)
-          .update({
+          .get();
+
+      String collectionName = "Jobseeker";
+      if (!jobseekerDoc.exists) {
+        final companyDoc = await firestoreInstance
+            .collection("Company")
+            .doc(currentUser.uid)
+            .get();
+        if (companyDoc.exists) {
+          collectionName = "Company";
+        }
+      }
+
+      // Gunakan set dengan merge: true agar tidak error jika document belum ada
+      await firestoreInstance
+          .collection(collectionName)
+          .doc(currentUser.uid)
+          .set({
             'token_notification': tokenId,
             'lastTokenUpdate': FieldValue.serverTimestamp(),
-          });
+          }, SetOptions(merge: true));
 
       return "Token notifikasi telah berhasil ditambahkan";
     } catch (e) {
@@ -345,18 +398,40 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
     final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
     var currentUser = FirebaseAuth.instance.currentUser;
 
+    if (currentUser == null) {
+      throw Exception("User belum login/registrasi, tidak bisa hapus token.");
+    }
+
     try {
-      await firestoreInstance
+      // Cek collection mana (Jobseeker atau Company) untuk user ini
+      final jobseekerDoc = await firestoreInstance
           .collection("Jobseeker")
-          .doc(currentUser!.uid)
-          .update({
+          .doc(currentUser.uid)
+          .get();
+
+      String collectionName = "Jobseeker";
+      if (!jobseekerDoc.exists) {
+        final companyDoc = await firestoreInstance
+            .collection("Company")
+            .doc(currentUser.uid)
+            .get();
+        if (companyDoc.exists) {
+          collectionName = "Company";
+        }
+      }
+
+      // Gunakan set dengan merge: true untuk aman kalau document ada
+      await firestoreInstance
+          .collection(collectionName)
+          .doc(currentUser.uid)
+          .set({
             'token_notification': "",
             'lastTokenUpdate': FieldValue.serverTimestamp(),
-          });
+          }, SetOptions(merge: true));
 
       return "Token notifikasi telah berhasil dihapus dari daftar";
     } catch (e) {
-      throw Exception("Error modul gagal dihapus $e");
+      throw Exception("Error token gagal dihapus $e");
     }
   }
 

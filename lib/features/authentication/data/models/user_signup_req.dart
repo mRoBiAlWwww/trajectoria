@@ -112,7 +112,7 @@ extension UserSignupReqX on UserSignupReq {
       userId: '',
       email: email,
       name: fullName.isNotEmpty ? fullName : '',
-      role: 'Jobseeker',
+      role: 'Company',
       createdAt: Timestamp.now(),
       profileImage: imageUrl ?? '',
       companyDescription: '',

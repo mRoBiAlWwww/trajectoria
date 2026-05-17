@@ -107,6 +107,7 @@ Future<void> sendDirectNotification(
 
     if (response.statusCode == 200) {
       debugPrint("Sukses kirim notif: ${response.body}");
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Notifikasi Terkirim ke User A!")),
       );
@@ -116,6 +117,7 @@ Future<void> sendDirectNotification(
     }
   } catch (e) {
     debugPrint("Error: $e");
+    if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text("Gagal: $e")));

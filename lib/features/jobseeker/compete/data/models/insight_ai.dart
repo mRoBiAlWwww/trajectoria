@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:trajectoria/features/jobseeker/compete/domain/entities/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/insight_ai.dart';
 
 class InsightAIModel {
   final List<String> commonPattern;

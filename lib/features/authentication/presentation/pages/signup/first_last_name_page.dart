@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
@@ -69,7 +68,7 @@ class _FirstLastNamePageState extends State<FirstLastNamePage> {
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(4.0),
+                        topLeft: Radius.circular(5.0),
                         bottomLeft: Radius.circular(4.0),
                       ),
                     ),

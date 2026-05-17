@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/file_items.dart';
-import 'package:trajectoria/features/jobseeker/compete/domain/entities/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/insight_ai.dart';
 
 class SubmissionEntity {
   final String submissionId;

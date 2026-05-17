@@ -7,7 +7,7 @@ import 'package:trajectoria/features/authentication/domain/entities/user.dart';
 
 class UserModelFactory {
   static UserModel fromMap(Map<String, dynamic> map) {
-    final role = map['role'];
+    final role = map['role']?.toString().toLowerCase();
     if (role == 'company') {
       return CompanyModel.fromMap(map);
     } else {
@@ -16,7 +16,7 @@ class UserModelFactory {
   }
 
   static UserModel fromEntity(UserEntity entity) {
-    if (entity.role == 'company') {
+    if (entity.role.toLowerCase() == 'company') {
       return CompanyModel.fromEntity(entity as CompanyEntity);
     } else {
       return JobSeekerModel.fromEntity(entity as JobSeekerEntity);

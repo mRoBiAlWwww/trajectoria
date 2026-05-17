@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:trajectoria/common/helper/parser/capitalize.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/file_items.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/competition_participants.dart';
-import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/insight_ai.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission_req.dart';
 import 'package:trajectoria/core/dependency_injection/service_locator.dart';

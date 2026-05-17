@@ -73,6 +73,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
   build_runner:
   envied_generator:
 

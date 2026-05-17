@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/file_items.dart';
-import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/insight_ai.dart';
 import 'package:trajectoria/features/jobseeker/compete/domain/entities/submission.dart';
 
 class SubmissionModel {

@@ -1,0 +1,59 @@
+name: Build Flutter Android
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create google-services.json for dev
+        run: |
+          mkdir -p android/app/src/dev
+          echo '${{ secrets.GOOGLE_SERVICES_JSON_DEV }}' > android/app/src/dev/google-services.json
+
+      - name: Create google-services.json for prod
+        run: |
+          mkdir -p android/app/src/prod
+          echo '${{ secrets.GOOGLE_SERVICES_JSON_PROD }}' > android/app/src/prod/google-services.json
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK dev
+        run: flutter build apk --flavor dev --release
+
+      - name: Build APK prod
+        run: flutter build apk --flavor prod --release
+
+      - name: Build AAB prod
+        run: flutter build appbundle --flavor prod --release
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/**/*.aab

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trajectoria/common/helper/navigator/app_navigator.dart';
 import 'package:trajectoria/common/widgets/appbar/custom_appbar.dart';

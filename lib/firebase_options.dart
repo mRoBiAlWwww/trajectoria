@@ -41,46 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAZqugphyA9bt5Bmko1Ou9f4GYczI02uFM',
-    appId: '1:991376195963:web:cf22d90c0f72fe4af57dde',
-    messagingSenderId: '991376195963',
-    projectId: 'trajectoria-9023f',
-    authDomain: 'trajectoria-9023f.firebaseapp.com',
-    storageBucket: 'trajectoria-9023f.firebasestorage.app',
+    apiKey: 'AIzaSyBIM5dzsGkvGYygLK6rgIPlqioQzfX0r6Y',
+    appId: '1:631660559852:web:80aa7a252908273dbbd4c9',
+    messagingSenderId: '631660559852',
+    projectId: 'gdgoc-4e5a5',
+    authDomain: 'gdgoc-4e5a5.firebaseapp.com',
+    storageBucket: 'gdgoc-4e5a5.firebasestorage.app',
+    measurementId: 'G-2TNMLDYH1D',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDRFa4uYyaJx3JVO7ERSp-in7TnrRpbLSw',
-    appId: '1:991376195963:android:ecfca9de7623022df57dde',
-    messagingSenderId: '991376195963',
-    projectId: 'trajectoria-9023f',
-    storageBucket: 'trajectoria-9023f.firebasestorage.app',
+    apiKey: 'AIzaSyDskzrnERcUawr8oASmnlS2cDDj5lglGt4',
+    appId: '1:631660559852:android:54c2990a6d672ba2bbd4c9',
+    messagingSenderId: '631660559852',
+    projectId: 'gdgoc-4e5a5',
+    storageBucket: 'gdgoc-4e5a5.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAbpwuHmASJFaoNg-D1moGXR5zWdmPaUIE',
-    appId: '1:991376195963:ios:c938895691e42dcbf57dde',
-    messagingSenderId: '991376195963',
-    projectId: 'trajectoria-9023f',
-    storageBucket: 'trajectoria-9023f.firebasestorage.app',
+    apiKey: 'AIzaSyD_unOsYxlS9PQnwi71_bw3f07ei3z0xsg',
+    appId: '1:631660559852:ios:f6a986c91bbdf93dbbd4c9',
+    messagingSenderId: '631660559852',
+    projectId: 'gdgoc-4e5a5',
+    storageBucket: 'gdgoc-4e5a5.firebasestorage.app',
+    iosClientId: '631660559852-8hdsaej60uha08dipm6nc6p5sc96po3q.apps.googleusercontent.com',
     iosBundleId: 'com.example.trajectoria',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAbpwuHmASJFaoNg-D1moGXR5zWdmPaUIE',
-    appId: '1:991376195963:ios:c938895691e42dcbf57dde',
-    messagingSenderId: '991376195963',
-    projectId: 'trajectoria-9023f',
-    storageBucket: 'trajectoria-9023f.firebasestorage.app',
+    apiKey: 'AIzaSyD_unOsYxlS9PQnwi71_bw3f07ei3z0xsg',
+    appId: '1:631660559852:ios:f6a986c91bbdf93dbbd4c9',
+    messagingSenderId: '631660559852',
+    projectId: 'gdgoc-4e5a5',
+    storageBucket: 'gdgoc-4e5a5.firebasestorage.app',
+    iosClientId: '631660559852-8hdsaej60uha08dipm6nc6p5sc96po3q.apps.googleusercontent.com',
     iosBundleId: 'com.example.trajectoria',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAZqugphyA9bt5Bmko1Ou9f4GYczI02uFM',
-    appId: '1:991376195963:web:2e695d18c081e2f2f57dde',
-    messagingSenderId: '991376195963',
-    projectId: 'trajectoria-9023f',
-    authDomain: 'trajectoria-9023f.firebaseapp.com',
-    storageBucket: 'trajectoria-9023f.firebasestorage.app',
+    apiKey: 'AIzaSyBIM5dzsGkvGYygLK6rgIPlqioQzfX0r6Y',
+    appId: '1:631660559852:web:77359f20a61567acbbd4c9',
+    messagingSenderId: '631660559852',
+    projectId: 'gdgoc-4e5a5',
+    authDomain: 'gdgoc-4e5a5.firebaseapp.com',
+    storageBucket: 'gdgoc-4e5a5.firebasestorage.app',
+    measurementId: 'G-DX2F754VEX',
   );
+
 }

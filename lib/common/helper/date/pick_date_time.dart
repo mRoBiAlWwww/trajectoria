@@ -10,6 +10,8 @@ Future<Timestamp?> pickDateTime(BuildContext context) async {
     initialDate: DateTime.now(),
   );
 
+  if (!context.mounted) return null;
+
   if (pickedDate == null) return null;
 
   // Pilih jam

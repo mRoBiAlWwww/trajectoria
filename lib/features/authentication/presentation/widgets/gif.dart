@@ -32,7 +32,7 @@ class GifSlideshow extends StatefulWidget {
   GifSlideshow({super.key});
 
   @override
-  _GifSlideshowState createState() => _GifSlideshowState();
+  State<GifSlideshow> createState() => _GifSlideshowState();
 }
 
 class _GifSlideshowState extends State<GifSlideshow> {

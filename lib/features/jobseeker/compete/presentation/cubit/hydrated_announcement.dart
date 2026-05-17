@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,7 +14,9 @@ class HydratedAnnouncement extends HydratedCubit<List<String>> {
           prefs.getStringList('pending_announcements') ?? [];
 
       if (pendingList.isNotEmpty) {
-        print("📥 SYNC: Menemukan ${pendingList.length} data dari background.");
+        debugPrint(
+          "📥 SYNC: Menemukan ${pendingList.length} data dari background.",
+        );
 
         final Set<String> uniqueIds = Set.from(state)..addAll(pendingList);
         emit(uniqueIds.toList());

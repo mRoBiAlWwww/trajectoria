@@ -9,9 +9,9 @@ import 'package:trajectoria/common/helper/parser/parse_sumary.dart';
 import 'package:trajectoria/core/config/env/env.dart';
 import 'package:trajectoria/features/company/dashboard/data/models/announcement.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/competitions.dart';
-import 'package:trajectoria/features/jobseeker/compete/data/models/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/data/models/insight_ai.dart';
 import 'package:trajectoria/features/jobseeker/compete/data/models/submission.dart';
-import 'package:trajectoria/features/jobseeker/compete/domain/entities/insightAI.dart';
+import 'package:trajectoria/features/jobseeker/compete/domain/entities/insight_ai.dart';
 
 abstract class CompetitionOrganizerService {
   Future<String> createCompetition(CompetitionModel newCompetition);

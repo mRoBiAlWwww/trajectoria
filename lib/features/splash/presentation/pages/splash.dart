@@ -39,6 +39,10 @@ class _SplashPageState extends State<SplashPage> {
         if (state is AuthSuccess) {
           AppNavigator.pushReplacement(context, MainWrapper());
         }
+        if (state is AuthFailure) {
+          // Fallback ke welcome supaya tidak stuck di splash
+          AppNavigator.pushReplacement(context, WelcomeAnimationPage());
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.splashBackground,

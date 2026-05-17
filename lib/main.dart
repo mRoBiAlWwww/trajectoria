@@ -29,12 +29,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory(
-            (await getApplicationDocumentsDirectory()).path,
-          ),
+        ? HydratedStorage.webStorageDirectory
+        : await getApplicationDocumentsDirectory(),
   );
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else if (defaultTargetPlatform == TargetPlatform.android) {
+    // Android uses flavor-specific google-services.json
+    await Firebase.initializeApp();
+  } else {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   NotificationService.instance.initialize();
   await initializeDependencies();
   await initializeDateFormatting('id', null);
